@@ -1,6 +1,3 @@
-from import_common import *
-
-
 class BsmNdrop:
     def __init__(self, data, drop_count):
         if(drop_count < 1):

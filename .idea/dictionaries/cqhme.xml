@@ -5,8 +5,16 @@
       <w>datalen</w>
       <w>drdata</w>
       <w>dropcount</w>
+      <w>entrustment</w>
+      <w>exchangelist</w>
       <w>isbuy</w>
+      <w>mavailable</w>
+      <w>mdrawable</w>
+      <w>mfree</w>
+      <w>mfrozen</w>
+      <w>mtotal</w>
       <w>ndrop</w>
+      <w>sqlite</w>
       <w>subdata</w>
     </words>
   </dictionary>

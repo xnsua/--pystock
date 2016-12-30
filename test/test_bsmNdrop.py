@@ -1,6 +1,8 @@
 from unittest import TestCase
-from bsm_ndrop import *
+
 from nose.tools import *
+
+from trade.bsm_ndrop import *
 
 
 class TestBsmNdrop(TestCase):

@@ -1,6 +1,12 @@
 import pandas as pd
 
 
+def read_sci_rgl():
+    sci_short = read_sci_short()
+    sci_rgl = sci_short / 100
+    return sci_rgl
+
+
 def read_sci_short():
     sci_all = read_sci()
     sci_short = pd.DataFrame({
@@ -8,9 +14,9 @@ def read_sci_short():
         'close': sci_all['Close'],
         'high': sci_all['High'],
         'low': sci_all['Low'], },
-       )
-    # Fatal : Can not write this line as parameter 'index=sci_all'Date'' in above line
-    sci_short.set_index(sci_all['Date'])
+    )
+    # Warning : Can not write this line as parameter 'index=sci_all'Date'' in above line
+    sci_short = sci_short.set_index(sci_all['Date'])
     return sci_short;
 
 

@@ -1,2 +1,0 @@
-class ParamCheckException(Exception):
-    pass

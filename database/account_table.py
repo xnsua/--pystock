@@ -1,4 +1,5 @@
 from sqlalchemy import Column
+from sqlalchemy import DateTime
 from sqlalchemy import Float
 from sqlalchemy import Table
 
@@ -8,6 +9,10 @@ from include.basic_structure import Account
 
 class AccountTable:
     # region   Readonly property
+    @property
+    def datetime(self):
+        return 'datetime'
+
     @property
     def account(self):
         return 'account'
@@ -46,27 +51,30 @@ class AccountTable:
 
     @property
     def table(self):
-        return self.__table__
+        return self.__table
 
     # endregion
 
     def __init__(self, db: Database):
-        self.__db__ = db
-        self.__engine__ = db.engine
-        self.__table__ = Table(self.account, db.meta,
-                               Column(self.account, Float),
-                               Column(self.initiate, Float),
-                               Column(self.free, Float),
-                               Column(self.frozen, Float),
-                               Column(self.drawable, Float),
-                               Column(self.total, Float),
-                               Column(self.profit, Float),
-                               Column(self.deposit, Float),
-                               Column(self.withdraw, Float))
+        self.__db = db
+        self.__engine = db.engine
+        self.__table = Table(self.account, db.meta,
+                             Column(self.datetime, DateTime),
+                             Column(self.account, Float),
+                             Column(self.initiate, Float),
+                             Column(self.free, Float),
+                             Column(self.frozen, Float),
+                             Column(self.drawable, Float),
+                             Column(self.total, Float),
+                             Column(self.profit, Float),
+                             Column(self.deposit, Float),
+                             Column(self.withdraw, Float))
+
     def save_account(self, account: Account):
         ins = self.table.insert()
-        self.__engine__.execute(ins, [
+        self.__engine.execute(ins, [
             {
+                self.datetime: account.datetime,
                 self.total: account.total,
                 self.free: account.free,
                 self.frozen: account.frozen,
@@ -77,8 +85,8 @@ class AccountTable:
         ])
 
     def read_account(self) -> Account:
-        sel = self.__table__.select()
-        res = self.__engine__.execute(sel)
+        sel = self.__table.select()
+        res = self.__engine.execute(sel)
         row = res.fetchone()
         account = Account()
 
@@ -88,5 +96,6 @@ class AccountTable:
         account.drawable = row[self.drawable]
         account.deposit = row[self.deposit]
         account.withdraw = row[self.withdraw]
+        account.datetime = row[self.datetime]
 
         return account

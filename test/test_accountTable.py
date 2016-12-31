@@ -1,19 +1,20 @@
+import datetime
 import os
 from unittest import TestCase
 
 from database.table_manager import TableManager
+from database.test_config import test_db_path
 from include.basic_structure import Account
 
 
 class TestAccountTable(TestCase):
-    dbfilename = 'test.db'
 
     def setUp(self):
         pass
 
     def tearDown(self):
         try:
-            os.remove(self.dbfilename)
+            os.remove(test_db_path)
         except OSError:
             pass
 
@@ -25,10 +26,11 @@ class TestAccountTable(TestCase):
         account.frozen = 2.0
         account.withdraw = 2.0
         account.deposit = 1.0
+        account.datetime = datetime.datetime.fromtimestamp(100)
         return account
 
     def test_read_save_account(self):
-        tm = TableManager()
+        tm = TableManager(test_db_path)
         account_table = tm.account_table
         account1 = self.get_account1()
         account_table.save_account(account1)

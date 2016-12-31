@@ -1,11 +1,11 @@
-from datetime import *
-import sqlalchemy as sal
-from sqlalchemy.engine.base import Engine
-import sqlite3
+import datetime as dt
+
 from utilities.equality_base import EqualityBase
+
 
 class Account(EqualityBase):
     def __init__(self):
+        self.datetime = dt.datetime.fromtimestamp(0)
         self.total = {}
         self.free = 0
         self.frozen = 0
@@ -14,17 +14,29 @@ class Account(EqualityBase):
         self.deposit = 0
         self.withdraw = 0
 
+    def __hash__(self):
+        return hash((self.datetime,
+                     self.total,
+                     self.free,
+                     self.frozen,
+                     self.drawable,
+                     self.deposit,
+                     self.withdraw))
+
 
 class Stock(EqualityBase):
     def __init__(self):
         self.name = None
         self.code = None
         self.amount = 0
-        self.buy_time = datetime.fromtimestamp(0)
+        self.buy_time = dt.datetime.fromtimestamp(0)
 
     def __str__(self):
         return 'Name: {}, Code: {}, Amount: {}, T : {}' \
             .format(self.name, self.code, self.amount, self.buy_time.date())
+
+    def __hash__(self):
+        return hash((self.name, self.code, self.amount, self.buy_time))
 
 
 class Entrustment(EqualityBase):

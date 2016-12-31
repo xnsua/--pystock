@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Float
@@ -84,12 +86,8 @@ class AccountTable:
             }
         ])
 
-    def read_account(self) -> Account:
-        sel = self.__table.select()
-        res = self.__engine.execute(sel)
-        row = res.fetchone()
+    def row_to_account(self, row) -> Account:
         account = Account()
-
         account.total = row[self.total]
         account.free = row[self.free]
         account.frozen = row[self.frozen]
@@ -97,5 +95,19 @@ class AccountTable:
         account.deposit = row[self.deposit]
         account.withdraw = row[self.withdraw]
         account.datetime = row[self.datetime]
-
         return account
+
+    def read_all(self) -> List[Account]:
+        sel = self.__table.select()
+        res = self.__engine.execute(sel)
+        rows = res.fetchall()
+        accounts = list()
+        for row in rows:
+            account = self.row_to_account(row)
+            accounts.append(account)
+        return accounts
+
+    def read_last_account(self) -> Account:
+        accounts = self.read_all()
+        accounts.sort(key=lambda obj: obj.datetime)
+        return accounts[-1]

@@ -22,7 +22,7 @@ class TestStockTable(TestCase):
     @staticmethod
     def get_stock1():
         stock = Stock()
-        stock.buy_time = datetime.fromtimestamp(1000)
+        stock.datetime = datetime.fromtimestamp(1000)
         stock.name = 'SCI'
         stock.code = '000001'
         stock.amount = '1000'
@@ -31,7 +31,7 @@ class TestStockTable(TestCase):
     @staticmethod
     def get_stock2():
         stock = Stock()
-        stock.buy_time = datetime.fromtimestamp(10000)
+        stock.datetime = datetime.fromtimestamp(10000)
         stock.name = 'SCI_2'
         stock.code = '000001_2'
         stock.amount = '1000_2'

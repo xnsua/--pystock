@@ -29,20 +29,20 @@ class Stock(EqualityBase):
         self.name = None
         self.code = None
         self.amount = 0
-        self.buy_time = dt.datetime.fromtimestamp(0)
+        self.datetime = dt.datetime.fromtimestamp(0)
 
     def __str__(self):
         return 'Name: {}, Code: {}, Amount: {}, T : {}' \
-            .format(self.name, self.code, self.amount, self.buy_time.date())
+            .format(self.name, self.code, self.amount, self.datetime.date())
 
     def __hash__(self):
-        return hash((self.name, self.code, self.amount, self.buy_time))
+        return hash((self.name, self.code, self.amount, self.datetime))
 
 
 class Entrustment(EqualityBase):
     def __init__(self):
         self.id = None
-        self.time = None
+        self.datetime = None
         self.code = None
         self.name = None
         self.operation = None

@@ -50,7 +50,7 @@ class StockTable:
 
     def row_to_stock(self, row) -> Stock:
         stock = Stock()
-        stock.buy_time = row[self.buy_time]
+        stock.datetime = row[self.buy_time]
         stock.name = row[self.name]
         stock.code = row[self.code]
         stock.amount = row[self.amount]
@@ -60,7 +60,7 @@ class StockTable:
         ins = self.__table.insert()
         self.__engine.execute(ins, [
             {
-                self.buy_time: stock.buy_time,
+                self.buy_time: stock.datetime,
                 self.name: stock.name,
                 self.code: stock.code,
                 self.amount: stock.amount

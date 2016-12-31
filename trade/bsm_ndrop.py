@@ -1,7 +1,10 @@
+from utilities.stock_exception import ParamCheckException
+
+
 class BsmNdrop:
     def __init__(self, data, drop_count):
-        if(drop_count < 1):
-            raise ParamCheckException
+        if drop_count < 1:
+            raise ParamCheckException()
         self.data = data
         self.drop_count = drop_count
         self.data_len = len(data)
@@ -12,7 +15,7 @@ class BsmNdrop:
             raise ParamCheckException('Index {} is out of range', index)
         if index < self.drop_count:
             return False
-        sub_data = self.data[index - self.drop_count: index];
+        sub_data = self.data[index - self.drop_count: index]
         if not any(sub_data):
             self.buy_record[index] = True
             return True

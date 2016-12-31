@@ -9,7 +9,7 @@ from database.db_basic import Database
 from include.basic_structure import Entrustment
 
 
-class StockTable:
+class EntrustmentTable:
     @property
     def datetime(self):
         return 'datetime'

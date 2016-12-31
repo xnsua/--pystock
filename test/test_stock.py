@@ -31,9 +31,9 @@ class TestStock(TestCase):
     def test_buy_time(self):
         stock = Stock()
         self.assertEqual(stock.datetime, datetime.fromtimestamp(0))
-        dtnow = datetime.now()
-        stock.datetime = dtnow
-        self.assertEqual(stock.datetime, dtnow)
+        now = datetime.now()
+        stock.datetime = now
+        self.assertEqual(stock.datetime, now)
 
     def test_name(self):
         stock = Stock()

@@ -9,7 +9,7 @@ from include.basic_structure import Stock
 
 class TestStockTable(TestCase):
     def setUp(self):
-        if (os.path.exists(test_db_path)):
+        if os.path.exists(test_db_path):
             os.remove(test_db_path)
         pass
 

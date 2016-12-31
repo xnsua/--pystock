@@ -8,6 +8,8 @@ from include.basic_structure import Account
 
 
 class TestAccountTable(TestCase):
+    def __init__(self):
+        super().__init__()
 
     def setUp(self):
         pass
@@ -18,7 +20,8 @@ class TestAccountTable(TestCase):
         except OSError:
             pass
 
-    def get_account1(self) -> Account:
+    @staticmethod
+    def get_account1() -> Account:
         account = Account()
         account.total = 5.0
         account.free = 2

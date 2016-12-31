@@ -1,7 +1,7 @@
-
-class Config():
+class Config:
     def __init__(self):
         pass
+
     @property
     def database_path(self):
         return 'stock.db'
@@ -16,5 +16,7 @@ class Config():
 
     @property
     def transfer_fee(self):
-        raise
+        raise NotImplemented()
+
+
 config = Config()

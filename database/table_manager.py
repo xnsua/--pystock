@@ -5,8 +5,8 @@ from database.stocks_table import StockTable
 
 
 class TableManager:
-    def __init__(self, testPath=''):
-        path = testPath if testPath else global_variable.config.database_path
+    def __init__(self, test_path=''):
+        path = test_path if test_path else global_variable.config.database_path
         self.__db = Database(path)
         self.__account_table = AccountTable(self.__db)
         self.__stock_table = StockTable(self.__db)

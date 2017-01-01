@@ -70,10 +70,10 @@ class EntrustmentTable:
         rows = res.fetchall()
         res = list()
         for row in rows:
-            res.append(self.row_to_entrustment(row))
+            res.append(self.__row_to_entrustment(row))
         return res
 
-    def row_to_entrustment(self, row) -> Entrustment:
+    def __row_to_entrustment(self, row) -> Entrustment:
         entrustment = Entrustment()
         entrustment.datetime = row[self.datetime]
         entrustment.id = row[self.id]

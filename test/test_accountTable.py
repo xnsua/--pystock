@@ -3,8 +3,8 @@ import os
 from unittest import TestCase
 
 from database.table_manager import TableManager
-from database.test_config import test_db_path
 from include.basic_structure import Account
+from test.config_for_test import test_db_path
 
 
 class TestAccountTable(TestCase):

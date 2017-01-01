@@ -5,14 +5,14 @@
     <bookmark url="file://$PROJECT_DIR$/database/account_table.py" line="101" mnemonic="2" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="94cabd1b-2b2c-4695-b773-5db50e0f3f92" name="Default" comment="Add : All table read and save test">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/database/test_entrustmentTable.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/database/test_exchangeListTable.py" />
+    <list default="true" id="94cabd1b-2b2c-4695-b773-5db50e0f3f92" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common/global_variable.py" afterPath="$PROJECT_DIR$/common/global_variable.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/database/entrustment_table.py" afterPath="$PROJECT_DIR$/database/entrustment_table.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/database/table_manager.py" afterPath="$PROJECT_DIR$/database/table_manager.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/basic_structure.py" afterPath="$PROJECT_DIR$/include/basic_structure.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test_accountTable.py" afterPath="$PROJECT_DIR$/test/test_accountTable.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test_stockTable.py" afterPath="$PROJECT_DIR$/test/test_stockTable.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/database/test_config.py" afterPath="$PROJECT_DIR$/test/config_for_test.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/database/test_entrustmentTable.py" afterPath="$PROJECT_DIR$/test/test_entrustmentTable.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/database/test_exchangeListTable.py" afterPath="$PROJECT_DIR$/test/test_exchangeListTable.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -29,7 +29,7 @@
     <SUITE FILE_PATH="coverage/PStock$Nosetest_TestExchangeListTable_test_read_save_exchange_list.coverage" NAME="Nosetest TestExchangeListTable.test_read_save_exchange_list Coverage Results" MODIFIED="1483240277766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database" />
     <SUITE FILE_PATH="coverage/PStock$Nosetest_TestAccount_test_equality__2_.coverage" NAME="Nosetest TestAccount.test_equality (2) Coverage Results" MODIFIED="1483000810832" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PStock$Nosetest_TestStock_test_amount__4_.coverage" NAME="Nosetest TestStock.test_amount (4) Coverage Results" MODIFIED="1482668236479" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/PStock$Nosetests_in_PStock__2_.coverage" NAME="Nosetests in PStock (2) Coverage Results" MODIFIED="1483189799219" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PStock$Nosetests_in_PStock__2_.coverage" NAME="Nosetests in PStock (2) Coverage Results" MODIFIED="1483245539937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PStock$global_variable.coverage" NAME="global_variable Coverage Results" MODIFIED="1483082605078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PStock$Nosetest_TestBsmNdrop_test_calc_buy_array.coverage" NAME="Nosetest TestBsmNdrop.test_calc_buy_array Coverage Results" MODIFIED="1482570559569" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/PStock$Nosetest_TestStock_test_buy_time.coverage" NAME="Nosetest TestStock.test_buy_time Coverage Results" MODIFIED="1482670909728" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -87,35 +87,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_stockTable.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/test_stockTable.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="627">
-              <caret line="39" column="35" lean-forward="false" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
-              <folding>
-                <element signature="e#974#1421#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="entrustment_table.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="entrustment_table.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/database/entrustment_table.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="912">
-              <caret line="100" column="9" lean-forward="false" selection-start-line="100" selection-start-column="9" selection-end-line="100" selection-end-column="9" />
+            <state relative-caret-position="551">
+              <caret line="75" column="11" lean-forward="false" selection-start-line="75" selection-start-column="11" selection-end-line="75" selection-end-column="11" />
               <folding>
-                <marker date="1483235517861" expanded="true" signature="288:2841" ph="..." />
+                <element signature="e#0#23#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="basic_structure.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="basic_structure.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/basic_structure.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="369">
-              <caret line="93" column="75" lean-forward="false" selection-start-line="93" selection-start-column="75" selection-end-line="93" selection-end-column="75" />
+            <state relative-caret-position="521">
+              <caret line="101" column="0" lean-forward="true" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="0" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -123,11 +111,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="config_for_test.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/config_for_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="19">
+              <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="global_variable.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/common/global_variable.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="475">
-              <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+            <state relative-caret-position="57">
+              <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -144,7 +142,7 @@
         </entry>
       </file>
       <file leaf-file-name="test_exchangeListTable.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/database/test_exchangeListTable.py">
+        <entry file="file://$PROJECT_DIR$/test/test_exchangeListTable.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="710">
               <caret line="39" column="50" lean-forward="false" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
@@ -184,13 +182,12 @@
         </entry>
       </file>
       <file leaf-file-name="test_entrustmentTable.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/database/test_entrustmentTable.py">
+        <entry file="file://$PROJECT_DIR$/test/test_entrustmentTable.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="722">
               <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
               <folding>
-                <element signature="e#0#9#0" expanded="true" />
-                <marker date="1483240382431" expanded="true" signature="765:1121" ph="..." />
+                <marker date="1483245539821" expanded="true" signature="765:1121" ph="..." />
               </folding>
             </state>
           </provider>
@@ -292,10 +289,10 @@
         <option value="$PROJECT_DIR$/test/test_accountTable.py" />
         <option value="$PROJECT_DIR$/database/table_manager.py" />
         <option value="$PROJECT_DIR$/common/global_variable.py" />
-        <option value="$PROJECT_DIR$/database/entrustment_table.py" />
         <option value="$PROJECT_DIR$/database/test_exchangeListTable.py" />
         <option value="$PROJECT_DIR$/database/test_entrustmentTable.py" />
         <option value="$PROJECT_DIR$/include/basic_structure.py" />
+        <option value="$PROJECT_DIR$/database/entrustment_table.py" />
       </list>
     </option>
   </component>
@@ -427,35 +424,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PStock" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PStock" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="include" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PStock" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="PStock" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="database" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -523,6 +492,13 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\GitRepo\PStock\test" />
+      <recent name="D:\GitRepo\PStock\data" />
+      <recent name="D:\GitRepo\PStock\database" />
+      <recent name="D:\GitRepo\PStock\trade\utilities" />
+      <recent name="D:\GitRepo\PStock\common" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\GitRepo\PStock" />
       <recent name="D:\GitRepo\PStock\trade\utilities" />
@@ -530,15 +506,8 @@
       <recent name="D:\GitRepo\PStock\test" />
       <recent name="D:\GitRepo\PStock\include" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\GitRepo\PStock\data" />
-      <recent name="D:\GitRepo\PStock\database" />
-      <recent name="D:\GitRepo\PStock\trade\utilities" />
-      <recent name="D:\GitRepo\PStock\common" />
-      <recent name="D:\GitRepo\PStock\data_organizer" />
-    </key>
   </component>
-  <component name="RunManager" selected="Python tests.Nosetests in PStock (1)">
+  <component name="RunManager" selected="Python tests.Nosetests in PStock (2)">
     <configuration default="false" name="Nosetest TestEntrustmentTable.test_read_save_entrustment" type="tests" factoryName="Nosetests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -550,29 +519,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="PStock" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/database/test_entrustmentTable.py" />
-      <option name="CLASS_NAME" value="TestEntrustmentTable" />
-      <option name="METHOD_NAME" value="test_read_save_entrustment" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_METHOD" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <option name="PARAMS" value="" />
-      <option name="USE_PARAM" value="false" />
-      <method />
-    </configuration>
-    <configuration default="false" name="Nosetest TestEntrustmentTable.test_read_save_entrustment" type="tests" factoryName="Nosetests" temporary="true" nameIsGenerated="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/database" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="PStock" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/database/test_entrustmentTable.py" />
+      <option name="SCRIPT_NAME" value="D:\GitRepo\PStock\test\test_entrustmentTable.py" />
       <option name="CLASS_NAME" value="TestEntrustmentTable" />
       <option name="METHOD_NAME" value="test_read_save_entrustment" />
       <option name="FOLDER_NAME" value="" />
@@ -594,7 +541,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="PStock" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/database/test_exchangeListTable.py" />
+      <option name="SCRIPT_NAME" value="D:\GitRepo\PStock\test\test_exchangeListTable.py" />
       <option name="CLASS_NAME" value="TestExchangeListTable" />
       <option name="METHOD_NAME" value="test_read_save_exchange_list" />
       <option name="FOLDER_NAME" value="" />
@@ -628,6 +575,28 @@
       <method />
     </configuration>
     <configuration default="false" name="Nosetests in PStock (1)" type="tests" factoryName="Nosetests" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="PStock" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="$PROJECT_DIR$" />
+      <option name="TEST_TYPE" value="TEST_FOLDER" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Nosetests in PStock (2)" type="tests" factoryName="Nosetests" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs />
@@ -859,17 +828,17 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python tests.Nosetest TestEntrustmentTable.test_read_save_entrustment" />
-      <item index="1" class="java.lang.String" itemvalue="Python tests.Nosetest TestEntrustmentTable.test_read_save_entrustment" />
-      <item index="2" class="java.lang.String" itemvalue="Python tests.Nosetest TestExchangeListTable.test_read_save_exchange_list" />
-      <item index="3" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock" />
-      <item index="4" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock (1)" />
+      <item index="1" class="java.lang.String" itemvalue="Python tests.Nosetest TestExchangeListTable.test_read_save_exchange_list" />
+      <item index="2" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock" />
+      <item index="3" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock (1)" />
+      <item index="4" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock (2)" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock (1)" />
-        <item index="1" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock" />
-        <item index="2" class="java.lang.String" itemvalue="Python tests.Nosetest TestExchangeListTable.test_read_save_exchange_list" />
-        <item index="3" class="java.lang.String" itemvalue="Python tests.Nosetest TestEntrustmentTable.test_read_save_entrustment" />
+        <item index="0" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock (2)" />
+        <item index="1" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock (1)" />
+        <item index="2" class="java.lang.String" itemvalue="Python tests.Nosetests in PStock" />
+        <item index="3" class="java.lang.String" itemvalue="Python tests.Nosetest TestExchangeListTable.test_read_save_exchange_list" />
         <item index="4" class="java.lang.String" itemvalue="Python tests.Nosetest TestEntrustmentTable.test_read_save_entrustment" />
       </list>
     </recent_temporary>
@@ -916,13 +885,17 @@
       <option name="project" value="LOCAL" />
       <updated>1483190282921</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Add : All table read and save test">
+      <created>1483240419989</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1483240419989</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="Nosetest_TestExchangeListTable_test_read_save_exchange_list - 2017.01.01 at 10h 05m 25s.xml">
-      <configuration name="Nosetest TestExchangeListTable.test_read_save_exchange_list" configurationId="tests" />
-    </history-entry>
     <history-entry file="Nosetest_TestExchangeListTable_test_read_save_exchange_list - 2017.01.01 at 10h 06m 44s.xml">
       <configuration name="Nosetest TestExchangeListTable.test_read_save_exchange_list" configurationId="tests" />
     </history-entry>
@@ -950,6 +923,9 @@
     <history-entry file="Nosetests_in_PStock_(1) - 2017.01.01 at 11h 12m 28s.xml">
       <configuration name="Nosetests in PStock (1)" configurationId="tests" />
     </history-entry>
+    <history-entry file="Nosetests_in_PStock_(2) - 2017.01.01 at 12h 39m 00s.xml">
+      <configuration name="Nosetests in PStock (2)" configurationId="tests" />
+    </history-entry>
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -964,8 +940,8 @@
     <frame x="54" y="-8" width="1874" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32952183" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32952183" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26299375" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32952183" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40503672" sideWeight="0.4020385" order="9" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.27027026" sideWeight="0.49779493" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23492724" sideWeight="0.5979615" order="10" side_tool="false" content_ui="tabs" x="321" y="490" width="607" height="384" />
@@ -1036,7 +1012,7 @@
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/database/test_exchangeListTable.py</url>
+          <url>file://$PROJECT_DIR$/test/test_exchangeListTable.py</url>
           <line>43</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
@@ -1168,13 +1144,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dbtables_todel.py" />
-    <entry file="file://$PROJECT_DIR$/database/test_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="21" lean-forward="false" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Roaming/Python/Python35/site-packages/nose/case.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="194">
@@ -1288,14 +1257,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common/global_variable.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/test_bsmNdrop.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
@@ -1336,16 +1297,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/entrustment_table.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="912">
-          <caret line="100" column="9" lean-forward="false" selection-start-line="100" selection-start-column="9" selection-end-line="100" selection-end-column="9" />
-          <folding>
-            <marker date="1483235517861" expanded="true" signature="288:2841" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/database/exchange_list_table.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
@@ -1354,7 +1305,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/test_exchangeListTable.py">
+    <entry file="file://$PROJECT_DIR$/test/test_exchangeListTable.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="710">
           <caret line="39" column="50" lean-forward="false" selection-start-line="39" selection-start-column="50" selection-end-line="39" selection-end-column="50" />
@@ -1362,23 +1313,48 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/database/test_entrustmentTable.py">
+    <entry file="file://$PROJECT_DIR$/test/test_entrustmentTable.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="722">
           <caret line="38" column="0" lean-forward="false" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
-            <marker date="1483240382431" expanded="true" signature="765:1121" ph="..." />
+            <marker date="1483245539821" expanded="true" signature="765:1121" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/include/basic_structure.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="369">
-          <caret line="93" column="75" lean-forward="false" selection-start-line="93" selection-start-column="75" selection-end-line="93" selection-end-column="75" />
+        <state relative-caret-position="521">
+          <caret line="101" column="0" lean-forward="true" selection-start-line="101" selection-start-column="0" selection-end-line="101" selection-end-column="0" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/config_for_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="19">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/global_variable.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/database/entrustment_table.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="551">
+          <caret line="75" column="11" lean-forward="false" selection-start-line="75" selection-start-column="11" selection-end-line="75" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -4,8 +4,8 @@ from unittest import TestCase
 
 from common.global_variable import constant
 from database.table_manager import TableManager
-from database.test_config import test_db_path
 from include.basic_structure import Entrustment
+from test.config_for_test import test_db_path
 
 
 class TestEntrustmentTable(TestCase):

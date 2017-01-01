@@ -14,9 +14,21 @@ class Config:
     def commission(self):
         return 2.5 / 10000
 
+
     @property
     def transfer_fee(self):
         raise NotImplemented()
 
 
+class Constants:
+    @property
+    def oper_sell(self):
+        return 'oper_sell'
+
+    @property
+    def oper_buy(self):
+        return 'oper_buy'
+
+
+constant = Constants()
 config = Config()

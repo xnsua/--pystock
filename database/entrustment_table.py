@@ -2,6 +2,7 @@ from typing import List
 
 from sqlalchemy import Column
 from sqlalchemy import DateTime
+from sqlalchemy import Float
 from sqlalchemy import String
 from sqlalchemy import Table
 
@@ -59,9 +60,9 @@ class EntrustmentTable:
                              Column(self.code, String),
                              Column(self.name, String),
                              Column(self.operation, String),
-                             Column(self.exchange, float),
+                             Column(self.exchange, Float),
                              Column(self.type, String),
-                             Column(self.withdraw, float))
+                             Column(self.withdraw, Float))
 
     def read_entrustment(self) -> List[Entrustment]:
         sel = self.__table.select()

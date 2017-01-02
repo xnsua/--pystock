@@ -1,11 +1,11 @@
-import datetime as dt
+import datetime
 
 from utilities.equality_base import EqualityBase
 
 
 class Account(EqualityBase):
     def __init__(self):
-        self.datetime = dt.datetime.fromtimestamp(0)
+        self.datetime = datetime.datetime.fromtimestamp(0)
         self.total = {}
         self.free = 0
         self.frozen = 0
@@ -40,7 +40,7 @@ class Stock(EqualityBase):
         self.name = None
         self.code = None
         self.amount = 0
-        self.datetime = dt.datetime.fromtimestamp(0)
+        self.datetime = datetime.datetime.fromtimestamp(0)
 
     def __str__(self):
         return 'Name: {}, Code: {}, Amount: {}, T : {}' \
@@ -53,7 +53,7 @@ class Stock(EqualityBase):
 class Entrustment(EqualityBase):
     def __init__(self):
         self.id = None
-        self.datetime = None
+        self.datetime = datetime.datetime.fromtimestamp(0)
         self.code = None
         self.name = None
         self.operation = None

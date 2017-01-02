@@ -6,11 +6,13 @@ from sqlalchemy import Float
 from sqlalchemy import String
 from sqlalchemy import Table
 
+from common.helper import is_today
 from database.db_basic import Database
 from include.basic_structure import Entrustment
 
 
 class EntrustmentTable:
+    # <editor-fold desc="Property">
     @property
     def datetime(self):
         return 'datetime'
@@ -51,6 +53,8 @@ class EntrustmentTable:
     def entrustment(self):
         return 'entrustment'
 
+    # </editor-fold>
+
     def __init__(self, db: Database):
         self.__db = db
         self.__engine = db.engine
@@ -84,6 +88,14 @@ class EntrustmentTable:
         entrustment.type = row[self.type]
         entrustment.withdraw = row[self.withdraw]
         return entrustment
+
+    def read_today_entrusment(self):
+        items = self.read_entrustment()
+        today_items = list()
+        for item in items:
+            if is_today(item.datetime.date()):
+                today_items.append(item)
+        return today_items
 
     def save_entrustment(self, entrustment: Entrustment):
         ins = self.__table.insert()

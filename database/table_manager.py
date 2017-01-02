@@ -1,9 +1,9 @@
-from common import global_variable
 from database.account_table import AccountTable
 from database.db_basic import Database
 from database.entrustment_table import EntrustmentTable
 from database.exchange_list_table import ExchangeListTable
 from database.stocks_table import StockTable
+from trade.utilities import global_variable
 
 
 class TableManager:

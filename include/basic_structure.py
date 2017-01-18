@@ -1,9 +1,9 @@
 import datetime
 
-from utilities.equality_base import EqualityBase
+from utilities.base_functions import BaseFunctions
 
 
-class Account(EqualityBase):
+class Account(BaseFunctions):
     def __init__(self):
         self.datetime = datetime.datetime.fromtimestamp(0)
         self.total = {}
@@ -35,7 +35,7 @@ class Account(EqualityBase):
                      self.withdraw))
 
 
-class Stock(EqualityBase):
+class Stock(BaseFunctions):
     def __init__(self):
         self.name = None
         self.code = None
@@ -50,7 +50,7 @@ class Stock(EqualityBase):
         return hash((self.name, self.code, self.amount, self.datetime))
 
 
-class Entrustment(EqualityBase):
+class Entrustment(BaseFunctions):
     def __init__(self):
         self.id = None
         self.datetime = datetime.datetime.fromtimestamp(0)
@@ -73,7 +73,7 @@ class Entrustment(EqualityBase):
                      self.type, self.withdraw))
 
 
-class ExchangeList(EqualityBase):
+class ExchangeList(BaseFunctions):
     def __init__(self):
         self.time = None
         self.id = None
@@ -99,3 +99,8 @@ class ExchangeList(EqualityBase):
     def __hash__(self):
         return hash((self.time, self.id, self.code, self.name, self.price, self.money_changed, self.money_remain,
                      self.stock_remain, self.commission, self.transfer_fee, self.tax))
+
+
+if __name__ == '__main__':
+    el = ExchangeList()
+    print(el)

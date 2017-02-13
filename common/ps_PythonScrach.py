@@ -31,7 +31,7 @@ def foowrapper():
 import numpy
 
 a = numpy.asarray(['1', '2'])
-numpy.savetxt("foo.csv", a, fmt='%s', delimiter=",")
+numpy.savetxt("tpfoo.csv", a, fmt='%s', delimiter=",")
 
 
 def main():

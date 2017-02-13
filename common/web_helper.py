@@ -1,5 +1,10 @@
+import datetime
+
 import requests
+import requests_cache
 from pyquery import PyQuery
+
+requests_cache.install_cache('demo_cache', expire_after=datetime.timedelta(days=1))
 
 
 def url_to_pyquery(url):

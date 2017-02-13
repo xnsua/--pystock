@@ -1,21 +1,15 @@
-# todo
 import datetime
 import json
+from typing import List, Tuple
 
 import dateutil.parser
-import requests_cache
 from lxml import etree
 from pyquery import PyQuery
 
 from common.log_helper import logger
 from common.time_helper import find_date_substr
-from include.fund_info import ManagerInfo, FundInfo
-
-requests_cache.install_cache('demo_cache', expire_after=datetime.timedelta(days=1))
-
-from typing import List, Tuple
-
 from common.web_helper import firefox_get_url
+from include.fund_info import ManagerInfo, FundInfo
 
 
 class EasyMoneyQuerier:

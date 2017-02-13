@@ -35,7 +35,6 @@ class Config:
 
     def get_fund_data_path(self):
         path = self.get_project_root().parent / self.kdata_path / self.kfund_path
-        # noinspection PyUnresolvedReferences
         path.mkdir(parents=True, exist_ok=True)
         return str(path)
 
@@ -43,7 +42,7 @@ class Config:
     def get_project_root():
         p = Path('..').resolve()
         assert p.name == 'PyStock'
-        return p
+        return Path(p)
 
 
 config = Config()

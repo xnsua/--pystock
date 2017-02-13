@@ -4,7 +4,7 @@ from datetime import datetime
 
 from common import json_helper
 from common import time_helper
-from common.file_helper import save_string_to_file, read_string_from_file
+from common.helper import save_string_to_file, read_string_from_file
 from utilities.base_functions import BaseFunctions
 
 
@@ -40,7 +40,7 @@ class FundInfo(BaseFunctions):
         return self.__repr__()
 
     def to_json(self):
-        return json.dumps(self, default=json_helper.json_default_encoder, ensure_ascii=False)
+        return json.dumps(self, default=json_helper.json_default_encoder, ensure_ascii=False, indent=4)
 
     def to_file(self, filename):
         save_string_to_file(self.to_json(), filename)
@@ -58,7 +58,6 @@ class FundInfo(BaseFunctions):
 
         def managerdict2manager(mdict: str):
             manager = ManagerInfo()
-            print(mdict)
             manager.__dict__ = mdict
             manager.start_time = time_helper.parse_time(manager.start_time)
             manager.end_time = time_helper.parse_time(manager.end_time)
@@ -78,6 +77,7 @@ if __name__ == '__main__':
 
     finfo.to_file(tfname)
     finfo2 = FundInfo.from_file(tfname)
+    print(tfname)
     os.remove(tfname)
 
     assert finfo == finfo2

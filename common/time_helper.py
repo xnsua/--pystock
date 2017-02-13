@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
 
 import dateutil.parser
 
+from common.string_helper import search_substr_by_regex
 
-# Time helper
 
 def to_seconds_str(o) -> str:
     return o.strftime('%y-%m-%d %H:%M:%S')
@@ -37,9 +37,15 @@ def parse_time(time_string):
 def is_today(value):
     if type(value) == datetime:
         return value.date() == datetime.today().date()
-    elif type(value) == datetime.date:
+    elif type(value) == date:
+        print('here')
         return value == datetime.today().date()
     return False
+
+
+def find_date_substr(source: str):
+    return search_substr_by_regex(source, '\d{4}-\d{1,2}-\d{1,2}')
+
 
 
 if __name__ == '__main__':

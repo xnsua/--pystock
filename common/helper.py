@@ -34,7 +34,7 @@ def save_string_to_file(filecontent: str, filename: str):
     Path(filename).write_text(filecontent, 'utf-8')
 
 
-def read_string_from_file(filename: str):
+def read_string_from_file(filename):
     return Path(filename).read_text(encoding='utf-8')
 
 

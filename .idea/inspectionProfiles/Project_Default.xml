@@ -5,6 +5,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="pathlib.PurePath.mkdir" />
+          <option value="dateutil.parser" />
         </list>
       </option>
     </inspection_tool>

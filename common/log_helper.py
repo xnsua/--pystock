@@ -5,8 +5,8 @@ from utilities.config import config
 logger = logging.getLogger('stock.log')
 logger.setLevel(logging.DEBUG)
 __ch = logging.StreamHandler()
-log_path = config.get_project_root() / 'stock.log'
-__fh = logging.FileHandler('stock.log')
+__log_path = config.get_project_root() / 'stock.log'
+__fh = logging.FileHandler(__log_path)
 __formatter = logging.Formatter('%(asctime)s %(levelname)s:%(message)s. (%(module)s, %(lineno)d)', "%y-%m-%d %H:%M:%S")
 __ch.setFormatter(__formatter)
 __fh.setFormatter(__formatter)

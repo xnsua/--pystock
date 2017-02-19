@@ -2,20 +2,21 @@ import json
 import os
 from datetime import datetime
 
+import dateutil
+
 from common import json_helper
-from common import time_helper
 from common.helper import save_string_to_file, read_string_from_file
 from utilities.base_functions import BaseFunctions
 
 
 class ManagerInfo(BaseFunctions):
-    def __init__(self, names: str = None, start_time=datetime.fromtimestamp(0),
-                 end_time=datetime.fromtimestamp(0)):
-        if not names:
-            names = []
-        self.names = names
-        self.start_time = start_time
-        self.end_time = end_time
+    def __init__(self, sst=datetime.fromtimestamp(111111)):
+        # if not names:
+        #     names = []
+        self.names = None
+        self.start_time = sst
+        self.end_time = datetime.fromtimestamp(111111)
+        pass
 
     def __str__(self):
         return self.__repr__()
@@ -59,8 +60,8 @@ class FundInfo(BaseFunctions):
         def managerdict2manager(mdict: str):
             manager = ManagerInfo()
             manager.__dict__ = mdict
-            manager.start_time = time_helper.parse_time(manager.start_time)
-            manager.end_time = time_helper.parse_time(manager.end_time)
+            manager.start_time = dateutil.parser.parse(manager.start_time)
+            manager.end_time = dateutil.parser.parse(manager.end_time)
             return manager
 
         info.managers = list(map(managerdict2manager, info.managers))

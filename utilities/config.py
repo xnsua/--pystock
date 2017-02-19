@@ -40,7 +40,9 @@ class Config:
 
     @staticmethod
     def get_project_root():
-        p = Path('..').resolve()
+        p = Path('.').resolve()
+        while p.name != 'PyStock':
+            p = p.parent
         assert p.name == 'PyStock'
         return Path(p)
 

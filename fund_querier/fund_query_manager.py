@@ -16,7 +16,7 @@ class FundQuerier:
     def query_or_update_all(cls):
         is_fund_codes_outdated = is_file_outdated(cls._get_fund_code_list_path(), span=timedelta(days=30))
         if is_fund_codes_outdated:
-            fcodes = easy_money_querier.query_all_stockfund_code()
+            fcodes = easy_money_querier.wget_all_stockfund_code()
         else:
             df = pandas.read_csv(cls._get_fund_code_list_path(), dtype=str, index_col=0)
             fcodes = df.iloc[:, 0].tolist()
@@ -42,7 +42,7 @@ class FundQuerier:
     @classmethod
     def _save_stockfund_codes(cls, fcodes):
         save_path = cls._get_fund_code_list_path()
-        fcodes = easy_money_querier.query_all_stockfund_code()
+        fcodes = easy_money_querier.wget_all_stockfund_code()
         df = pandas.DataFrame(fcodes)
         df.to_csv(save_path)
 
@@ -69,7 +69,7 @@ class FundQuerier:
 
     @classmethod
     def query_and_save_fund_value(cls, fund_code):
-        df = hexun_querier.get_fund_history(fund_code)
+        df = hexun_querier.wget_fund_history(fund_code)
         pathname = cls.get_fund_value_pathname(fund_code)
         rmdir_ifexist(pathname)
         df.to_csv(pathname)
@@ -86,7 +86,7 @@ class FundQuerier:
 
     @staticmethod
     def _get_fund_info_json_str(fund_code):
-        fundinfo = easy_money_querier.query_fund_info(fund_code)
+        fundinfo = easy_money_querier.wget_fund_info(fund_code)
         fundinfo.query_date = datetime.now()
         ss = fundinfo.to_json()
         return ss

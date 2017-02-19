@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 from datetime import datetime
 from pathlib import Path
@@ -17,7 +18,7 @@ def remove_ifexist(path):
         pass
 
 
-def mkdir_ifexist(path):
+def mkdir_ifnotexist(path):
     try:
         os.mkdir(path)
     except FileExistsError:
@@ -58,3 +59,24 @@ def is_file_outdated(path, span):
     if curspan > span:
         return True
     return False
+
+
+def get_file_modify_time(path):
+    file_dt = os.path.getmtime(path)
+    return datetime.fromtimestamp(file_dt)
+
+
+def get_file_create_time(path):
+    filedt = os.path.getctime(path)
+    return datetime.fromtimestamp(filedt)
+
+
+def time_exec(func):
+    start = datetime.now()
+    func()
+    print(datetime.now() - start)
+
+
+def ndays_ago(n):
+    today = dt.date.today()
+    return today - dt.timedelta(days=n)

@@ -1,5 +1,4 @@
-import pandas
-from    utilities.import_basic import *
+from time import sleep
 
 
 class Foo:
@@ -29,16 +28,40 @@ def foowrapper():
     foo()
 
 
-import numpy
+def sleep1():
+    sleep(1)
 
-a = numpy.asarray(['1', '2'])
-numpy.savetxt("tpfoo.csv", a, fmt='%s', delimiter=",")
+
+def sleep2():
+    sleep(2)
+
+
+def sleep3():
+    sleep(3)
+
+
+def sleep4():
+    sleep(4)
+
+
+def test():
+    a = 1
+    b = 2
+    huh = locals()
+    c = 3
+    foo = '{a}'.format(**locals())
+    print(foo)
 
 
 def main():
-    df = pandas.DataFrame([1])
-    print(df.iloc[0])
+    test()
+    sleep(2)
+    sum = 0
+    for i in range(1, 1000 * 1000):
+        sum += i * i
+    print(sum)
     return
+
 
 if __name__ == '__main__':
     main()

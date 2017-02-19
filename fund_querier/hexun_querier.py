@@ -6,13 +6,14 @@ import requests
 from pyquery import PyQuery
 
 from common.log_helper import logger
+from utilities import stock_helper
 
 
 class HexunQuerier:
     # http://data.funds.hexun.com/outxml/detail/openfundnetvalue.aspx?fundcode=161831&startdate=2015-11-21&enddate=2018-12-08
     HEXUN_URL = 'http://data.funds.hexun.com/outxml/detail/openfundnetvalue.aspx?fundcode={}&startdate={}&enddate={}'
 
-    def get_fund_history(self, fund_code, start_date=datetime.fromtimestamp(0).date(), end_date=datetime.now().date()):
+    def wget_fund_history(self, fund_code, start_date=stock_helper.stock_startday, end_date=datetime.now().date()):
 
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
@@ -45,4 +46,4 @@ class HexunQuerier:
 hexun_querier = HexunQuerier()
 
 if __name__ == '__main__':
-    fund_history = hexun_querier.get_fund_history('001938')
+    fund_history = hexun_querier.wget_fund_history('001938')

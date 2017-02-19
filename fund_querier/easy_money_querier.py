@@ -13,14 +13,14 @@ from include.fund_info import ManagerInfo, FundInfo
 
 
 class EasyMoneyQuerier:
-    def query_all_stockfund_code(self) -> List[str]:
-        codes, page_count = self.query_stockfund_code_for_page(1)
+    def wget_all_stockfund_code(self) -> List[str]:
+        codes, page_count = self.wget_stockfund_code_for_page(1)
         for i in range(2, page_count + 1):
-            pcodes, _ = self.query_stockfund_code_for_page(i)
+            pcodes, _ = self.wget_stockfund_code_for_page(i)
             codes.extend(pcodes)
         return codes
 
-    def query_stockfund_code_for_page(self, page_index) -> Tuple[List[str], int]:
+    def wget_stockfund_code_for_page(self, page_index) -> Tuple[List[str], int]:
         #     http://fundapi.eastmoney.com/fundtradenew.aspx?ft=pg&sc=1n&st=desc&pi=2&pn=100&cp=&ct=&cd=&ms=&fr=&plevel=&fst=&ftype=&fr1=&fl=0&isab=undefined
         # pi = page index
         urlfmt = 'http://fundapi.eastmoney.com/fundtradenew.aspx?ft=pg&sc=1n&st=desc&pi={}&pn=100&cp=&ct=&cd=&ms=&fr=&plevel=&fst=&ftype=&fr1=&fl=0&isab=undefined'
@@ -47,7 +47,7 @@ class EasyMoneyQuerier:
         page_count = content.split(':')[1]
         return int(page_count)
 
-    def query_fund_info(self, fundcode: str) -> FundInfo:
+    def wget_fund_info(self, fundcode: str) -> FundInfo:
         fund_info = FundInfo()
         fmt = 'http://fund.eastmoney.com/{}.html'
         url = fmt.format(fundcode)
@@ -101,6 +101,6 @@ easy_money_querier = EasyMoneyQuerier()
 
 if __name__ == '__main__':
     try:
-        val = easy_money_querier.query_fund_info('003954')
+        val = easy_money_querier.wget_fund_info('003954')
     except Exception as e:
         print(str(e))

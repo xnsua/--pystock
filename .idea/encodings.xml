@@ -2,5 +2,7 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/data/000001.sh.csv" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/data/data_163/000001.sh.csv" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/stock_querier/jqtt1.csv" charset="GBK" />
   </component>
 </project>

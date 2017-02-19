@@ -1,7 +1,5 @@
 from datetime import datetime, date
 
-import dateutil.parser
-
 from common.string_helper import search_substr_by_regex
 
 
@@ -28,25 +26,18 @@ def to_microseconds_str(o, seconds_dight=3) -> str:
     return ss
 
 
-def parse_time(time_string):
-    return dateutil.parser.parse(time_string)
-
-
 # Date helper
 
 def is_today(value):
     if type(value) == datetime:
         return value.date() == datetime.today().date()
     elif type(value) == date:
-        print('here')
         return value == datetime.today().date()
     return False
 
 
 def find_date_substr(source: str):
     return search_substr_by_regex(source, '\d{4}-\d{1,2}-\d{1,2}')
-
-
 
 if __name__ == '__main__':
     a = datetime.now()

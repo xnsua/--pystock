@@ -6,8 +6,8 @@ import dateutil.parser
 from lxml import etree
 from pyquery import PyQuery
 
+from common.helper import find_date_substr
 from common.log_helper import logger
-from common.time_helper import find_date_substr
 from common.web_helper import firefox_get_url
 from include.fund_info import ManagerInfo, FundInfo
 

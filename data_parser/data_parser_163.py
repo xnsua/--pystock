@@ -1,17 +1,17 @@
 from common.helper import time_exec
-from utilities import stock_time
+from utilities import trade_day_index
 from utilities.import_basic import *
 from utilities.import_scipy import *
 
 
 def read_stock(path):
     foo1 = dt.datetime.now()
-    df = pd.read_csv(path, encoding='gbk', parse_dates=['日期'])
+    df = pd.read_csv(path, encoding='gbk', index_col=0)
     return df
 
 
 def main():
-    time_exec(lambda: stock_time.read_date_map())
+    time_exec(lambda: trade_day_index.read_date_map())
     pass
 
 

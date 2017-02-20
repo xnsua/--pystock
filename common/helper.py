@@ -1,6 +1,7 @@
 import datetime as dt
 import os
-from datetime import datetime
+import re
+from datetime import datetime, date
 from pathlib import Path
 
 
@@ -77,6 +78,58 @@ def time_exec(func):
     print(datetime.now() - start)
 
 
-def ndays_ago(n):
-    today = dt.date.today()
-    return today - dt.timedelta(days=n)
+def ndays_later(n, olddate=None):
+    if not olddate:
+        olddate = dt.date.today()
+    return olddate + dt.timedelta(days=n)
+
+
+def ndays_ago(n, olddate=None):
+    if not olddate:
+        olddate = dt.date.today()
+    return olddate - dt.timedelta(days=n)
+
+
+def to_datetime(olddate: dt.date):
+    return dt.datetime(olddate.year, olddate.month, olddate.day)
+
+
+def to_seconds_str(o) -> str:
+    return o.strftime('%y-%m-%d %H:%M:%S')
+
+
+def to_min_str(o) -> str:
+    return o.strftime('%y-%m-%d %H:%M')
+
+
+def to_day_str(o) -> str:
+    return o.strftime('%y-%m-%d')
+
+
+def to_microseconds_str(o, seconds_dight=3) -> str:
+    ss = o.strftime('%y-%m-%d %H:%M:%S.%f')
+    if seconds_dight == 0:
+        ss = ss[:-7]
+        return ss
+    if seconds_dight == 6:
+        return ss
+    ss = ss[:seconds_dight - 6]
+    return ss
+
+
+def is_today(value):
+    if type(value) == datetime:
+        return value.date() == datetime.today().date()
+    elif type(value) == date:
+        return value == datetime.today().date()
+    return False
+
+
+def find_date_substr(source: str):
+    return search_substr_by_regex('\d{4}-\d{1,2}-\d{1,2}', source)
+
+
+def search_substr_by_regex(regex: str, source: str):
+    reg = re.compile(regex)
+    match = reg.search(source)
+    return match.group()

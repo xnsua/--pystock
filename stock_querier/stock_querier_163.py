@@ -17,7 +17,7 @@ def download_stock_history(stockcode, savepath, startdate=stock_helper.stock_sta
 def wget_stock_history(stockcode, startdate=dt.datetime(1990, 1, 1), enddate=dt.datetime(2050, 1, 1)) -> pd.DataFrame:
     fmt163 = 'http://quotes.money.163.com/service/chddata.html?code={}&start={}&end={}&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;VOTURNOVER;VATURNOVER'
 
-    url = fmt163.format(stockcode, startdate.strftime('%Y%m%d'), enddate.strftime('Y%m%d'))
+    url = fmt163.format(stockcode, startdate.strftime('%Y%m%d'), enddate.strftime('%Y%m%d'))
     res = hp.firefox_get_url(url)
     content = res.content.decode(encoding='GBK')
     df = pd.read_csv(io.StringIO(content))

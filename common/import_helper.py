@@ -5,7 +5,4 @@ from common.helper import *
 from common.json_helper import *
 
 # noinspection PyUnresolvedReferences
-from common.string_helper import *
-
-# noinspection PyUnresolvedReferences
 from common.web_helper import *

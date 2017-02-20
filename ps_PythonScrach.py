@@ -1,4 +1,6 @@
-from time import sleep
+from time import *
+
+from utilities.import_basic import *
 
 
 class Foo:
@@ -54,12 +56,13 @@ def test():
 
 
 def main():
-    test()
-    sleep(2)
     sum = 0
     for i in range(1, 1000 * 1000):
         sum += i * i
     print(sum)
+    print(dt.date.today().strftime('%Y%m%d'))
+    print(dt.datetime.now().strftime('%Y%m%d'))
+    print(dt.datetime('2015-2-1h'))
     return
 
 

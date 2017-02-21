@@ -1,9 +1,9 @@
 import datetime
 
-from utilities.base_functions import BaseFunctions
+from utilities.base_functions import UtilObjectBase
 
 
-class Account(BaseFunctions):
+class Account(UtilObjectBase):
     def __init__(self):
         self.datetime = datetime.datetime.fromtimestamp(0)
         self.total = {}
@@ -35,7 +35,7 @@ class Account(BaseFunctions):
                      self.withdraw))
 
 
-class Stock(BaseFunctions):
+class Stock(UtilObjectBase):
     def __init__(self):
         self.name = None
         self.code = None
@@ -50,7 +50,7 @@ class Stock(BaseFunctions):
         return hash((self.name, self.code, self.amount, self.datetime))
 
 
-class Entrustment(BaseFunctions):
+class Entrustment(UtilObjectBase):
     def __init__(self):
         self.id = None
         self.datetime = datetime.datetime.fromtimestamp(0)
@@ -73,7 +73,7 @@ class Entrustment(BaseFunctions):
                      self.type, self.withdraw))
 
 
-class ExchangeList(BaseFunctions):
+class ExchangeList(UtilObjectBase):
     def __init__(self):
         self.time = None
         self.id = None

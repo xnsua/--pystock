@@ -6,10 +6,10 @@ import dateutil
 
 from common import json_helper
 from common.helper import save_string_to_file, read_string_from_file
-from utilities.base_functions import BaseFunctions
+from utilities.base_functions import UtilObjectBase
 
 
-class ManagerInfo(BaseFunctions):
+class ManagerInfo(UtilObjectBase):
     def __init__(self, sst=datetime.fromtimestamp(111111)):
         # if not names:
         #     names = []
@@ -25,7 +25,7 @@ class ManagerInfo(BaseFunctions):
         return self.__dict__.__str__()
 
 
-class FundInfo(BaseFunctions):
+class FundInfo(UtilObjectBase):
     def __init__(self):
         self.code = ''
         self.name = ''

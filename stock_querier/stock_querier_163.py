@@ -25,7 +25,7 @@ def wget_stock_history(stockcode, startdate=dt.datetime(1990, 1, 1), enddate=dt.
 
 
 def main():
-    download_stock_history('0000001', 'jqtt1.csv', startdate=common.helper.ndays_ago(5))
+    download_stock_history('utfile0000001', 'jqtt1.csv', startdate=common.helper.ndays_ago(5))
 
 
 if __name__ == '__main__':

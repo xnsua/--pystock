@@ -26,7 +26,6 @@ def foo():
 
 
 def foowrapper():
-    varhello = 'varhello'
     foo()
 
 
@@ -46,6 +45,7 @@ def sleep4():
     sleep(4)
 
 
+# noinspection PyShadowingNames
 def test():
     a = 1
     b = 2
@@ -56,10 +56,10 @@ def test():
 
 
 def main():
-    sum = 0
+    lsum = 0
     for i in range(1, 1000 * 1000):
-        sum += i * i
-    print(sum)
+        lsum += i * i
+    print(lsum)
     print(dt.date.today().strftime('%Y%m%d'))
     print(dt.datetime.now().strftime('%Y%m%d'))
     print(dt.datetime('2015-2-1h'))

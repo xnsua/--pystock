@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from common.helper import find_date_substr, search_substr_by_regex
 
+
 class TestIsToday(TestCase):
     def test_find_date_substr(self):
         dstr = 'abc123'

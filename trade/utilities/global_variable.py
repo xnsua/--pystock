@@ -14,7 +14,6 @@ class Config:
     def commission(self):
         return 2.5 / 10000
 
-
     @property
     def transfer_fee(self):
         raise NotImplemented()

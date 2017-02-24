@@ -30,7 +30,8 @@ class EasyMoneyQuerier:
         page_count = self._parse_stock_fund_page_count(res.text)
         return codes, page_count
 
-    def _parse_stock_fund_code_for_page(self, content: str):
+    @staticmethod
+    def _parse_stock_fund_code_for_page(content: str):
         pos1 = content.index('[')
         pos2 = content.rindex(']')
         content = content[pos1: pos2 + 1]
@@ -40,7 +41,8 @@ class EasyMoneyQuerier:
             retvalue.append(item.split('|')[0])
         return retvalue
 
-    def _parse_stock_fund_page_count(self, content: str):
+    @staticmethod
+    def _parse_stock_fund_page_count(content: str):
         pos1 = content.index('allPages')
         pos2 = content.rindex('}')
         content = content[pos1:pos2]
@@ -57,7 +59,7 @@ class EasyMoneyQuerier:
         py = PyQuery(urltext)
 
         rate_info = py('.jjpj, jjpj1, jjpj2, jjpj3, jjpj4, jjpj5')
-        if (rate_info.size() == 1):
+        if rate_info.size() == 1:
             rate_info = rate_info[0]
         rate_map = {'jjpj': 0, 'jjpj1': 1, 'jjpj2': 2, 'jjpj3': 3, 'jjpj4': 4, 'jjpj5': 5}
         fund_info.rate = rate_map[py(rate_info).attr('class')]
@@ -80,7 +82,8 @@ class EasyMoneyQuerier:
         py = PyQuery(htm)
         managers = []
         for idx, item in enumerate(py.children()):  # type: etree.Element
-            if idx == 0: continue
+            if idx == 0:
+                continue
             manager = ManagerInfo()
             for idx2, pitem in enumerate(map(PyQuery, item)):
                 htm = pitem.text()  # type:str

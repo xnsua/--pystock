@@ -18,7 +18,8 @@ class TestExchangeListTable(TestCase):
         except OSError:
             pass
 
-    def get_exchange_list1(self):
+    @staticmethod
+    def get_exchange_list1():
         item = ExchangeList()
         item.time = datetime.fromtimestamp(10000)
         item.id = '64453431'

@@ -46,6 +46,19 @@ class Config:
         assert p.name == 'PyStock'
         return Path(p)
 
+    @classmethod
+    def get_test_dir(cls):
+        tdir = cls.get_project_root() / 'test_dir'
+        tdir.mkdir()
+
+    @classmethod
+    def get_test_file_txt(cls):
+        return cls.get_test_dir() / 'utfile1.txt'
+
+    @classmethod
+    def get_test_file_csv(cls):
+        return cls.get_test_dir() / 'utfile1.csv'
+
 
 config = Config()
 

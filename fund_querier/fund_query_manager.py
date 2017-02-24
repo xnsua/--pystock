@@ -40,7 +40,7 @@ class FundQuerier:
                 logger.warn('Query Fund value %s failed, Msg: %s', fcode, str(e))
 
     @classmethod
-    def _save_stockfund_codes(cls, fcodes):
+    def _save_stockfund_codes(cls):
         save_path = cls._get_fund_code_list_path()
         fcodes = easy_money_querier.wget_all_stockfund_code()
         df = pandas.DataFrame(fcodes)

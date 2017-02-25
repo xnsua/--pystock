@@ -1,6 +1,7 @@
 demo_cache.sqlite
 
 haitong_login*
+haitong_unlock*
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -48,7 +49,6 @@ fabric.properties
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
 *$py.class
 
 # C extensions
@@ -137,8 +137,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
-HaiTongRobot/haitong_login_tongxin.ahk
-HaiTongRobot/haitong_login_trade.ahk
 data/data_163/
 stock_querier/jqtt1.csv
 utilities/000001.sh.csv

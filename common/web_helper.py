@@ -17,10 +17,11 @@ def url_to_pyquery(url):
     return py
 
 
-def firefox_get_url(url):
+def firefox_get_url(url, headers_={}):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
     }
+    headers = {**headers, **headers_}
     response = requests.get(url, timeout=5, headers=headers)
     return response
 
@@ -34,7 +35,9 @@ def firefox_download_file(url, filepath):
 
 
 def main():
-    # firefox_download_file('http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP', 'jqtt.down')
+    firefox_download_file(
+        'http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP',
+        'jqtt.down')
     pass
 
 

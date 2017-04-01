@@ -6,7 +6,7 @@ from common.helper import save_string_to_file, read_string_from_file
 
 
 class Config:
-    kdata_path = 'pydata'
+    kdata_path = 'PyStockData'
     kfund_path = 'fund'
     kstock_path = 'stock'
     config_filename = 'config.json'
@@ -40,11 +40,7 @@ class Config:
 
     @staticmethod
     def get_project_root():
-        p = Path('.').resolve()
-        while p.name != 'PyStock':
-            p = p.parent
-        assert p.name == 'PyStock'
-        return Path(p)
+        return Path(__file__).parent.parent
 
     @classmethod
     def get_test_dir(cls):
@@ -64,5 +60,5 @@ config = Config()
 
 if __name__ == '__main__':
     print(config.get_fund_data_path())
-    config.get_project_root()
+    print(config.get_project_root())
     pass

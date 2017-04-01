@@ -14,4 +14,6 @@ class UtilObjectBase(object):
         return self.__dict__.__str__()
 
     def __hash__(self):
+        # This is valid only for non-nested dict.
+        # Frozenset is use to remove the order of items in dict.
         return hash(frozenset(self.__dict__.items()))

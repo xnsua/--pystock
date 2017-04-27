@@ -8,7 +8,7 @@ from common.helper import save_string_to_file, rmdir_ifexist, is_file_outdated
 from common.log_helper import logger
 from fund_querier.easy_money_querier import easy_money_querier
 from fund_querier.hexun_querier import hexun_querier
-from utilities.config import config
+from utilities.config_module import config
 
 
 class FundQuerier:
@@ -76,13 +76,13 @@ class FundQuerier:
 
     @staticmethod
     def _get_fund_info_save_path(fund_code: str):
-        path = Path(config.get_fund_data_path())
+        path = Path(config.fund_data_path)
         save_path = path / fund_code
         return str(save_path)
 
     @staticmethod
     def _get_fund_code_list_path():
-        return str(Path(config.get_fund_data_path()) / 'fund_codes.csv')
+        return str(Path(config.fund_data_path) / 'fund_codes.csv')
 
     @staticmethod
     def _get_fund_info_json_str(fund_code):

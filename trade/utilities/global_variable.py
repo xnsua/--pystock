@@ -30,4 +30,3 @@ class Constants:
 
 
 constant = Constants()
-config = Config()

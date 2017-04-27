@@ -47,6 +47,12 @@ def call_after_first(func):
     func()
 
 
+def get_list_from_file(filename):
+    fcontent = (Path(filename)).read_text()
+    listcontent = fcontent.split('\n')
+    listcontent = filter(bool, listcontent)
+    return listcontent
+
 call_after_first.first_time = True
 
 

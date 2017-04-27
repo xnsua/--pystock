@@ -1,6 +1,7 @@
 import io
 
 import pandas as pd
+import requests
 
 import common.helper
 from utilities import stock_helper
@@ -18,7 +19,7 @@ def wget_stock_history(stockcode, startdate=dt.datetime(1990, 1, 1), enddate=dt.
     fmt163 = 'http://quotes.money.163.com/service/chddata.html?code={}&start={}&end={}&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;VOTURNOVER;VATURNOVER'
 
     url = fmt163.format(stockcode, startdate.strftime('%Y%m%d'), enddate.strftime('%Y%m%d'))
-    res = hp.firefox_get_url(url)
+    res = hp.firefox_get_url(requests.Session(), url)
     content = res.content.decode(encoding='GBK')
     df = pd.read_csv(io.StringIO(content))
     return df

@@ -2,7 +2,7 @@ import datetime as dt
 import pathlib as pl
 
 from common.helper import read_string_from_file
-from utilities.config import config
+from utilities.config_module import config
 
 
 class Lunar:
@@ -11,7 +11,6 @@ class Lunar:
         self.month = 0
         self.day = 0
         self.leap_month = 0
-
 
 solumap = {}
 

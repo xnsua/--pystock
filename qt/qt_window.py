@@ -1,6 +1,7 @@
 import functools
 import sys
 
+from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QPushButton, \
     QApplication, QHBoxLayout, \
     QLineEdit, QFormLayout
@@ -20,6 +21,17 @@ def generateFormLayout(layoutname, buyorsellstr):
     return formlayout
 
 
+class TestRunable(QObject):
+    def __init__(self):
+        super().__init__()
+        pass
+
+    signalresult = pyqtSignal(int)
+
+    def run(self):
+        pass
+
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -27,6 +39,12 @@ class MainWindow(QWidget):
         self.initUI()
         self.setAllButtonFunction()
         self.showMainWindow()
+        tr = TestRunable()
+        tr.signalresult.connect(self.testslot)
+
+    def testslot(self, val):
+        print(val)
+        pass
 
     def initUI(self):
         vlayout = QHBoxLayout(self)

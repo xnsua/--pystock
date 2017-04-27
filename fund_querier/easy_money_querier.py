@@ -3,6 +3,7 @@ import json
 from typing import List, Tuple
 
 import dateutil.parser
+import requests
 from lxml import etree
 from pyquery import PyQuery
 
@@ -25,7 +26,7 @@ class EasyMoneyQuerier:
         # pi = page index
         urlfmt = 'http://fundapi.eastmoney.com/fundtradenew.aspx?ft=pg&sc=1n&st=desc&pi={}&pn=100&cp=&ct=&cd=&ms=&fr=&plevel=&fst=&ftype=&fr1=&fl=0&isab=undefined'
         url = urlfmt.format(page_index)
-        res = firefox_get_url(url)
+        res = firefox_get_url(requests.Session(), url)
         codes = self._parse_stock_fund_code_for_page(res.text)
         page_count = self._parse_stock_fund_page_count(res.text)
         return codes, page_count
@@ -54,7 +55,7 @@ class EasyMoneyQuerier:
         fmt = 'http://fund.eastmoney.com/{}.html'
         url = fmt.format(fundcode)
         logger.info(url)
-        response = firefox_get_url(url)
+        response = firefox_get_url(requests.Session(), url)
         urltext = response.content.decode('utf-8')
         py = PyQuery(urltext)
 

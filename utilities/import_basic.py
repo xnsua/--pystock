@@ -6,6 +6,6 @@ import pathlib as pl
 import common.import_helper as hp
 import utilities.import_utilities as ut
 from common.log_helper import logger
-from .config import config
+from .config_module import config
 
 __all__ = ['dt', 'os', 'pl', 'hp', 'config', 'logger', 'ut']

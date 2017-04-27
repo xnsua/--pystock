@@ -2,32 +2,32 @@ import datetime
 
 import requests
 import requests_cache
-from pyquery import PyQuery
 
-requests_cache.install_cache('demo_cache', expire_after=datetime.timedelta(days=1))
+session_cache_one_day = requests_cache.CachedSession(
+    'session_cache_one_day', expire_after=datetime.timedelta(days=1))
+
+session_nocache = requests.session()
 
 
-def url_to_pyquery(url):
-    headers = {
+def firefox_get_url(session, url, headers={}):
+    agent = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
     }
-    rep = requests.get(url, timeout=5, headers=headers)
-
-    py = PyQuery(rep.content)
-    return py
-
-
-def firefox_get_url(url, headers_={}):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
-    }
-    headers = {**headers, **headers_}
-    response = requests.get(url, timeout=5, headers=headers)
+    headers = {**agent, **headers}
+    response = session.get(url, timeout=5, headers=headers)
     return response
 
 
-def firefox_download_file(url, filepath):
-    r = requests.get(url, stream=True)
+def firefox_quick_get_url(url, headers={}):
+    return firefox_get_url(session_nocache, url, headers)
+
+
+def firefox_quick_download_file(url, filepath, headers={}):
+    return firefox_download_file(session_nocache, url, filepath, headers)
+
+
+def firefox_download_file(session, url, filepath, headers_={}):
+    r = session.get(url, headers=headers_, stream=True)
     if r.status_code == 200:
         with open(filepath, 'wb') as f:
             for chunk in r.iter_content(1024):
@@ -35,9 +35,9 @@ def firefox_download_file(url, filepath):
 
 
 def main():
-    firefox_download_file(
-        'http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP',
-        'jqtt.down')
+    firefox_download_file(requests.Session(),
+                          'http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP',
+                          'jqtt.down')
     pass
 
 

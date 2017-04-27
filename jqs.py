@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from PyQt5.QtCore import QObject, QRunnable, pyqtSignal
 
 
@@ -10,7 +12,8 @@ class Tasks(QObject):
     def __init__(self):
         super(Tasks, self).__init__()
 
-    def process_result(self, task):
+    @staticmethod
+    def process_result(task):
         print('Receiving', task)
 
 
@@ -31,11 +34,12 @@ class Worker(QRunnable):
 
 
 if __name__ == "__main__":
+
     import sys
 
+    Path('../a/b').mkdir(parents=True, exist_ok=True)
     print(sys.path)
 
-    np
     # app = QApplication(sys.argv)
     # main = Tasks()
     # worker = Worker(1, main.process_result)

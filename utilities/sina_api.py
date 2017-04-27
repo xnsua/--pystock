@@ -9,12 +9,6 @@ from utilities.stock_helper import etf_t1
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
 
-def get_index(index_list):
-    # 'http://hq.sinajs.cn/list=s_sh000001'
-    # 'http://hq.sinajs.cn/list=s_sz399001'
-    pass
-
-
 def get_price(stocklist):
     stockprices = get_realtime_stock_info(stocklist)
     stockprices = list(stockprices.price)
@@ -54,6 +48,7 @@ def main():
     sstime = dt.datetime.now()
     # ret = get_price(['sh601003', 'sh601001'])
     ret = get_price('sh' + v[3:] for v in etf_t1)
+    print(ret)
     print(dt.datetime.now() - sstime)
 
 

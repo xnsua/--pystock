@@ -31,19 +31,19 @@ class Config:
 
     def save(self):
         jstr = json.dumps(self.config_json, ensure_ascii=False)
-        save_string_to_file(jstr, self.get_config_path())
+        save_string_to_file(jstr, self.config_pathname)
 
     def get_fund_data_path(self):
-        path = self.project_root.parent / self.kdata_path / self.kfund_path
+        path = self.project_root.parent / self.fund_data_path
         path.mkdir(parents=True, exist_ok=True)
         return str(path)
 
 
-config = Config()
+myconfig = Config()
 
 if __name__ == '__main__':
-    print(config.project_root)
-    print(config.config_pathname)
-    print(config.stock_data_path)
-    print(config.fund_data_path)
+    print(myconfig.project_root)
+    print(myconfig.config_pathname)
+    print(myconfig.stock_data_path)
+    print(myconfig.fund_data_path)
     pass

@@ -1,12 +1,16 @@
+import datetime as dt
+
 import pandas as pd
 
+import common.helper as hp
 from stock_querier import stock_querier_163
-from utilities.import_basic import *
 from utilities.stock_helper import stock_startday
+from .config_module import myconfig
 
 _szzs_163 = '0000001'
 _szzs_filename = '000001.sh.csv'
-_szzs_filepath = str(config.get_project_root() / 'data' / 'data_163' / _szzs_filename)
+_szzs_filepath = str(
+    myconfig.get_project_root() / 'data' / 'data_163' / _szzs_filename)
 
 
 def read_date_map():

@@ -1,16 +1,12 @@
+import datetime as dt
 import logging
 import os
 import pathlib as pl
 
-
-def get_project_root():
-    return pl.Path(__file__).parent
-
-
-logger = logging.getLogger('tdxserver.log')
+logger = logging.getLogger('py_stock.log')
 logger.setLevel(logging.DEBUG)
 __ch = logging.StreamHandler()
-__log_path = get_project_root() / 'tdxserver.log'
+__log_path = pl.Path(__file__).parent / 'py_stock.log'
 __fh = logging.FileHandler(__log_path, 'w', 'utf-8')
 __formatter = logging.Formatter(
     '%(asctime)s.%(msecs)03d %(levelname)s: %(message)s.',
@@ -104,7 +100,6 @@ def jqd(*args):
 
 
 import atexit
-
 atexit.register(
     lambda: mylog.info(
         '-------------------- PROGRAM EXIT ------------------------------'))

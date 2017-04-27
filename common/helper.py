@@ -32,7 +32,7 @@ def save_bin_to_file(filename: str, b: bytes):
     return
 
 
-def save_string_to_file(filecontent: str, filename: str):
+def save_string_to_file(filecontent, filename):
     Path(filename).write_text(filecontent, 'utf-8')
 
 

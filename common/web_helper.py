@@ -3,13 +3,16 @@ import datetime
 import requests
 import requests_cache
 
+# noinspection PyTypeChecker
 session_cache_one_day = requests_cache.CachedSession(
     'session_cache_one_day', expire_after=datetime.timedelta(days=1))
 
 session_nocache = requests.session()
 
 
-def firefox_get_url(session, url, headers={}):
+def firefox_get_url(session, url, headers=None):
+    if headers is None:
+        headers = {}
     agent = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
     }
@@ -18,15 +21,21 @@ def firefox_get_url(session, url, headers={}):
     return response
 
 
-def firefox_quick_get_url(url, headers={}):
+def firefox_quick_get_url(url, headers=None):
+    if headers is None:
+        headers = {}
     return firefox_get_url(session_nocache, url, headers)
 
 
-def firefox_quick_download_file(url, filepath, headers={}):
+def firefox_quick_download_file(url, filepath, headers=None):
+    if headers is None:
+        headers = {}
     return firefox_download_file(session_nocache, url, filepath, headers)
 
 
-def firefox_download_file(session, url, filepath, headers_={}):
+def firefox_download_file(session, url, filepath, headers_=None):
+    if headers_ is None:
+        headers_ = {}
     r = session.get(url, headers=headers_, stream=True)
     if r.status_code == 200:
         with open(filepath, 'wb') as f:
@@ -35,9 +44,9 @@ def firefox_download_file(session, url, filepath, headers_={}):
 
 
 def main():
-    firefox_download_file(requests.Session(),
-                          'http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP',
-                          'jqtt.down')
+    # firefox_download_file(requests.Session(),
+    #                       'http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP',
+    #                       'jqtt.down')
     pass
 
 

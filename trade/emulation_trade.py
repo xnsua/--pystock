@@ -1,10 +1,20 @@
 import multiprocessing
 
 from common.helper import sleep_ms
-from common.log_helper import jqd
-from data_server.data_server_constant import k_id_trade_loop, k_id_data_server
+from common.log_helper import MyLog
 from data_server.data_server_main import data_server_loop
 from trade.buy_after_drop import buy_after_drop_loop_for_etfs
+from trade.trade_constant import k_id_trade_loop, k_id_data_server
+
+mylog1 = MyLog(filename='pystock.log')
+
+
+# mylog1 = logging.getLogger('3')
+# mylog1.addHandler(logging.FileHandler('1.log', 'w', 'utf-8'))
+
+# def jqd(*args):
+#     errstr = ' '.join(str(v) for v in args)
+#     mylog.log_with_level(mylog.debug, errstr, outputfilepos=False)
 
 
 class TradeLoop:
@@ -41,15 +51,15 @@ class TradeLoop:
             v.start()
 
     def process_loop(self):
-        jqd('Trade loop')
+        mylog1.debug('Trade loop')
         for key, val in self.model_queue_dict.items():
             val.put('Trade Loop -> Model')
         self.data_server_queue.put('Trade Loop -> Data server')
 
         while 1:
             val = self.self_queue.get()
-            sleep_ms(1000)
-            jqd(f'In Trade Loop: {val}')
+            sleep_ms(10000)
+            mylog1.debug(f'In Trade Loop: {val}')
 
 
 def begin_trade():
@@ -61,6 +71,7 @@ def begin_trade():
 
 def main():
     begin_trade()
+    sleep_ms(1000000)
     pass
 
 

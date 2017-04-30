@@ -1,6 +1,6 @@
 import datetime
 
-from utilities.base_functions import UtilObjectBase
+from common.base_functions import UtilObjectBase
 
 
 class Account(UtilObjectBase):

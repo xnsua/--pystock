@@ -1,4 +1,4 @@
-from utilities.stock_exception import ParamCheckException
+from stock_basic.stock_exception import ParamCheckException
 
 
 class BsmNdrop:

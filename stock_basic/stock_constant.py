@@ -1,8 +1,9 @@
 import datetime as dt
 
 stock_startday = dt.date(1990, 12, 19)
-stock_starttime = dt.datetime(1990, 12, 19)
+str_stock_startday = str(stock_startday)
 
+stock_starttime = dt.datetime(1990, 12, 19)
 stock_in_etf50 = ['SH.600000', 'SH.600016', 'SH.600028', 'SH.600029',
                   'SH.600030', 'SH.600036', 'SH.600048', 'SH.600050',
                   'SH.600100', 'SH.600104', 'SH.600109', 'SH.600111',

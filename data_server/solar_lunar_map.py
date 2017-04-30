@@ -1,8 +1,7 @@
 import datetime as dt
-import pathlib as pl
 
 from common.helper import read_string_from_file
-from utilities.config_module import myconfig
+from config_module import myconfig
 
 
 class Lunar:
@@ -18,7 +17,7 @@ solumap = {}
 def load_map():
     # noinspection PyTypeChecker
     fcon = read_string_from_file(
-        (pl.Path(myconfig.get_project_root()) / 'data' / 'solar_lunar_map.txt'))
+        (myconfig.project_root / 'data_server' / 'solar_lunar_map.txt'))
     lines = fcon.split('\n')
     for item in lines:
         if item:
@@ -36,7 +35,7 @@ def load_map():
 def main():
     global solumap
     solumap = load_map()
-    # print(solumap)
+    print(solumap)
 
 
 if __name__ == '__main__':

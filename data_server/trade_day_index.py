@@ -3,17 +3,17 @@ import datetime as dt
 import pandas as pd
 
 import common.helper as hp
-from stock_querier import stock_querier_163
-from utilities.stock_helper import stock_startday
-from .config_module import myconfig
+from config_module import myconfig
+from data_server.stock_querier import _163_api
+from stock_basic.stock_constant import stock_startday
 
 _szzs_163 = '0000001'
 _szzs_filename = '000001.sh.csv'
 _szzs_filepath = str(
-    myconfig.get_project_root() / 'data' / 'data_163' / _szzs_filename)
+    myconfig.project_root / 'data_server' / 'data_163' / _szzs_filename)
 
 
-def read_date_map():
+def update__date_map():
     try:
         df = pd.read_csv(_szzs_filepath, encoding='gbk', index_col=0)
         lastday = dt.datetime.strptime(df['日期'].iloc[0], '%Y-%m-%d').date()
@@ -22,7 +22,9 @@ def read_date_map():
         lastday = stock_startday
     dfmore = []
     if lastday != dt.date.today():
-        dfmore = stock_querier_163.wget_stock_history(_szzs_163, startdate=hp.ndays_later(1, lastday))
+        dfmore = _163_api.wget_stock_history(_szzs_163,
+                                             startdate=hp.ndays_later(1,
+                                                                      lastday))
     dfall = pd.concat([dfmore, df], ignore_index=True)  # type: pd.DataFrame
     dfall.to_csv(_szzs_filepath, encoding='gbk')
 
@@ -36,11 +38,12 @@ def read_date_map():
 
 
 def query_date_map():
-    stock_querier_163.download_stock_history(_szzs_163, _szzs_filepath, hp.ndays_ago(12), hp.ndays_ago(6))
+    _163_api.download_stock_history(_szzs_163, _szzs_filepath, hp.ndays_ago(12),
+                                    hp.ndays_ago(6))
 
 
 def main():
-    date_dict = read_date_map()
+    date_dict = update__date_map()
     for val in date_dict.items():
         print(val)
 

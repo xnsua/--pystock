@@ -9,8 +9,8 @@ __ch = logging.StreamHandler()
 __log_path = pl.Path(__file__).parent / 'py_stock.log'
 __fh = logging.FileHandler(__log_path, 'w', 'utf-8')
 __formatter = logging.Formatter(
-    '%(asctime)s.%(msecs)03d %(levelname)s: %(message)s.',
-    # '[%(thread)d]%(asctime)s %(levelname)s:%(message)s.',
+    # '%(asctime)s.%(msecs)03d %(levelname)s: %(message)s.',
+    '[%(thread)d]%(asctime)s %(levelname)s:%(message)s.',
     "%m-%d %H:%M:%S")
 # "%y-%m-%d %H:%M:%S")
 __ch.setFormatter(__formatter)
@@ -96,7 +96,7 @@ mylog = MyLog()
 
 def jqd(*args):
     errstr = ' '.join(str(v) for v in args)
-    mylog.log_with_level(logger.debug, errstr, outputfilepos=True)
+    mylog.log_with_level(logger.debug, errstr, outputfilepos=False)
 
 
 import atexit

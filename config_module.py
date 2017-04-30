@@ -6,10 +6,13 @@ from common.helper import save_string_to_file, read_string_from_file
 
 
 class Config:
-    project_root = Path(__file__).parent.parent
+    project_root = Path(__file__).parent
     config_pathname = project_root / 'config.json'
 
     stock_data_path = project_root.parent / 'py_stock_data'
+    stock_day_data_path = stock_data_path / 'day/data_server/'
+    stock_day_data_etf_path = stock_data_path / 'day/etf_data'
+
     fund_data_path = project_root.parent / 'py_fund_data'
 
     def __init__(self):

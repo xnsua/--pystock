@@ -1,50 +1,33 @@
-from pathlib import Path
+import datetime as dt
 
-from PyQt5.QtCore import QObject, QRunnable, pyqtSignal
+import tushare as ts
 
-
-class WorkerSignals(QObject):
-    result = pyqtSignal(int)
-
-
-# region Description
-class Tasks(QObject):
-    def __init__(self):
-        super(Tasks, self).__init__()
-
-    @staticmethod
-    def process_result(task):
-        print('Receiving', task)
+from common.helper import remove_ifexist
+from config_module import myconfig
+from stock_basic.stock_constant import str_stock_startday
 
 
-# endregion
+def get_k_data(stockcode):
+    today_date = dt.date.today()
+    df = ts.get_k_data(stockcode, start=str_stock_startday, end=str(today_date))
+    df2 = df.set_index('date')
+    filename = myconfig.stock_day_data_etf_path / (stockcode + '.csv')
+    remove_ifexist(filename)
+    df2.to_csv(filename)
 
 
-class Worker(QRunnable):
-    def __init__(self, task, callback):
-        super().__init__()
-
-        self.task = task
-        self.signals = WorkerSignals()
-        self.signals.result.connect(callback)
-
-    def run(self):
-        print('Sending', self.task)
-        self.signals.result.emit(self.task)
+def func(vv, **kwargs):
+    print(vv)
+    print(kwargs)
+    pass
 
 
-if __name__ == "__main__":
+def main():
+    func({'vv': 'aa', 'cc': 'dd'})
 
-    import sys
+    # get_k_data('000001')
+    # print(str(stock_startday))
 
-    Path('../a/b').mkdir(parents=True, exist_ok=True)
-    print(sys.path)
 
-    # app = QApplication(sys.argv)
-    # main = Tasks()
-    # worker = Worker(1, main.process_result)
-    # # worker.signals.result.connect(main.process_result)
-    #
-    # QThreadPool.globalInstance().start(worker)
-    # QThreadPool.globalInstance().waitForDone()
-    # sys.exit(app.exec_())
+if __name__ == '__main__':
+    main()

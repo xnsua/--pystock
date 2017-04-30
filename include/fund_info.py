@@ -5,8 +5,8 @@ from datetime import datetime
 import dateutil
 
 from common import json_helper
+from common.base_functions import UtilObjectBase
 from common.helper import save_string_to_file, read_string_from_file
-from utilities.base_functions import UtilObjectBase
 
 
 class ManagerInfo(UtilObjectBase):

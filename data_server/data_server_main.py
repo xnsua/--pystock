@@ -1,19 +1,17 @@
 import multiprocessing
+import queue
+import random
+from contextlib import suppress
 
-from common.helper import LogicException, exception_to_logstr, sleep_ms
-from common.log_helper import MyLog
+from common.helper import LogicException, exception_to_logstr, sleep_ms, \
+    seconds_from_epoch
+from common.log_helper import mylog
 from data_server.etf_updater import update_etf
-from trade.trade_constant import k_id_data_server, k_id_trade_loop
-
-mylog2 = MyLog(filename='data_server.log')
-
-
-# mylog2 = logging.getLogger('3')
-# mylog2.addHandler(logging.FileHandler('2.log', 'w', 'utf-8'))
-
-# def jqd(*args):
-#     errstr = ' '.join(str(v) for v in args)
-#     mylog.log_with_level(mylog.debug, errstr, outputfilepos=False)
+from data_server.stock_querier.sina_api import get_realtime_stock_info
+from stock_basic.stock_helper import is_trade_day
+from trade.comm_message import CommMessage
+from trade.trade_constant import k_id_data_server, k_msg_set_monitor_stock, \
+    k_msg_push_monitor_stocks
 
 
 def data_server_loop(**queue_dict):
@@ -31,46 +29,73 @@ class DataServer:
         self.self_queue = queue_dict[
             k_id_data_server]  # type: multiprocessing.Queue
         self.queue_dict = queue_dict
+        self.real_time_stocks_dict = {}
+
+    def do_day_work(self):
+        if not is_trade_day():
+            return
+
+    def add_real_time_stock(self, sender, stocklist):
+        self.real_time_stocks_dict[sender] = stocklist
+
+    def get_realtime_stock_info(self):
+        stocklist = []
+        for k, v in self.real_time_stocks_dict.items():
+            stocklist.extend(v)
+
+        if not stocklist:
+            return None
+        df_stockinfo = get_realtime_stock_info(stocklist)
+        return df_stockinfo
 
     def run_loop(self):
-        mylog2.debug('Data server run loop ...')
-        trade_queue = self.queue_dict[k_id_trade_loop]
-        trade_queue.put('Dataserver -> Trade queue')
         while 1:
-            msg = self.self_queue.get()
-            # jqd(f'In dataserver: f{msg}')
-            sleep_ms(1000)
+            seconds = seconds_from_epoch()
+            self.handle_msg()
+            self.push_real_time_info()
+            ms = random.randint(300, 600)
+            # random sleep for message.
+            sleepseconds = ms - (seconds_from_epoch() - seconds) * 1000
+            sleep_ms(sleepseconds if sleepseconds > 0 else 0)
 
-            # return 1
-            # while 1:
-            #     msg = self.self_queue.get()
-            #     sender, operation, content = msg
-            #     self.dispatch_msg(sender, operation, content)
+    def push_real_time_info(self):
+        if self.real_time_stocks_dict:
+            dfstockinfo = self.get_realtime_stock_info()
+            for sender, liststock in self.real_time_stocks_dict.items():
+                df = dfstockinfo[dfstockinfo.index.isin(liststock)]
+                if len(df.index) == len(liststock):
+                    respqueue = self.find_queue_by_sender(sender)
+                    respqueue.put(CommMessage(k_id_data_server,
+                                              k_msg_push_monitor_stocks, df))
+                else:
+                    mylog.warn('Cannot find push data')
 
-    def dispatch_msg(self, sender, operation, content):
+    def handle_msg(self):
+        with suppress(queue.Empty):
+            msg = self.self_queue.get(block=False)
+            self.dispatch_msg(msg)
+
+    def dispatch_msg(self, msg: CommMessage):
+        sender = msg.sender
+        operation = msg.operation
+        param = msg.param
+        out_queue = self.find_queue_by_sender(sender)
         try:
             func = self.find_func_by_operation(operation)
-            out_queue = self.find_out_queue_by_sender(sender)
-            result = func(**content)
-            out_queue.put((k_id_data_server, (operation, result)))
+            func(sender, param)
         except Exception as e:
             out_queue.put((k_id_data_server, (Exception.__name__, e)))
-            mylog2.error(exception_to_logstr(e))
+            mylog.error(exception_to_logstr(e))
 
-    def find_out_queue_by_sender(self, sender):
+    def find_queue_by_sender(self, sender):
         try:
             return self.queue_dict[sender]
         except:
             raise LogicException(f'Can not find out queue of sender {sender}')
 
-    @staticmethod
-    def find_func_by_operation(operation):
-        gls = globals()
-        for k in gls:
-            if k == operation:
-                if type(gls[k]) == function:
-                    return gls[k]
-        raise LogicException(f'Can not find func of name {operation}')
+    def find_func_by_operation(self, operation):
+        funcmap = {k_msg_set_monitor_stock: self.add_real_time_stock}
+        return funcmap[operation]
 
 
 def main():

@@ -145,6 +145,11 @@ def sleep_ms(millisecond):
     time.sleep(millisecond / 1000)
 
 
+def seconds_from_epoch():
+    import time
+    return time.time()
+
+
 from datetime import datetime
 
 

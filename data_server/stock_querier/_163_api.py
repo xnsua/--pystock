@@ -6,13 +6,13 @@ import requests
 
 import common.helper
 from common.web_helper import firefox_get_url
-from stock_basic import stock_constant
+from stock_basic import stock_helper
 
 
 # The 163 website add 0 to the stockcode to imply SH stock
 # Add the 1 to the stockcode to imply the SZ stock
 def download_stock_history(stockcode, savepath,
-                           startdate=stock_constant.stock_startday,
+                           startdate=stock_helper.stock_startday,
                            enddate=dt.date.today()):
     # noinspection PyTypeChecker
     df = wget_stock_history(stockcode, startdate, enddate)

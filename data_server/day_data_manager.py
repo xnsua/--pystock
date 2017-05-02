@@ -5,7 +5,7 @@ import pandas as pd
 import tushare as ts
 
 from common.helper import ndays_later, ndays_ago
-from stock_basic.stock_constant import stock_startday
+from stock_basic.stock_helper import stock_startday
 
 
 def update_k_data(stockcode: str, path):

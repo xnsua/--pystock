@@ -102,12 +102,12 @@ class MyLog:
         raise FatalException(errstr)
 
 
-# mylog = MyLog(filename='pystock.log')
-#
-#
-# def jqd(*args):
-#     errstr = ' '.join(str(v) for v in args)
-#     mylog.log_with_level(mylog.debug, errstr, outputfilepos=False)
+mylog = MyLog(filename='py_stock.log')
+
+
+def jqd(*args):
+    errstr = ' '.join(str(v) for v in args)
+    mylog.log_with_level(mylog.debug, errstr, outputfilepos=True)
 
 
 def main():

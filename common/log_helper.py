@@ -101,6 +101,27 @@ class MyLog:
         self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
         raise FatalException(errstr)
 
+    def info_if(self, condition, errstr):
+        if condition:
+            self.log_with_level(self.logger.info, errstr, outputfilepos=False)
+
+    def debug_if(self, condition, errstr):
+        if condition:
+            self.log_with_level(self.logger.debug, errstr, outputfilepos=True)
+
+    def warn_if(self, condition, errstr):
+        if condition:
+            self.log_with_level(self.logger.warning, errstr, outputfilepos=True)
+
+    def error_if(self, condition, errstr):
+        if condition:
+            self.log_with_level(self.logger.error, errstr, outputfilepos=True)
+
+    def fatal_if(self, condition, errstr):
+        if condition:
+            self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
+        raise FatalException(errstr)
+
 
 mylog = MyLog(filename='py_stock.log')
 
@@ -112,7 +133,7 @@ def jqd(*args):
 
 def main():
     # mylog = MyLog(filename='pystock2.log')
-    # mylog.debug('aaa')
+    # mylog.debug_if(1<0, 'aaa')
     # sleep_ms(100000)
     pass
 

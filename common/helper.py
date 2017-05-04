@@ -5,6 +5,7 @@ import traceback
 from pathlib import Path
 
 
+# <editor-fold desc="FileAndDir">
 def rmdir_ifexist(path):
     try:
         os.rmdir(path)
@@ -61,8 +62,8 @@ def is_file_outdated(path, span):
     if not os.path.exists(path):
         return True
     file_dt = os.path.getmtime(path)
-    file_dt = datetime.fromtimestamp(file_dt)
-    now = datetime.now()
+    file_dt = dt.datetime.fromtimestamp(file_dt)
+    now = dt.datetime.now()
     curspan = now - file_dt
     if curspan > span:
         return True
@@ -71,18 +72,22 @@ def is_file_outdated(path, span):
 
 def get_file_modify_time(path):
     file_dt = os.path.getmtime(path)
-    return datetime.fromtimestamp(file_dt)
+    return dt.datetime.fromtimestamp(file_dt)
 
 
 def get_file_create_time(path):
     filedt = os.path.getctime(path)
-    return datetime.fromtimestamp(filedt)
+    return dt.datetime.fromtimestamp(filedt)
 
 
+# </editor-fold>
+
+
+# <editor-fold desc="Time">
 def time_exec(func):
-    start = datetime.now()
+    start = dt.datetime.now()
     func()
-    print(datetime.now() - start)
+    print(dt.datetime.now() - start)
 
 
 def ndays_later(n, olddate=None):
@@ -97,8 +102,22 @@ def ndays_ago(n, olddate=None):
     return olddate - dt.timedelta(days=n)
 
 
-def today_date():
+def dttoday():
     return dt.date.today()
+
+
+def dtnow():
+    return dt.datetime.now()
+
+
+def dttime():
+    return dt.datetime.now().time()
+
+
+def seconds_of(val):
+    if type(val) == dt.time:
+        return val.hour * 3600 + val.minute * 60 + val.second + val.microsecond / 1000_000
+    raise Exception(f'Unsupported type {type(val)}')
 
 
 def to_datetime(olddate: dt.date):
@@ -140,9 +159,14 @@ def find_date_substr(source: str):
     return re.search(r'\d{4}-\d{1,2}-\d{1,2}', source).group()
 
 
-def sleep_ms(millisecond):
+def sleep_for_milliseconds(millisecond):
     import time
     time.sleep(millisecond / 1000)
+
+
+def sleep_for_seconds(seconds):
+    import time
+    time.sleep(seconds)
 
 
 def seconds_from_epoch():
@@ -150,9 +174,29 @@ def seconds_from_epoch():
     return time.time()
 
 
-from datetime import datetime
+def milliseconds_from_epoch():
+    import time
+    return time.time() * 1000
 
 
+def do_it_every(func, timedelta_: dt.timedelta):
+    while 1:
+        start = dtnow()
+        func()
+        end = dtnow()
+        if end - start < timedelta_:
+            sleep_for_seconds(
+                timedelta_.total_seconds() - (end - start).total_seconds())
+
+
+# </editor-fold>
+
+def assign(dest, src):
+    dest = src
+    return dest
+
+
+# <editor-fold desc="Exception">
 class LogicException(Exception):
     pass
 
@@ -227,3 +271,28 @@ def exception_to_logstr(e):
     tbstr = ''.join(traceback.format_tb(e.__traceback__))
     tbstr = tbstr + str(e)
     return f'Exception encountered: \n{tbstr}'
+
+
+# </editor-fold>
+
+def type_info(val):
+    if type(val) == list:
+        info = 'typeinfo:: list['
+        for i in range(min(len(val), 3)):
+            info += str(type(val[i])) + ','
+        info += ']'
+        return info
+    if type(val) == dict:
+        info = 'typeinfo:: dict{'
+        for i, key in enumerate(val):
+            if i < 3:
+                info += str(type(key)) + ':' + str(type(val[key])) + ','
+        info += '}'
+        return info
+    if type(val) == set:
+        info = 'typeinfo:: set{'
+        for i, item in enumerate(val):
+            if i < 3:
+                info += str(type(item)) + ','
+        info += '}'
+        return info

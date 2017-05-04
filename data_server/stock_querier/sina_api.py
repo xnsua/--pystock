@@ -1,9 +1,8 @@
 import datetime as dt
 import re
 
-from common.helper import sleep_ms
+from common.helper import sleep_for_milliseconds, dtnow
 from common.web_helper import firefox_quick_get_url
-from stock_basic.stock_helper import etf_t1
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
@@ -49,9 +48,10 @@ pd.set_option('precision', 5)
 def main():
     while 1:
         sstime = dt.datetime.now()
-        ret = get_realtime_stock_info('sh' + v for v in etf_t1)
-        sleep_ms(150)
-        print(dt.datetime.now() - sstime)
+        ret = get_realtime_stock_info('sh' + v for v in ['510900'])
+        sleep_for_milliseconds(1000)
+        print(dtnow())
+        print(ret.ix[0, 'price'])
 
 
 if __name__ == '__main__':

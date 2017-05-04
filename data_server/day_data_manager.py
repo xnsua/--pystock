@@ -21,10 +21,8 @@ def update_k_data(stockcode: str, path):
         lastdate = ndays_ago(1, stock_startday)
 
     query_start_date = ndays_later(1, lastdate)
-    # toch
-    # Return if there is no new data
     now = dt.datetime.now()
-    if now.date() == query_start_date and now.hour < 17:
+    if now.date() == query_start_date and now.hour < 16:
         return dfread
 
     dfupdate = ts.get_k_data(stockcode, start=str(query_start_date))

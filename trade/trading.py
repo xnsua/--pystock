@@ -3,7 +3,7 @@ import threading
 
 import pandas as pd
 
-from common.helper import sleep_ms
+from common.helper import sleep_for_milliseconds
 from data_server.data_server_main import data_server_loop
 from trade.buy_after_drop import buy_after_drop_loop_for_etfs
 from trade.trade_constant import *
@@ -11,14 +11,14 @@ from trade.trade_constant import *
 pd.options.display.max_rows = 10
 
 
-class TradeLoop:
+class Trading:
     def __init__(self):
         self.out_queues = []
         self.self_queue = queue.Queue()
         self.data_server_queue = queue.Queue()
 
-        self.queue_dict = {k_id_trade_loop: self.self_queue,
-                           k_id_data_server: self.data_server_queue}
+        self.queue_dict = {ks_id_trade_loop: self.self_queue,
+                           ks_id_data_server: self.data_server_queue}
         self.model_queue_dict = {}
         self.trade_models = []
         self.threads = []
@@ -34,7 +34,8 @@ class TradeLoop:
 
         data_server_thread = threading.Thread(
             target=data_server_loop,
-            kwargs={**self.queue_dict, **self.model_queue_dict})
+            kwargs={**self.queue_dict,
+                    ks_model_queue_dict: self.model_queue_dict})
         data_server_thread.start()
 
         for v in self.trade_models:
@@ -51,13 +52,15 @@ class TradeLoop:
         self.prepare()
         while 1:
             val = self.self_queue.get()
-            sleep_ms(1000)
+            sleep_for_milliseconds(1000)
 
 
 def begin_trade():
-    tradeloop = TradeLoop()
+    tradeloop = Trading()
     tradeloop.add_model(
-        (buy_after_drop_loop_for_etfs, k_idm_buy_after_drop, {k_drop_days: 2}))
+        (
+            buy_after_drop_loop_for_etfs, ks_idm_buy_after_drop,
+            {ks_drop_days: 2}))
     tradeloop.process_loop()
 
 

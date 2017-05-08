@@ -1,6 +1,10 @@
 import datetime
+import datetime as dt
 
-# Trade Module
+import common.helper as hp
+
+# <editor-fold desc="TradeModel">
+
 ks_id_data_server = 'id_data_server'
 ks_id_trade_loop = 'id_trade_loop'
 ks_model_name = 'model_name'
@@ -11,18 +15,10 @@ ks_msg_set_monitor_stock = 'msg_set_monitor_stock'
 ks_msg_push_monitor_stocks = 'msg_push_monitor_stocks'
 
 ks_drop_days = 'drop_days'
+ks_datetime_manager = 'datetime_manager'
+# </editor-fold>
 
-# Stock constant
-
-ks_open = 'open'
-ks_close = 'close'
-ks_low = 'low'
-ks_hight = 'high'
-
-ks_data = 'date'
-ks_volumn = 'volumn'
-ks_amount = 'amount'
-
+# <editor-fold desc="Stock Time Constant">
 ks_not_trade_day = 'not_trade_day'
 ks_stage_entered = 'stage_entered'
 
@@ -44,36 +40,46 @@ k_midnoon_break_time = (datetime.time(11, 30, 0), datetime.time(13, 00, 0))
 k_trade2_time = (datetime.time(13, 0, 0), datetime.time(15, 00, 0))
 k_after_trade_time = (datetime.time(15, 0, 0), datetime.time.max)
 
-ks_trade_stage_map = {ks_before_bid: k_before_bid_time,
-                      ks_bid_stage1: k_bid_stage1_time,
-                      ks_bid_stage2: k_bid_stage2_time,
-                      ks_bid_over: k_bid_over_time,
-                      ks_trade1: k_trade1_time,
-                      ks_midnoon_break: k_midnoon_break_time,
-                      ks_trade2: k_trade2_time,
-                      ks_after_trade: k_after_trade_time}
+kd_trade_stage = {ks_before_bid: k_before_bid_time,
+                  ks_bid_stage1: k_bid_stage1_time,
+                  ks_bid_stage2: k_bid_stage2_time,
+                  ks_bid_over: k_bid_over_time,
+                  ks_trade1: k_trade1_time,
+                  ks_midnoon_break: k_midnoon_break_time,
+                  ks_trade2: k_trade2_time,
+                  ks_after_trade: k_after_trade_time}
+
+
+# </editor-fold>
 
 
 def find_stage(time):
-    for kv in ks_trade_stage_map:
-        begin, end = ks_trade_stage_map[kv]
+    for kv in kd_trade_stage:
+        begin, end = kd_trade_stage[kv]
         if begin <= time < end:
             return kv
     raise Exception(f'Cannot find time stage for time {time}')
 
 
-def test_find_time():
-    assert ks_before_bid == find_stage(datetime.time(1, 1, 1))
-    assert ks_bid_stage1 == find_stage(datetime.time(9, 15, 0))
-    assert ks_bid_stage2 == find_stage(datetime.time(9, 24, 0))
-    assert ks_bid_over == find_stage(datetime.time(9, 28, 0))
-    assert ks_trade1 == find_stage(datetime.time(9, 35, 0))
-    assert ks_midnoon_break == find_stage(datetime.time(12, 0, 0))
-    assert ks_trade2 == find_stage(datetime.time(13, 3, 0))
-    assert ks_after_trade == find_stage(datetime.time(16, 3, 0))
+def is_in_expanded_stage(time, stage, expand_time_delta=dt.timedelta()):
+    t1, t2 = kd_trade_stage[stage]
+    dt1 = hp.to_datetime(t1)
+    dt2 = hp.to_datetime(t2)
+    dt1a = dt1 - expand_time_delta
+    dt2a = dt2 + expand_time_delta
+    return dt1a <= hp.to_datetime(time) <= dt2a
 
 
-# Communication constant
+# <editor-fold desc="Stock Terms">
+ks_open = 'open'
+ks_close = 'close'
+ks_low = 'low'
+ks_hight = 'high'
+
+ks_data = 'date'
+ks_volumn = 'volumn'
+ks_amount = 'amount'
+
 ks_operation = 'operation'
 ks_stock_code = 'stock_code'
 ks_price = 'price'
@@ -97,8 +103,11 @@ ks_moneymovement = "moneymovement"
 ks_deliveryentrust = "deliveryentrust"
 
 
+# </editor-fold>
+
+
 def main():
-    test_find_time()
+    pass
 
 
 if __name__ == '__main__':

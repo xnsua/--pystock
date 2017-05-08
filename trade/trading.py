@@ -38,7 +38,8 @@ class Trading:
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
             kwargs={**self.queue_dict,
-                    ks_model_queue_dict: self.model_queue_dict})
+                    ks_model_queue_dict: self.model_queue_dict,
+                    ks_datetime_manager: self.dtm})
         data_server_thread.start()
 
         for v in self.trade_models:

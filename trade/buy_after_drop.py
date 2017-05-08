@@ -10,7 +10,7 @@ from trade.comm_message import CommMessage
 from trade.trade_constant import *
 
 
-def buy_after_drop_loop_for_etfs(**param):
+def thread_buy_after_drop(**param):
     obj = BuyAfterDrop(param)
     obj.loop()
 
@@ -21,14 +21,8 @@ class BuyAfterDrop:
         self.drop_days = param_dict[ks_drop_days]
         self.trade_loop_queue = param_dict[ks_id_trade_loop]
         self.data_server_queue = param_dict[ks_id_data_server]
-        self.name = ks_idm_buy_after_drop
+        self.name = param_dict[ks_model_name]
         self.self_queue = param_dict[self.name]
-        # self.time_points = \
-        #     TimePoints({datetime.time(10, 0, 0): ks_buy,
-        #                 datetime.time(11, 0, 0): ks_sell_or_cancel,
-        #                 datetime.time(10, 0, 0): ks_buy,
-        #                 datetime.time(10, 0, 0): ks_sell_or_cancel,
-        #                 })
 
     def loop(self):
         # toch

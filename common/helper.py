@@ -120,9 +120,12 @@ def seconds_of(val):
     raise Exception(f'Unsupported type {type(val)}')
 
 
-def to_datetime(olddate: dt.date):
-    return dt.datetime(olddate.year, olddate.month, olddate.day)
-
+def to_datetime(dateortime):
+    if type(dateortime) == dt.date:
+        return dt.datetime(dateortime.year, dateortime.month, dateortime.day)
+    elif type(dateortime) == dt.time:
+        return dt.datetime.combine(dttoday(), dateortime)
+    raise LogicException(f'{dateortime} has wrong type')
 
 def to_seconds_str(o) -> str:
     return o.strftime('%y-%m-%d %H:%M:%S')

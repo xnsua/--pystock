@@ -17,7 +17,7 @@ from trade.trade_constant import ks_id_data_server, ks_msg_set_monitor_stock, \
     ks_stage_entered
 
 
-def data_server_loop(**queue_dict):
+def thread_data_server_loop(**queue_dict):
     data_server = DataServer(queue_dict)
     data_server.run_loop()
 
@@ -32,6 +32,7 @@ class DataServer:
         self.self_queue = queue_dict[
             ks_id_data_server]  # type: multiprocessing.Queue
         self.model_queue_dict = queue_dict[ks_model_queue_dict]
+
         self.monitored_stocks_map = {}
         self.stage = None
         self.stage_func_map = {

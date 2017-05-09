@@ -10,26 +10,26 @@ from trade.trade_constant import *
 
 def thread_buy_after_drop(**param):
     obj = BuyAfterDrop(param)
-    obj.loop()
+    obj.run_loop()
 
 
 class BuyAfterDrop:
     def __init__(self, param_dict):
         self.realtime_stock_info = None
         self.drop_days = param_dict[ks_drop_days]
-        self.trade_loop_queue = param_dict[ks_id_trade_loop]
+        self.trade_loop_queue = param_dict[ks_id_trade_manager]
         self.data_server_queue = param_dict[ks_id_data_server]
         self.name = param_dict[ks_model_name]
         self.self_queue = param_dict[self.name]
         self.etf_day_data = None
 
         self.prepare()
-        self.loop()
+        self.run_loop()
 
     def prepare(self):
         self.etf_day_data = update_etf()
 
-    def loop(self):
+    def run_loop(self):
         self.data_server_queue.put(
             CommMessage(self.name, ks_msg_set_monitor_stock,
                         [*etf_t1, *etf_t0]))
@@ -50,7 +50,7 @@ class BuyAfterDrop:
         func(sender, param)
 
     def find_operation(self, operation_name):
-        operdict = {ks_msg_push_monitor_stocks: self.on_realtime_stock_info}
+        operdict = {ks_msg_push_realtime_stocks: self.on_realtime_stock_info}
         return operdict[operation_name]
 
 

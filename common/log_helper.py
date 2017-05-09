@@ -132,9 +132,7 @@ def jqd(*args):
 
 
 def main():
-    # mylog = MyLog(filename='pystock2.log')
-    # mylog.debug_if(1<0, 'aaa')
-    # sleep_ms(100000)
+    jqd('hh')
     pass
 
 

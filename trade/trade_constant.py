@@ -6,13 +6,14 @@ import common.helper as hp
 # <editor-fold desc="TradeModel">
 
 ks_id_data_server = 'id_data_server'
-ks_id_trade_loop = 'id_trade_loop'
+ks_id_trade_manager = 'id_trade_manager'
 ks_model_name = 'model_name'
 ks_idm_buy_after_drop = 'idm_buy_after_drop'
 ks_model_queue_dict = 'model_queue_dict'
 
 ks_msg_set_monitor_stock = 'msg_set_monitor_stock'
-ks_msg_push_monitor_stocks = 'msg_push_monitor_stocks'
+ks_msg_push_realtime_stocks = 'msg_push_realtime_stocks'
+ks_push_realtime_interval = 'push_realtime_interval'
 
 ks_drop_days = 'drop_days'
 ks_datetime_manager = 'datetime_manager'
@@ -52,6 +53,9 @@ kd_trade_stage = {ks_before_bid: k_before_bid_time,
 
 # </editor-fold>
 
+ks_msg_quit_loop = 'msg_quit_loop'
+ks_msg_exception_occur = 'msg_exception_occur'
+
 
 def find_stage(time):
     for kv in kd_trade_stage:
@@ -61,12 +65,12 @@ def find_stage(time):
     raise Exception(f'Cannot find time stage for time {time}')
 
 
-def is_in_expanded_stage(time, stage, expand_time_delta=dt.timedelta()):
+def is_in_expanded_stage(time, stage, time_delta=dt.timedelta()):
     t1, t2 = kd_trade_stage[stage]
     dt1 = hp.to_datetime(t1)
     dt2 = hp.to_datetime(t2)
-    dt1a = dt1 - expand_time_delta
-    dt2a = dt2 + expand_time_delta
+    dt1a = dt1 - time_delta
+    dt2a = dt2 + time_delta
     return dt1a <= hp.to_datetime(time) <= dt2a
 
 

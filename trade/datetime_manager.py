@@ -1,68 +1,36 @@
-import os
-import time
-import json
-import sys
 import datetime as dt
-import pathlib as pl
-import requests
-from contextlib import suppress
+import time
 
-from common.helper import dttoday, dtnow, dttime
-from config_module import myconfig
-import tushare as ts
-from common.log_helper import jqd
-import common.helper as hp
+from common.helper import dtnow
 
 
-# noinspection PyMethodMayBeStatic
 class DateTimeManager:
-    def __init__(self):
-        self.timerstart = None
-
-    def today(self):
-        return dttoday()
-
-    def now(self):
-        return dtnow()
-
-    def time(self):
-        return dttime()
-
-    def sleep_for_seconds(self, sec):
-        time.sleep(sec)
-
-    def set_timer(self):
-        self.timerstart = self.now()
-
-    def elapse_seconds(self):
-        return (self.now() - self.timerstart).total_seconds()
-
-
-class MockDateTimeManager(DateTimeManager):
-    def __init__(self, start_dt, speed):
+    def __init__(self, start_dt=dtnow(), speed=1):
         self.start_dt = start_dt
+        self.real_start_time = dtnow()
+
         self.speed = speed
+        self.timer_start = self.now()
 
     def now(self):
-        vnow = dtnow()
-        vtimedelta = vnow - self.start_dt
+        vtimedelta = dtnow() - self.real_start_time
         sec1 = vtimedelta.total_seconds()
         sec2 = sec1 * self.speed
         vtimedelta2 = dt.timedelta(seconds=sec2)
         now = self.start_dt + vtimedelta2
         return now
 
+    def today(self):
+        return self.now().date()
+
     def time(self):
         return self.now().time()
 
-    def sleep(self, seconds):
-        time.sleep(seconds / self.speed)
+    def sleep(self, sec):
+        time.sleep(sec / self.speed)
 
+    def set_timer(self):
+        self.timer_start = self.now()
 
-v = MockDateTimeManager(hp.to_datetime(dt.time(10, 1, 1)), 50)
-
-while 1:
-    print(v.time())
-    v.set_timer()
-    v.sleep(10)
-    print(v.elapse_seconds())
+    def elapse_seconds(self):
+        return (self.now() - self.timer_start).total_seconds()

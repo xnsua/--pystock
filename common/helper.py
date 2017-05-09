@@ -127,6 +127,11 @@ def to_datetime(dateortime):
         return dt.datetime.combine(dttoday(), dateortime)
     raise LogicException(f'{dateortime} has wrong type')
 
+
+def dt_from_time(a, b, c):
+    return dt.datetime.combine(dttoday(), dt.time(a, b, c))
+
+
 def to_seconds_str(o) -> str:
     return o.strftime('%y-%m-%d %H:%M:%S')
 
@@ -270,10 +275,12 @@ def claim_contain(collection, val, msg=''):
 
 # </editor-fold>
 
-def exception_to_logstr(e):
-    tbstr = ''.join(traceback.format_tb(e.__traceback__))
-    tbstr = tbstr + str(e)
-    return f'Exception encountered: \n{tbstr}'
+def to_logstr(e):
+    if isinstance(e, Exception):
+        tbstr = ''.join(traceback.format_tb(e.__traceback__))
+        tbstr = tbstr + str(e)
+        return f'Exception encountered: \n{tbstr}'
+    raise Exception(f'Unsupport type {type(e)} value:{e}')
 
 
 # </editor-fold>

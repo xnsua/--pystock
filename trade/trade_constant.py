@@ -13,6 +13,7 @@ ks_model_queue_dict = 'model_queue_dict'
 
 ks_msg_set_monitor_stock = 'msg_set_monitor_stock'
 ks_msg_push_realtime_stocks = 'msg_push_realtime_stocks'
+ks_msg_wait_result_queue = 'msg_wait_result_queue'
 ks_push_realtime_interval = 'push_realtime_interval'
 
 ks_drop_days = 'drop_days'

@@ -42,7 +42,7 @@ class MyLog:
             atexit.register(lambda: self.logger.info(
                 '-------------------- PROGRAM EXIT ------------------------------'))
 
-    def log_with_level(self, log_with_level, errstr, outputfilepos=True):
+    def log_with_level(self, level_log, errstr, outputfilepos=True):
         def find_caller():
             """
             Find the stack frame of the caller so that we can note the source
@@ -69,21 +69,20 @@ class MyLog:
         purefilename = pl.Path(caller[0]).name
         callerstr = str((purefilename, caller[1], caller[2]))
         if outputfilepos:
-            errstr = errstr + '.  ' + callerstr
-
-        if self.last_error_str == errstr and self.last_log_level == log_with_level:
+            errstr = errstr + '.    ' + callerstr
+        if self.last_error_str == errstr and self.last_log_level == level_log:
             timestr = dt.datetime.now().strftime('%d %H:%M:%S.%f')[:-4]
             self.same_error_time.append(timestr)
             if len(self.same_error_time) == 1:
-                log_with_level(f'---------- REPEAT BEGIN: {timestr}')
+                level_log(f'---------- REPEAT BEGIN: {timestr}')
         else:
             if self.same_error_time:
                 self.last_log_level(f'---------- REPEAT END. LOG TIME::'
                                     f'{self.same_error_time}')
             self.last_error_str = errstr
-            self.last_log_level = log_with_level
+            self.last_log_level = level_log
             self.same_error_time = []
-            log_with_level(errstr)
+            level_log(errstr)
 
     def info(self, errstr):
         self.log_with_level(self.logger.info, errstr, outputfilepos=False)
@@ -128,7 +127,7 @@ mylog = MyLog(filename='py_stock.log')
 
 def jqd(*args):
     errstr = ' '.join(str(v) for v in args)
-    mylog.log_with_level(mylog.debug, errstr, outputfilepos=True)
+    mylog.log_with_level(mylog.logger.debug, errstr, outputfilepos=True)
 
 
 def main():

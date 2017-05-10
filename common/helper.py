@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+import queue
 import re
 import traceback
 from pathlib import Path
@@ -306,3 +307,19 @@ def type_info(val):
                 info += str(type(item)) + ','
         info += '}'
         return info
+
+
+class ObjectCabinet:
+    def __init__(self, generator):
+        self.queue = queue.Queue()
+        self.generator = generator
+
+    def fetch_one(self):
+        try:
+            fetch_result = self.queue.get(block=False)
+            return fetch_result
+        except queue.Empty:
+            return self.generator()
+
+    def put_one(self, obj):
+        self.queue.put(obj)

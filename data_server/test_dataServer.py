@@ -35,8 +35,6 @@ class TestDataServer(TestCase):
         datetime_manager.sleep(sleep_seconds - 0.5)
         data_server_queue.put(CommMessage(ks_id_trade_manager, ks_msg_quit_loop, None))
         data_server_thread.join()
-        # jqd(model_queue.queue)
-        jqd('Len', len(model_queue.queue))
         assert len(model_queue.queue) == 3
         for val in model_queue.queue:
             assert val.operation == ks_msg_push_realtime_stocks

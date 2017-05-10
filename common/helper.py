@@ -323,3 +323,18 @@ class ObjectCabinet:
 
     def put_one(self, obj):
         self.queue.put(obj)
+
+    def use_one(self):
+        class Context:
+            def __init__(self, cabinet):
+                self.cabinet = cabinet
+                self.current_obj = None
+
+            def __enter__(self):
+                self.current_obj = self.cabinet.fetch_one()
+                return self.current_obj
+
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                self.cabinet.put_one(self.current_obj)
+
+        return Context(self)

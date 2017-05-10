@@ -51,7 +51,6 @@ kd_trade_stage = {ks_before_bid: k_before_bid_time,
                   ks_trade2: k_trade2_time,
                   ks_after_trade: k_after_trade_time}
 
-
 # </editor-fold>
 
 ks_msg_quit_loop = 'msg_quit_loop'
@@ -84,6 +83,24 @@ ks_hight = 'high'
 ks_data = 'date'
 ks_volumn = 'volumn'
 ks_amount = 'amount'
+
+
+class ClientHttpAccessConstant:
+    k_operation = 'operation'
+    k_stock_code = 'stock_code'
+    k_price = 'price'
+    k_amount = 'amount'
+    k_entrust_type = 'entrust_type'
+    k_entrust_id = 'entrust_id'
+    k_query_info_type = 'query_info_type'
+    k_buy = 'buy'
+    k_sell = 'sell'
+    k_cancel_entrust = 'cancel_entrust'
+    k_query = 'query'
+    k_buy_or_sell = 'buy_or_sell'
+    k_fixed_price = 'fixed_price'
+    k_query_content = 'query_content'
+
 
 ks_operation = 'operation'
 ks_stock_code = 'stock_code'

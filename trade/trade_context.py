@@ -2,8 +2,7 @@ import queue
 
 from common.helper import ObjectCabinet
 from trade.comm_message import CommMessage
-from trade.trade_constant import ks_msg_wait_result_queue, ks_stock_code, ks_price, \
-    ks_amount
+from trade.trade_constant import ks_msg_wait_result_queue
 
 
 class TradeContext:
@@ -32,4 +31,5 @@ class TradeContext:
         params = {ks_stock_code: stock_code,
                   ks_price: price,
                   ks_amount: amount,
+                  k
                   }

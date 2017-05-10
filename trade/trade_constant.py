@@ -80,10 +80,6 @@ ks_close = 'close'
 ks_low = 'low'
 ks_hight = 'high'
 
-ks_data = 'date'
-ks_volumn = 'volumn'
-ks_amount = 'amount'
-
 
 class ClientHttpAccessConstant:
     k_operation = 'operation'
@@ -101,28 +97,13 @@ class ClientHttpAccessConstant:
     k_fixed_price = 'fixed_price'
     k_query_content = 'query_content'
 
-
-ks_operation = 'operation'
-ks_stock_code = 'stock_code'
-ks_price = 'price'
-ks_entrust_type = 'entrust_type'
-ks_entrust_id = 'entrust_id'
-ks_query_info_type = 'query_info_type'
-ks_buy = 'buy'
-ks_sell = 'sell'
-ks_sell_or_cancel = 'sell_or_cancel'
-ks_cancel_entrust = 'cancel_entrust'
-ks_query = 'query'
-ks_buy_or_sell = 'buy_or_sell'
-ks_fixed_price = 'fixed_price'
-ks_query_content = 'query_content'
-ks_myshare = "myshare"
-ks_dayentrust = "dayentrust"
-ks_dayfinentrust = "dayfinentrust"
-ks_hisentrust = "hisentrust"
-ks_hisfinentrust = "hisfinentrust"
-ks_moneymovement = "moneymovement"
-ks_deliveryentrust = "deliveryentrust"
+    k_myshare = "myshare"
+    k_dayentrust = "dayentrust"
+    k_dayfinentrust = "dayfinentrust"
+    k_hisentrust = "hisentrust"
+    k_hisfinentrust = "hisfinentrust"
+    k_moneymovement = "moneymovement"
+    k_deliveryentrust = "deliveryentrust"
 
 
 # </editor-fold>

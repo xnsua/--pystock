@@ -21,9 +21,11 @@ class DateTimeManager:
         return now
 
     def today(self):
+        # noinspection PyUnresolvedReferences
         return self.now().date()
 
     def time(self):
+        # noinspection PyUnresolvedReferences
         return self.now().time()
 
     def sleep(self, sec):

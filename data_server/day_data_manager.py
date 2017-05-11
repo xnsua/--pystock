@@ -42,8 +42,8 @@ def update_etf():
     rval = {}
     for val in stock_helper.etf_t1:
         val = val[2:]
-        rval[val] = day_data_manager.update_k_data(val, etf_path)
+        rval[val] = update_k_data(val, etf_path)
     for val in stock_helper.etf_t0:
         val = val[2:]
-        rval[val] = day_data_manager.update_k_data(val, etf_path)
+        rval[val] = update_k_data(val, etf_path)
     return rval

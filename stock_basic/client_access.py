@@ -23,30 +23,30 @@ def visit_server(urlargs):
 
 
 def sell_stock(stock_code, price, amount, entrust_type):
-    urlargs = {_c.k_operation: _c.k_sell, _c.k_stock_code: stock_code,
-               _c.k_price: price,
-               _c.k_amount: amount,
-               _c.k_entrust_type: entrust_type}
+    urlargs = {_c.operation: _c.sell, _c.stock_code: stock_code,
+               _c.price: price,
+               _c.amount: amount,
+               _c.entrust_type: entrust_type}
     ret = visit_server(urlargs)
     print(ret)
 
 
 def buy_stock(stock_code, price, amount, entrust_type):
-    urlargs = {_c.k_operation: _c.k_buy, _c.k_stock_code: stock_code, _c.k_price: price,
-               _c.k_amount: amount, _c.k_entrust_type: entrust_type}
+    urlargs = {_c.operation: _c.buy, _c.stock_code: stock_code, _c.price: price,
+               _c.amount: amount, _c.entrust_type: entrust_type}
     ret = visit_server(urlargs)
     print(ret)
 
 
 def query_account_info(info_type):
-    urlargs = {_c.k_operation: _c.k_query, _c.k_query_info_type: info_type}
+    urlargs = {_c.operation: _c.query, _c.account_info_type: info_type}
     ret = visit_server(urlargs)
     print(ret)
 
 
 def cancel_entrust(entrust_id, stock_code, buyorsell):
-    urlargs = {_c.k_operation: _c.k_cancel_entrust, _c.k_entrust_id: entrust_id,
-               _c.k_stock_code: stock_code, _c.k_buy_or_sell: buyorsell}
+    urlargs = {_c.operation: _c.cancel_entrust, _c.entrust_id: entrust_id,
+               _c.stock_code: stock_code, _c.buy_or_sell: buyorsell}
     ret = visit_server(urlargs)
     print(ret)
 
@@ -54,7 +54,7 @@ def cancel_entrust(entrust_id, stock_code, buyorsell):
 def main():
     # sell_stock('SH.510900', 1.1, 100)
     # buy_stock('SH.510900', 1.1, 100)
-    # query_account_info(_cas.k_myshare)
+    # query_account_info(_cas.myshare)
     cancel_entrust('O1704271039310081771', '510900', 'buy')
 
 

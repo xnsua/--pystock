@@ -1,4 +1,3 @@
-import datetime as dt
 import re
 
 from common.helper import sleep_for_milliseconds, dtnow
@@ -47,7 +46,6 @@ pd.set_option('precision', 5)
 
 def main():
     while 1:
-        sstime = dt.datetime.now()
         ret = get_realtime_stock_info('sh' + v for v in ['510900'])
         sleep_for_milliseconds(1000)
         print(dtnow())

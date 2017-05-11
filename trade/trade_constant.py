@@ -1,117 +1,90 @@
 import datetime
-import datetime as dt
-
-import common.helper as hp
-
-# <editor-fold desc="TradeModel">
-
-ks_id_data_server = 'id_data_server'
-ks_id_trade_manager = 'id_trade_manager'
-ks_model_name = 'model_name'
-ks_idm_buy_after_drop = 'idm_buy_after_drop'
-ks_model_queue_dict = 'model_queue_dict'
-
-ks_msg_set_monitor_stock = 'msg_set_monitor_stock'
-ks_msg_push_realtime_stocks = 'msg_push_realtime_stocks'
-ks_msg_wait_result_queue = 'msg_wait_result_queue'
-ks_push_realtime_interval = 'push_realtime_interval'
-
-ks_drop_days = 'drop_days'
-ks_datetime_manager = 'datetime_manager'
-# </editor-fold>
-
-# <editor-fold desc="Stock Time Constant">
-ks_not_trade_day = 'not_trade_day'
-ks_stage_entered = 'stage_entered'
-
-ks_before_bid = 'before_day_trade'
-ks_bid_stage1 = 'bid_stage1'
-ks_bid_stage2 = 'bid_stage2'
-ks_bid_over = 'bid_over'
-ks_trade1 = 'trade1'
-ks_midnoon_break = 'midnoon_break'
-ks_trade2 = 'trade2'
-ks_after_trade = 'after_day_trade'
-
-k_before_bid_time = (datetime.time.min, datetime.time(9, 15, 0))
-k_bid_stage1_time = (datetime.time(9, 15, 0), datetime.time(9, 20, 0))
-k_bid_stage2_time = (datetime.time(9, 20, 0), datetime.time(9, 25, 0))
-k_bid_over_time = (datetime.time(9, 25, 0), datetime.time(9, 30, 0))
-k_trade1_time = (datetime.time(9, 30, 0), datetime.time(11, 30, 0))
-k_midnoon_break_time = (datetime.time(11, 30, 0), datetime.time(13, 00, 0))
-k_trade2_time = (datetime.time(13, 0, 0), datetime.time(15, 00, 0))
-k_after_trade_time = (datetime.time(15, 0, 0), datetime.time.max)
-
-kd_trade_stage = {ks_before_bid: k_before_bid_time,
-                  ks_bid_stage1: k_bid_stage1_time,
-                  ks_bid_stage2: k_bid_stage2_time,
-                  ks_bid_over: k_bid_over_time,
-                  ks_trade1: k_trade1_time,
-                  ks_midnoon_break: k_midnoon_break_time,
-                  ks_trade2: k_trade2_time,
-                  ks_after_trade: k_after_trade_time}
-
-# </editor-fold>
-
-ks_msg_quit_loop = 'msg_quit_loop'
-ks_msg_exception_occur = 'msg_exception_occur'
 
 
-def find_stage(time):
-    for kv in kd_trade_stage:
-        begin, end = kd_trade_stage[kv]
-        if begin <= time < end:
-            return kv
-    raise Exception(f'Cannot find time stage for time {time}')
+class TradeCommicationConstant:
+    id_data_server = 'id_data_server'
+    id_trade_manager = 'id_trade_manager'
+    model_name = 'model_name'
+    idm_buy_after_drop = 'idm_buy_after_drop'
+    model_queue_dict = 'model_queue_dict'
+
+    msg_set_monitor_stock = 'msg_set_monitor_stock'
+    msg_push_realtime_stocks = 'msg_push_realtime_stocks'
+    msg_wait_result_queue = 'msg_wait_result_queue'
+    push_realtime_interval = 'push_realtime_interval'
+
+    datetime_manager = 'datetime_manager'
+    msg_quit_loop = 'msg_quit_loop'
+    msg_exception_occur = 'msg_exception_occur'
+    msg_buy_stock = 'msg_buy_stock'
+    msg_sell_stock = 'msg_sell_stock'
+    msg_cancel_entrust = 'msg_cancel_entrust'
+    msg_query_account_info = 'msg_query_account_info'
 
 
-def is_in_expanded_stage(time, stage, time_delta=dt.timedelta()):
-    t1, t2 = kd_trade_stage[stage]
-    dt1 = hp.to_datetime(t1)
-    dt2 = hp.to_datetime(t2)
-    dt1a = dt1 - time_delta
-    dt2a = dt2 + time_delta
-    return dt1a <= hp.to_datetime(time) <= dt2a
+class ModelConstant:
+    bsm_drop_days = 'drop_days'
 
 
-# <editor-fold desc="Stock Terms">
-ks_open = 'open'
-ks_close = 'close'
-ks_low = 'low'
-ks_hight = 'high'
+class StockTimeConstant:
+    not_trade_day = 'not_trade_day'
+    stage_entered = 'stage_entered'
+
+    before_bid = 'before_day_trade'
+    bid_stage1 = 'bid_stage1'
+    bid_stage2 = 'bid_stage2'
+    bid_over = 'bid_over'
+    trade1 = 'trade1'
+    midnoon_break = 'midnoon_break'
+    trade2 = 'trade2'
+    after_trade = 'after_day_trade'
+
+    before_bid_time = (datetime.time.min, datetime.time(9, 15, 0))
+    bid_stage1_time = (datetime.time(9, 15, 0), datetime.time(9, 20, 0))
+    bid_stage2_time = (datetime.time(9, 20, 0), datetime.time(9, 25, 0))
+    bid_over_time = (datetime.time(9, 25, 0), datetime.time(9, 30, 0))
+    trade1_time = (datetime.time(9, 30, 0), datetime.time(11, 30, 0))
+    midnoon_break_time = (datetime.time(11, 30, 0), datetime.time(13, 00, 0))
+    trade2_time = (datetime.time(13, 0, 0), datetime.time(15, 00, 0))
+    after_trade_time = (datetime.time(15, 0, 0), datetime.time.max)
+
+    trade_stage_dict = {before_bid: before_bid_time,
+                        bid_stage1: bid_stage1_time,
+                        bid_stage2: bid_stage2_time,
+                        bid_over: bid_over_time,
+                        trade1: trade1_time,
+                        midnoon_break: midnoon_break_time,
+                        trade2: trade2_time,
+                        after_trade: after_trade_time}
+
+
+class StockTerms:
+    open = 'open'
+    close = 'close'
+    low = 'low'
+    high = 'high'
 
 
 class ClientHttpAccessConstant:
-    k_operation = 'operation'
-    k_stock_code = 'stock_code'
-    k_price = 'price'
-    k_amount = 'amount'
-    k_entrust_type = 'entrust_type'
-    k_entrust_id = 'entrust_id'
-    k_query_info_type = 'query_info_type'
-    k_buy = 'buy'
-    k_sell = 'sell'
-    k_cancel_entrust = 'cancel_entrust'
-    k_query = 'query'
-    k_buy_or_sell = 'buy_or_sell'
-    k_fixed_price = 'fixed_price'
-    k_query_content = 'query_content'
+    operation = 'operation'
+    stock_code = 'stock_code'
+    price = 'price'
+    amount = 'amount'
+    entrust_type = 'entrust_type'
+    entrust_id = 'entrust_id'
+    account_info_type = 'account_info_type'
+    buy = 'buy'
+    sell = 'sell'
+    cancel_entrust = 'cancel_entrust'
+    query = 'query'
+    buy_or_sell = 'buy_or_sell'
+    fixed_price = 'fixed_price'
+    query_account_info = 'query_account_info'
 
-    k_myshare = "myshare"
-    k_dayentrust = "dayentrust"
-    k_dayfinentrust = "dayfinentrust"
-    k_hisentrust = "hisentrust"
-    k_hisfinentrust = "hisfinentrust"
-    k_moneymovement = "moneymovement"
-    k_deliveryentrust = "deliveryentrust"
-
-
-# </editor-fold>
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()
+    myshare = "myshare"
+    dayentrust = "dayentrust"
+    dayfinentrust = "dayfinentrust"
+    hisentrust = "hisentrust"
+    hisfinentrust = "hisfinentrust"
+    moneymovement = "moneymovement"
+    deliveryentrust = "deliveryentrust"

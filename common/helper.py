@@ -200,6 +200,8 @@ def do_it_every(func, timedelta_: dt.timedelta):
 
 # </editor-fold>
 
+# noinspection PyUnusedLocal
+# Used in lambda
 def assign(dest, src):
     dest = src
     return dest
@@ -310,9 +312,10 @@ def type_info(val):
 
 
 class ObjectCabinet:
-    def __init__(self, generator):
+    def __init__(self, generator, clear_func):
         self.queue = queue.Queue()
         self.generator = generator
+        self.clear_func = clear_func
 
     def fetch_one(self):
         try:
@@ -322,6 +325,8 @@ class ObjectCabinet:
             return self.generator()
 
     def put_one(self, obj):
+        if self.clear_func:
+            self.clear_func(obj)
         self.queue.put(obj)
 
     def use_one(self):

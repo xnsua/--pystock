@@ -11,6 +11,8 @@ from trade.trade_constant import *
 
 pd.options.display.max_rows = 10
 
+_tcc = TradeCommicationConstant
+
 
 class Trading:
     def __init__(self, trade_model=None, datetime_manager=None):
@@ -37,16 +39,18 @@ class Trading:
 
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
-            kwargs={**self.queue_dict,
-                    ks_model_queue_dict: self.model_queue_dict,
-                    ks_datetime_manager: self.dtm})
+            kwargs={_tcc.id_trade_manager: self.self_queue,
+                    _tcc.id_data_server: self.data_server_queue,
+                    _tcc.model_queue_dict: self.model_queue_dict,
+                    _tcc.datetime_manager: self.dtm})
         data_server_thread.start()
 
         for v in self.trade_models:
             target, model_name, param_dict = v
             thread = threading.Thread(
                 target=target,
-                kwargs={**self.queue_dict,
+                kwargs={_tcc.id_trade_manager: self.self_queue,
+                        _tcc.id_data_server: self.data_server_queue,
                         model_name: self.model_queue_dict[
                             model_name],
                         **param_dict})
@@ -60,7 +64,8 @@ class Trading:
 
 def thread_begin_trade():
     trade_model = [
-        (thread_buy_after_drop, ks_idm_buy_after_drop, {ks_drop_days: 2})]
+        (thread_buy_after_drop, _tcc.idm_buy_after_drop,
+         {ModelConstant.bsm_drop_days: 2})]
     tradeloop = Trading(trade_model=trade_model,
                         datetime_manager=DateTimeManager())
     tradeloop.handle_msg()

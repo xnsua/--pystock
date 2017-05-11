@@ -19,6 +19,7 @@ _stc = StockTimeConstant
 def thread_data_server_loop(trade_context, **kwargs):
     try:
         data_server = DataServer(trade_context, kwargs)
+        trade_context.thread_local.name = _tcc.id_data_server
         data_server.run_loop()
     except Exception as e:
         mylog.fatal(to_logstr(e))
@@ -28,16 +29,25 @@ class DataServer:
     def __init__(self, trade_context: TradeContext, param_dict):
         self.trade_context = trade_context
         self.trade_context.thread_local.name = _tcc.id_data_server
+        self.dtm = self.trade_context.dtm
+        self.self_queue = self.trade_context.get_thread_queue()
 
         self.push_interval_time = param_dict.get(_tcc.push_realtime_interval, 1)
 
         self.monitored_stock_map = {}
         self.df_readtime_stock_info = None  # type: pd.DataFrame
 
+        self.msg_function_dict = {_tcc.msg_set_monitored_stock: self.add_monitered_stock,
+                                  _tcc.msg_quit_loop: self.quit_loop}
+
         self.quit = False
 
-    def add_monitered_stock(self, sender, stocklist):
-        self.monitored_stock_map[sender] = stocklist
+    def add_monitered_stock(self, sender, param):
+        self.monitored_stock_map[sender] = param
+
+    # noinspection PyUnusedLocal
+    def quit_loop(self, sender, param):
+        self.quit = True
 
     def update_realtime_stock_info(self):
         stocklist = []
@@ -68,8 +78,9 @@ class DataServer:
     def in_expand_trade_time(self):
         td1 = dt.timedelta(seconds=60)  # Test use this value
         td2 = dt.timedelta(seconds=30)  # Test use this value
-        if not is_in_expanded_stage(self.dtm.time(), _stc.trade1, td1) \
-                and not is_in_expanded_stage(self.dtm.time(), _stc.trade2, td2):
+        in_stage1 = is_in_expanded_stage(self.dtm.time(), _stc.trade1, td1)
+        in_stage2 = is_in_expanded_stage(self.dtm.time(), _stc.trade2, td2)
+        if not in_stage1 and not in_stage2:
             return False
         return True
 
@@ -92,9 +103,6 @@ class DataServer:
             return False
 
     def dispatch_msg(self, msg: CommMessage):
-        if msg.operation == _tcc.msg_quit_loop:
-            self.quit = True
-            return
         sender = msg.sender
         operation = msg.operation
         param = msg.param
@@ -115,8 +123,7 @@ class DataServer:
             raise LogicException(f'Can not find out queue of sender {sender}')
 
     def find_func_by_operation(self, operation):
-        funcmap = {_tcc.msg_set_monitored_stock: self.add_monitered_stock}
-        return funcmap[operation]
+        return self.msg_function_dict[operation]
 
 
 def main():

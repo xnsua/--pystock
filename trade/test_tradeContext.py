@@ -12,16 +12,16 @@ _tcc = TradeCommicationConstant
 
 class TestTradeContext(TestCase):
     # def __init__(self):
-    #     self.trading_manager_queue = None
+    #     self.trade_manager_queue = None
     #     self.data_server_queue = None
     #     self.model_buy_after_drop = None
     #     self.dtm_manager = None
 
     def setUp(self):
-        self.trading_manager_queue = queue.Queue()
+        self.trade_manager_queue = queue.Queue()
         self.data_server_queue = queue.Queue()
         self.model_buy_after_drop = queue.Queue()
-        queue_dict = {_tcc.id_trade_manager: self.trading_manager_queue,
+        queue_dict = {_tcc.id_trade_manager: self.trade_manager_queue,
                       _tcc.id_data_server: self.data_server_queue,
                       _tcc.idm_buy_after_drop: self.model_buy_after_drop}
         self.dtm_manager = DateTimeManager(dt_from_time(9, 30, 0), 2)
@@ -43,27 +43,10 @@ class TestTradeContext(TestCase):
             val.put_result(param_out)
 
         fetch_thread = threading.Thread(target=thread_fetch_msg,
-                                        args=(self.trading_manager_queue,))
+                                        args=(self.trade_manager_queue,))
         fetch_thread.start()
         rval = self.trade_context.send_msg(_tcc.id_trade_manager, message_operation,
                                            param_in)
         assert rval == param_out
         fetch_thread.join()
 
-    def test_push_realtime_info(self):
-        self.fail()
-
-    def test_add_monitored_stock(self):
-        self.fail()
-
-    def test_buy_stock(self):
-        self.fail()
-
-    def test_sell_stock(self):
-        self.fail()
-
-    def test_cancel_entrustment(self):
-        self.fail()
-
-    def test_query_account_info(self):
-        self.fail()

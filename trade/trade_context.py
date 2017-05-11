@@ -20,6 +20,12 @@ class TradeContext:
     def update_queue_dict(self, queue_dict):
         self.queue_dict.update(queue_dict)
 
+    def post_msg(self, dest, operation, param):
+        assert self.thread_local.name
+        dest_queue = self.queue_dict[dest]
+        msg = CommMessage(self.thread_local.name, operation, param, None)
+        dest_queue.put(msg)
+
     def send_msg(self, dest, operation, param):
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
@@ -30,12 +36,15 @@ class TradeContext:
             result = result_queue.get()
         return result
 
+    def get_thread_queue(self):
+        assert self.thread_local.name
+        return self.queue_dict[self.thread_local.name]
+
     def push_realtime_info(self, dest, stocks):
-        self.send_msg(dest, _tcc.msg_push_realtime_stocks, stocks)
+        self.post_msg(dest, _tcc.msg_push_realtime_stocks, stocks)
 
     def add_monitored_stock(self, stocks):
-        self.send_msg(self.thread_local.name, _tcc.id_data_server,
-                      _tcc.msg_set_monitored_stock, stocks)
+        self.send_msg(_tcc.id_data_server, _tcc.msg_set_monitored_stock, stocks)
 
     def buy_stock(self, stock_code, price, amount, entrust_type):
         params = {_hc.operation: _hc.buy,

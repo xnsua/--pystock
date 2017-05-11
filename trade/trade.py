@@ -20,17 +20,17 @@ _hc = ClientHttpAccessConstant
 def thread_begin_trade():
     trade_model = [(thread_buy_after_drop, _tcc.idm_buy_after_drop,
                     {ModelConstant.bsm_drop_days: 2})]
-    tradeloop = Trading(trade_model=trade_model,
-                        datetime_manager=DateTimeManager())
+    tradeloop = trade(trade_model=trade_model,
+                      datetime_manager=DateTimeManager())
     tradeloop.handle_msg()
 
 
-class Trading:
+class trade:
     def __init__(self, trade_model=None, datetime_manager=None):
         self.dtm = datetime_manager
 
         # Queue member
-        self.trading_manager_queue = queue.Queue()
+        self.trade_manager_queue = queue.Queue()
         self.data_server_queue = queue.Queue()
 
         # Trade models
@@ -56,7 +56,7 @@ class Trading:
         for arget, model_name, param in self.trade_models:
             model_queue_dict[model_name] = queue.Queue
 
-        queue_dict = {_tcc.id_trade_manager: self.trading_manager_queue,
+        queue_dict = {_tcc.id_trade_manager: self.trade_manager_queue,
                       _tcc.id_data_server: self.data_server_queue,
                       **model_queue_dict}
 
@@ -66,20 +66,20 @@ class Trading:
     def prepare(self):
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
-            args=[self.trade_context])
+            args=(self.trade_context,))
         data_server_thread.start()
 
         for val in self.trade_models:
             target, model_name, param_dict = val
             thread = threading.Thread(
                 target=target,
-                args=self.trade_context,
+                args=(self.trade_context,),
                 kwargs=param_dict)
             thread.start()
 
     def handle_msg(self):
         while 1:
-            msg = self.trading_manager_queue.get()
+            msg = self.trade_manager_queue.get()
             self.dispatch_msg(msg)
 
     def dispatch_msg(self, msg: CommMessage):

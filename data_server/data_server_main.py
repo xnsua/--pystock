@@ -1,5 +1,4 @@
 import datetime as dt
-import multiprocessing
 import queue
 import sys
 
@@ -9,38 +8,32 @@ from common.helper import LogicException, to_logstr
 from common.log_helper import mylog
 from data_server.stock_querier.sina_api import get_realtime_stock_info
 from trade.comm_message import CommMessage
-from trade.datetime_manager import DateTimeManager
 from trade.trade_constant import *
+from trade.trade_context import TradeContext
 from trade.trade_utility import is_in_expanded_stage
 
 _tcc = TradeCommicationConstant
 _stc = StockTimeConstant
 
 
-def thread_data_server_loop(**param_dict):
-    trade_manager_queue = param_dict[_tcc.id_trade_manager]
+def thread_data_server_loop(trade_context, **kwargs):
     try:
-        data_server = DataServer(param_dict)
+        data_server = DataServer(trade_context, kwargs)
         data_server.run_loop()
     except Exception as e:
-        mylog.warn(to_logstr(e))
-        trade_manager_queue.put(
-            CommMessage(_tcc.id_data_server, _tcc.msg_exception_occur, e))
-        pass
+        mylog.fatal(to_logstr(e))
 
 
 class DataServer:
-    def __init__(self, param_dict):
-        self.self_queue = param_dict[
-            _tcc.id_data_server]  # type: multiprocessing.Queue
-        self.trade_manager_queue = param_dict[
-            _tcc.id_trade_manager]  # type: multiprocessing.Queue
-        self.dtm = param_dict[_tcc.datetime_manager]  # type: DateTimeManager
-        self.model_queue_dict = param_dict[_tcc.model_queue_dict]
+    def __init__(self, trade_context: TradeContext, param_dict):
+        self.trade_context = trade_context
+        self.trade_context.thread_local.name = _tcc.id_data_server
+
+        self.push_interval_time = param_dict.get(_tcc.push_realtime_interval, 1)
 
         self.monitored_stock_map = {}
         self.df_readtime_stock_info = None  # type: pd.DataFrame
-        self.push_interval_time = param_dict.get(_tcc.push_realtime_interval, 1)
+
         self.quit = False
 
     def add_monitered_stock(self, sender, stocklist):
@@ -86,9 +79,7 @@ class DataServer:
             for sender, liststock in self.monitored_stock_map.items():
                 df = dfstockinfo[dfstockinfo.index.isin(liststock)]
                 if len(df.index) == len(liststock):
-                    respqueue = self.find_queue_by_sender(sender)
-                    respqueue.put(CommMessage(_tcc.id_data_server,
-                                              _tcc.msg_push_realtime_stocks, df))
+                    self.trade_context.push_realtime_info(sender, df)
                 else:
                     mylog.warn('Cannot find push data')
 
@@ -107,12 +98,12 @@ class DataServer:
         sender = msg.sender
         operation = msg.operation
         param = msg.param
-        out_queue = self.find_queue_by_sender(sender)
         try:
             func = self.find_func_by_operation(operation)
-            func(sender, param)
+            rval = func(sender, param)
+            msg.put_result(rval)
         except Exception as e:
-            out_queue.put((_tcc.id_data_server, (Exception.__name__, e)))
+            msg.put_result((Exception.__name__, e))
             mylog.error(to_logstr(e))
 
     def find_queue_by_sender(self, sender):
@@ -124,7 +115,7 @@ class DataServer:
             raise LogicException(f'Can not find out queue of sender {sender}')
 
     def find_func_by_operation(self, operation):
-        funcmap = {_tcc.msg_set_monitor_stock: self.add_monitered_stock}
+        funcmap = {_tcc.msg_set_monitored_stock: self.add_monitered_stock}
         return funcmap[operation]
 
 

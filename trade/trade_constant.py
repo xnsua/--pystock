@@ -8,7 +8,7 @@ class TradeCommicationConstant:
     idm_buy_after_drop = 'idm_buy_after_drop'
     model_queue_dict = 'model_queue_dict'
 
-    msg_set_monitor_stock = 'msg_set_monitor_stock'
+    msg_set_monitored_stock = 'msg_set_monitor_stock'
     msg_push_realtime_stocks = 'msg_push_realtime_stocks'
     msg_wait_result_queue = 'msg_wait_result_queue'
     push_realtime_interval = 'push_realtime_interval'

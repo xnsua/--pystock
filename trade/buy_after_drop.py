@@ -1,41 +1,40 @@
 from contextlib import suppress
 from queue import Empty
 
-from common.log_helper import jqd
+from common.helper import to_logstr
+from common.log_helper import jqd, mylog
 from data_server.day_data_manager import update_etf
 from stock_basic.stock_helper import etf_t1, etf_t0
 from trade.comm_message import CommMessage
 from trade.trade_constant import *
+from trade.trade_context import TradeContext
 
 _tcc = TradeCommicationConstant
 
 
 def thread_buy_after_drop(**param):
-    obj = BuyAfterDrop(param)
-    obj.run_loop()
+    try:
+        obj = BuyAfterDrop(param)
+        obj.run_loop()
+    except Exception as e:
+        mylog.fatal(to_logstr(e))
 
 
 class BuyAfterDrop:
-    def __init__(self, param_dict):
-        self.realtime_stock_info = None
-        self.drop_days = param_dict[ModelConstant.bsm_drop_days]
-        self.trade_loop_queue = param_dict[_tcc.id_trade_manager]
-        self.data_server_queue = param_dict[_tcc.id_data_server]
-        self.name = param_dict[_tcc.model_name]
-        self.self_queue = param_dict[self.name]
-        self.etf_day_data = None
+    def __init__(self, trade_context: TradeContext, **param_dict):
+        trade_context.thread_local.name = _tcc.idm_buy_after_drop
+        self.tc = trade_context
 
-        self.prepare()
-        self.run_loop()
+        self.drop_days = param_dict[ModelConstant.bsm_drop_days]
+
+        self.etf_day_data = None
 
     def prepare(self):
         self.etf_day_data = update_etf()
+        self.tc.add_monitored_stock([*etf_t1, *etf_t0])
 
     def run_loop(self):
-        self.data_server_queue.put(
-            CommMessage(self.name, _tcc.msg_set_monitor_stock,
-                        [*etf_t1, *etf_t0]))
-
+        self.prepare()
         while True:
             with suppress(Empty):
                 msg = self.self_queue.get()
@@ -43,14 +42,15 @@ class BuyAfterDrop:
 
     def on_realtime_stock_info(self, sender, param):
         del sender
-        self.realtime_stock_info = param
+        del param
 
-    def dispatch_msg(self, commmsg: CommMessage):
-        jqd(f'BuyAfterDrop: Receive Message: {commmsg}')
-        sender = commmsg.sender
-        func = self.find_operation(commmsg.operation)
-        param = commmsg.param
-        func(sender, param)
+    def dispatch_msg(self, msg: CommMessage):
+        jqd(f'BuyAfterDrop: Receive Message: {msg}')
+        sender = msg.sender
+        func = self.find_operation(msg.operation)
+        param = msg.param
+        rval = func(sender, param)
+        msg.put_result(rval)
 
     def find_operation(self, operation_name):
         operdict = {_tcc.msg_push_realtime_stocks: self.on_realtime_stock_info}

@@ -30,7 +30,7 @@ class TestDataServer(TestCase):
                     _tcc.datetime_manager: datetime_manager,
                     _tcc.push_realtime_interval: push_realtime_interval})
         data_server_queue.put(
-            CommMessage(_tcc.idm_buy_after_drop, _tcc.msg_set_monitor_stock,
+            CommMessage(_tcc.idm_buy_after_drop, _tcc.msg_set_monitored_stock,
                         [*etf_t0]))
 
         data_server_thread.start()
@@ -59,7 +59,7 @@ class TestDataServer(TestCase):
                     _tcc.datetime_manager: datetime_manager,
                     _tcc.push_realtime_interval: push_realtime_interval})
         data_server_queue.put(
-            CommMessage(_tcc.idm_buy_after_drop, _tcc.msg_set_monitor_stock,
+            CommMessage(_tcc.idm_buy_after_drop, _tcc.msg_set_monitored_stock,
                         [*etf_t0]))
 
         data_server_thread.start()
@@ -90,7 +90,7 @@ class TestDataServer(TestCase):
                     _tcc.push_realtime_interval: push_realtime_interval})
         data_server_thread.start()
         data_server_queue.put(
-            CommMessage(_tcc.idm_buy_after_drop, _tcc.msg_set_monitor_stock,
+            CommMessage(_tcc.idm_buy_after_drop, _tcc.msg_set_monitored_stock,
                         [*etf_t0]))
 
         sleep_seconds = 5

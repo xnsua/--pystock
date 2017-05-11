@@ -3,15 +3,26 @@ import threading
 
 import pandas as pd
 
-from common.log_helper import jqd
 from data_server.data_server_main import thread_data_server_loop
+from stock_basic.client_access import visit_client_server
 from trade.buy_after_drop import thread_buy_after_drop
+from trade.comm_message import CommMessage
 from trade.datetime_manager import DateTimeManager
 from trade.trade_constant import *
+from trade.trade_context import TradeContext
 
 pd.options.display.max_rows = 10
 
 _tcc = TradeCommicationConstant
+_hc = ClientHttpAccessConstant
+
+
+def thread_begin_trade():
+    trade_model = [(thread_buy_after_drop, _tcc.idm_buy_after_drop,
+                    {ModelConstant.bsm_drop_days: 2})]
+    tradeloop = Trading(trade_model=trade_model,
+                        datetime_manager=DateTimeManager())
+    tradeloop.handle_msg()
 
 
 class Trading:
@@ -19,56 +30,64 @@ class Trading:
         self.dtm = datetime_manager
 
         # Queue member
-        self.self_queue = queue.Queue()
+        self.trading_manager_queue = queue.Queue()
         self.data_server_queue = queue.Queue()
-
-        self.model_queue_dict = {}
 
         # Trade models
         self.trade_models = trade_model
+
+        # Trade context
+        self.trade_context = None
+        self.init_trade_context()
 
         # Run loop
         self.prepare()
         self.handle_msg()
 
-    def prepare(self):
-        for v in self.trade_models:
-            target, model_name, param_dict = v
-            new_queue = queue.Queue()
-            self.model_queue_dict.update({model_name: new_queue})
+        self.msg_map = {
+            _hc.buy: self.buy_stock,
+            _hc.sell: self.sell_stock,
+            _hc.cancel_entrust: self.cancel_entrust,
+            _hc.query_account_info: self.query_account_info
+        }
 
+    def init_trade_context(self):
+        model_queue_dict = {}
+        for arget, model_name, param in self.trade_models:
+            model_queue_dict[model_name] = queue.Queue
+
+        queue_dict = {_tcc.id_trade_manager: self.trading_manager_queue,
+                      _tcc.id_data_server: self.data_server_queue,
+                      **model_queue_dict}
+
+        self.trade_context = TradeContext(queue_dict, self.dtm)
+        self.trade_context.thread_local.name = _tcc.id_trade_manager
+
+    def prepare(self):
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
-            kwargs={_tcc.id_trade_manager: self.self_queue,
-                    _tcc.id_data_server: self.data_server_queue,
-                    _tcc.model_queue_dict: self.model_queue_dict,
-                    _tcc.datetime_manager: self.dtm})
+            args=[self.trade_context])
         data_server_thread.start()
 
-        for v in self.trade_models:
-            target, model_name, param_dict = v
+        for val in self.trade_models:
+            target, model_name, param_dict = val
             thread = threading.Thread(
                 target=target,
-                kwargs={_tcc.id_trade_manager: self.self_queue,
-                        _tcc.id_data_server: self.data_server_queue,
-                        model_name: self.model_queue_dict[
-                            model_name],
-                        **param_dict})
+                args=self.trade_context,
+                kwargs=param_dict)
             thread.start()
 
     def handle_msg(self):
         while 1:
-            val = self.self_queue.get()
-            jqd('Trading Receive Message: ', val)
+            msg = self.trading_manager_queue.get()
+            self.dispatch_msg(msg)
 
-
-def thread_begin_trade():
-    trade_model = [
-        (thread_buy_after_drop, _tcc.idm_buy_after_drop,
-         {ModelConstant.bsm_drop_days: 2})]
-    tradeloop = Trading(trade_model=trade_model,
-                        datetime_manager=DateTimeManager())
-    tradeloop.handle_msg()
+    def dispatch_msg(self, msg: CommMessage):
+        operlist = [_tcc.msg_buy_stock, _tcc.msg_sell_stock,
+                    _tcc.msg_cancel_entrust, _tcc.msg_query_account_info]
+        if msg.operation in operlist:
+            visit_client_server(msg.param)
+        raise Exception(f'Unknown msg: {msg}')
 
 
 def main():

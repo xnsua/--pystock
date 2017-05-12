@@ -32,7 +32,7 @@ class DataServer:
         self.dtm = self.trade_context.dtm
         self.self_queue = self.trade_context.get_thread_queue()
 
-        self.push_interval_time = param_dict.get(_tcc.push_realtime_interval, 1)
+        self.param_dict = param_dict
 
         self.monitored_stock_map = {}
         self.df_readtime_stock_info = None  # type: pd.DataFrame
@@ -70,8 +70,9 @@ class DataServer:
                 self.push_realtime_stock_info()
 
                 elapse_seconds = (self.dtm.now() - start_time).total_seconds()
-                if elapse_seconds < count:
-                    self.dtm.sleep(count - elapse_seconds)
+                push_interval_time = self.param_dict[_tcc.push_realtime_interval]
+                if elapse_seconds < count * push_interval_time:
+                    self.dtm.sleep(count * push_interval_time - elapse_seconds)
             else:
                 break
 

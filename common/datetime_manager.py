@@ -1,4 +1,5 @@
 import datetime as dt
+import sys
 import time
 
 from common.helper import dtnow
@@ -40,3 +41,14 @@ class DateTimeManager:
     def elapse_seconds(self):
         return (self.now() - self.timer_start).total_seconds()
 
+    def do_it_every(self, func, timedelta_, quit_condition):
+        start = self.now()
+        for i in range(1, sys.maxsize):
+            if not quit_condition:
+                func()
+
+                sleep_time = timedelta_ * i - (self.now() - start)
+                if sleep_time.total_seconds() > 0:
+                    self.sleep(sleep_time.total_seconds())
+            else:
+                break

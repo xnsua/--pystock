@@ -4,10 +4,10 @@ import threading
 from unittest import TestCase
 
 import common.helper as hp
+from common.datetime_manager import DateTimeManager
 from common.log_helper import jqd
 from data_server.data_server_main import thread_data_server_loop
 from stock_basic.stock_helper import etf_t0
-from trade.datetime_manager import DateTimeManager
 from trade.trade_constant import *
 from trade.trade_context import TradeContext
 

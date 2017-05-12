@@ -3,11 +3,12 @@ import threading
 
 import pandas as pd
 
+from common.datetime_manager import DateTimeManager
+from common.helper import dttimedelta
 from data_server.data_server_main import thread_data_server_loop
 from stock_basic.client_access import visit_client_server
 from trade.buy_after_drop import thread_buy_after_drop
 from trade.comm_message import CommMessage
-from trade.datetime_manager import DateTimeManager
 from trade.trade_constant import *
 from trade.trade_context import TradeContext
 
@@ -66,7 +67,12 @@ class trade:
     def prepare(self):
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
-            args=(self.trade_context,))
+            args=(self.trade_context,),
+            kwargs={
+                _tcc.push_realtime_interval: 1,
+                _tcc.trade1_timedelta: dttimedelta(seconds=60),
+                _tcc.trade2_timedelta: dttimedelta(seconds=30)
+            })
         data_server_thread.start()
 
         for val in self.trade_models:

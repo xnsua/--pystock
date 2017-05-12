@@ -5,8 +5,9 @@ import re
 import traceback
 from pathlib import Path
 
-
 # <editor-fold desc="FileAndDir">
+
+
 def rmdir_ifexist(path):
     try:
         os.rmdir(path)
@@ -103,6 +104,11 @@ def ndays_ago(n, olddate=None):
     return olddate - dt.timedelta(days=n)
 
 
+dtdate = dt.date
+dtdatetime = dt.datetime
+dttimedelta = dt.timedelta
+
+
 def dttoday():
     return dt.date.today()
 
@@ -111,7 +117,7 @@ def dtnow():
     return dt.datetime.now()
 
 
-def dttime():
+def dtnowtime():
     return dt.datetime.now().time()
 
 
@@ -186,16 +192,6 @@ def seconds_from_epoch():
 def milliseconds_from_epoch():
     import time
     return time.time() * 1000
-
-
-def do_it_every(func, timedelta_: dt.timedelta):
-    while 1:
-        start = dtnow()
-        func()
-        end = dtnow()
-        if end - start < timedelta_:
-            sleep_for_seconds(
-                timedelta_.total_seconds() - (end - start).total_seconds())
 
 
 # </editor-fold>

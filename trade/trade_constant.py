@@ -11,7 +11,10 @@ class TradeCommicationConstant:
     msg_set_monitored_stock = 'msg_set_monitor_stock'
     msg_push_realtime_stocks = 'msg_push_realtime_stocks'
     msg_wait_result_queue = 'msg_wait_result_queue'
+
     push_realtime_interval = 'push_realtime_interval'
+    trade1_timedelta = 'trade1_timedelta'
+    trade2_timedelta = 'trade2_timedelta'
 
     datetime_manager = 'datetime_manager'
     msg_quit_loop = 'msg_quit_loop'

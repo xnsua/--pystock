@@ -21,9 +21,10 @@ def thread_buy_after_drop(trade_context, **param):
 
 
 class BuyAfterDrop:
-    def __init__(self, trade_context: TradeContext, **param_dict):
+    def __init__(self, trade_context: TradeContext, param_dict):
+        self.trade_context = trade_context
         trade_context.thread_local.name = _tcc.idm_buy_after_drop
-        self.tc = trade_context
+        self.self_queue = trade_context.get_current_thread_queue()
 
         self.drop_days = param_dict[ModelConstant.bsm_drop_days]
 
@@ -31,7 +32,7 @@ class BuyAfterDrop:
 
     def prepare(self):
         self.etf_day_data = update_etf()
-        self.tc.add_monitored_stock([*etf_t1, *etf_t0])
+        self.trade_context.add_monitored_stock([*etf_t1, *etf_t0])
 
     def run_loop(self):
         self.prepare()

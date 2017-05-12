@@ -10,30 +10,30 @@ from stock_basic import stock_helper
 from stock_basic.stock_helper import stock_startday
 
 
-def update_k_data(stockcode: str, path):
-    stockcode = stockcode.replace('SH.', '')
-    stockcode = stockcode.replace('SZ.', '')
-    filename = pl.Path(path) / (stockcode + '.csv')
+def update_k_data(stock_code: str, path):
+    stock_code = stock_code.replace('SH.', '')
+    stock_code = stock_code.replace('SZ.', '')
+    filename = pl.Path(path) / (stock_code + '.csv')
     try:
-        dfread = pd.read_csv(filename, index_col='date')
-        lastdate = dt.datetime.strptime(dfread.index.values[-1:][0],
+        df_read = pd.read_csv(filename, index_col='date')
+        last_date = dt.datetime.strptime(df_read.index.values[-1:][0],
                                         '%Y-%m-%d').date()
     except FileNotFoundError:
-        dfread = pd.DataFrame()
-        lastdate = ndays_ago(1, stock_startday)
+        df_read = pd.DataFrame()
+        last_date = ndays_ago(1, stock_startday)
 
-    query_start_date = ndays_later(1, lastdate)
+    query_start_date = ndays_later(1, last_date)
     now = dt.datetime.now()
     if now.date() == query_start_date and now.hour < 16:
-        return dfread
+        return df_read
 
-    dfupdate = ts.get_k_data(stockcode, start=str(query_start_date))
-    dfupdate.set_index('date', inplace=True)
+    df_update = ts.get_k_data(stock_code, start=str(query_start_date))
+    df_update.set_index('date', inplace=True)
 
-    dfconcat = pd.concat([dfread, dfupdate],
-                         ignore_index=False)  # type: pd.DataFrame
-    dfconcat.to_csv(filename)
-    return dfconcat
+    df_concat = pd.concat([df_read, df_update],
+                          ignore_index=False)  # type: pd.DataFrame
+    df_concat.to_csv(filename)
+    return df_concat
 
 
 def update_etf():

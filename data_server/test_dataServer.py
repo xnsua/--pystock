@@ -45,7 +45,7 @@ class TestDataServer(TestCase):
         # The fist push could failed because there is no monitor stock
         self.trade_context.add_monitored_stock([*etf_t0])
         sleep_seconds = 5
-        # Time is not accurate, so substract 0.5
+        # Time is not accurate, so subtract 0.5
         self.trade_context.dtm.sleep(sleep_seconds - 0.5)
         jqd('send message :self.trade_context.dtm.now()\n', self.trade_context.dtm.now())
         self.trade_context.send_msg(_tcc.id_data_server, _tcc.msg_quit_loop, None)
@@ -73,7 +73,7 @@ class TestDataServer(TestCase):
         data_server_thread.start()
         self.trade_context.add_monitored_stock([*etf_t0])
         sleep_seconds = 5
-        # Time is not accurate, so substract 0.5
+        # Time is not accurate, so subtract 0.5
         self.trade_context.dtm.sleep(sleep_seconds - 0.5)
 
         self.trade_context.send_msg(_tcc.id_data_server, _tcc.msg_quit_loop, None)
@@ -101,7 +101,7 @@ class TestDataServer(TestCase):
         data_server_thread.start()
         self.trade_context.add_monitored_stock([*etf_t0])
         sleep_seconds = 5
-        # Time is not accurate, so substract 0.5
+        # Time is not accurate, so subtract 0.5
         self.trade_context.dtm.sleep(sleep_seconds - 0.5)
 
         self.trade_context.send_msg(_tcc.id_data_server, _tcc.msg_quit_loop, None)

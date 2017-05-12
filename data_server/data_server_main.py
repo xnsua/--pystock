@@ -29,7 +29,7 @@ class DataServer:
         self.trade_context = trade_context
         self.trade_context.thread_local.name = _tcc.id_data_server
         self.dtm = self.trade_context.dtm  # type: DateTimeManager
-        self.self_queue = self.trade_context.get_thread_queue()  # type:queue.Queue
+        self.self_queue = self.trade_context.get_current_thread_queue()  # type:queue.Queue
 
         self.param_dict = param_dict
 
@@ -50,13 +50,13 @@ class DataServer:
         jqd('self.quit\n', self.quit, self.dtm.now())
 
     def update_realtime_stock_info(self):
-        stocklist = []
+        stock_list = []
         for k, v in self.monitored_stock_map.items():
-            stocklist.extend(v)
+            stock_list.extend(v)
 
-        if not stocklist:
+        if not stock_list:
             return None
-        self.df_realtime_stock_info = get_realtime_stock_info(stocklist)
+        self.df_realtime_stock_info = get_realtime_stock_info(stock_list)
         return self.df_realtime_stock_info
 
     def run_loop(self):
@@ -67,8 +67,8 @@ class DataServer:
             try:
                 # Handle all message first
                 while 1:
-                    realtimeout = interval.total_seconds() / self.dtm.speed
-                    msg = self.self_queue.get(timeout=realtimeout)
+                    real_timeout = interval.total_seconds() / self.dtm.speed
+                    msg = self.self_queue.get(timeout=real_timeout)
                     self.dispatch_msg(msg)
 
             except queue.Empty:
@@ -88,10 +88,10 @@ class DataServer:
     def push_realtime_stock_info(self):
         # jqd('PPP begin', self.dtm.now())
         if self.in_expand_trade_time() and self.monitored_stock_map:
-            dfstockinfo = self.update_realtime_stock_info()
-            for sender, liststock in self.monitored_stock_map.items():
-                df = dfstockinfo[dfstockinfo.index.isin(liststock)]
-                if len(df.index) == len(liststock):
+            df_stock_info = self.update_realtime_stock_info()
+            for sender, list_stock in self.monitored_stock_map.items():
+                df = df_stock_info[df_stock_info.index.isin(list_stock)]
+                if len(df.index) == len(list_stock):
                     self.trade_context.push_realtime_info(sender, df)
                 else:
                     mylog.warn('Cannot find push data')

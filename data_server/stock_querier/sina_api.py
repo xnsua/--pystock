@@ -17,15 +17,15 @@ def get_realtime_stock_info(stock_list):
         fiter = re.finditer(r'var hq_str_(..\d{6})="(.*)";', contentlist)
         # print(contentlistist)
         # fiter = re.finditer(r'var', contentlist)
-        stockcodes = []
+        stock_codes = []
         attrs = []
         for v in fiter:
-            stockcodes.append(v[1])
+            stock_codes.append(v[1])
             content = v[2].split(',')
             content = content[0:6]
             content.append(content.pop(0))
             attrs.append(content)
-        df = pd.DataFrame(attrs, index=stockcodes, columns=_column_names,
+        df = pd.DataFrame(attrs, index=stock_codes, columns=_column_names,
                           dtype=float)
         df['name'] = df['name'].astype(str)
         return df

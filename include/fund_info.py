@@ -25,6 +25,7 @@ class ManagerInfo(UtilObjectBase):
         return self.__dict__.__str__()
 
 
+# noinspection PyUnresolvedReferences
 class FundInfo(UtilObjectBase):
     def __init__(self):
         self.code = ''

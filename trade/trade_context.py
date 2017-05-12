@@ -36,7 +36,7 @@ class TradeContext:
             result = result_queue.get()
         return result
 
-    def get_thread_queue(self):
+    def get_current_thread_queue(self):
         assert self.thread_local.name
         return self.queue_dict[self.thread_local.name]
 
@@ -62,10 +62,10 @@ class TradeContext:
                   _hc.entrust_type: entrust_type}
         return self.send_msg(_tcc.id_trade_manager, _tcc.msg_sell_stock, params)
 
-    def cancel_entrustment(self, entrust_id, stockcode, buy_or_sell):
+    def cancel_entrustment(self, entrust_id, stock_code, buy_or_sell):
         params = {_hc.operation: _hc.cancel_entrust,
                   _hc.entrust_id: entrust_id,
-                  _hc.stock_code: stockcode,
+                  _hc.stock_code: stock_code,
                   _hc.buy_or_sell: buy_or_sell}
         return self.send_msg(_tcc.id_trade_manager, _tcc.msg_cancel_entrust, params)
 

@@ -21,9 +21,9 @@ _hc = ClientHttpAccessConstant
 def thread_begin_trade():
     trade_model = [(thread_buy_after_drop, _tcc.idm_buy_after_drop,
                     {ModelConstant.bsm_drop_days: 2})]
-    tradeloop = Trade(trade_model=trade_model,
-                      datetime_manager=DateTimeManager())
-    tradeloop.handle_msg()
+    trade_loop = Trade(trade_model=trade_model,
+                       datetime_manager=DateTimeManager())
+    trade_loop.handle_msg()
 
 
 class Trade:
@@ -47,7 +47,7 @@ class Trade:
 
     def init_trade_context(self):
         model_queue_dict = {}
-        for arget, model_name, param in self.trade_models:
+        for target, model_name, param in self.trade_models:
             model_queue_dict[model_name] = queue.Queue
 
         queue_dict = {_tcc.id_trade_manager: self.trade_manager_queue,
@@ -82,9 +82,9 @@ class Trade:
             self.dispatch_msg(msg)
 
     def dispatch_msg(self, msg: CommMessage):
-        operlist = [_tcc.msg_buy_stock, _tcc.msg_sell_stock,
-                    _tcc.msg_cancel_entrust, _tcc.msg_query_account_info]
-        if msg.operation in operlist:
+        operation_list = [_tcc.msg_buy_stock, _tcc.msg_sell_stock,
+                          _tcc.msg_cancel_entrust, _tcc.msg_query_account_info]
+        if msg.operation in operation_list:
             visit_client_server(msg.param)
 
         raise Exception(f'Unknown msg: {msg}')

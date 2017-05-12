@@ -17,11 +17,11 @@ class DateTimeManager:
     def now(self):
         if not self.start_dt:
             return dtnow()
-        vtimedelta = dtnow() - self.real_start_time
-        sec1 = vtimedelta.total_seconds()
+        timedelta1 = dtnow() - self.real_start_time
+        sec1 = timedelta1.total_seconds()
         sec2 = sec1 * self.speed
-        vtimedelta2 = dt.timedelta(seconds=sec2)
-        now = self.start_dt + vtimedelta2
+        timedelta2 = dt.timedelta(seconds=sec2)
+        now = self.start_dt + timedelta2
         return now
 
     def today(self):

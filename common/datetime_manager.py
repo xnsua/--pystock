@@ -41,14 +41,12 @@ class DateTimeManager:
     def elapse_seconds(self):
         return (self.now() - self.timer_start).total_seconds()
 
-    def do_it_every(self, func, timedelta_, quit_condition):
+    # noinspection PyUnresolvedReferences,PyTypeChecker
+    def do_it_every(self, func, timedelta_):
         start = self.now()
         for i in range(1, sys.maxsize):
-            if not quit_condition:
-                func()
-
-                sleep_time = timedelta_ * i - (self.now() - start)
-                if sleep_time.total_seconds() > 0:
-                    self.sleep(sleep_time.total_seconds())
-            else:
+            if not func():
                 break
+            sleep_time = timedelta_ * i - (self.now() - start)
+            if sleep_time.total_seconds() > 0:
+                self.sleep(sleep_time.total_seconds())

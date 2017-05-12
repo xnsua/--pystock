@@ -14,6 +14,8 @@
       <w>mfrozen</w>
       <w>mtotal</w>
       <w>ndrop</w>
+      <w>realtime</w>
+      <w>rval</w>
       <w>sqlite</w>
       <w>subdata</w>
     </words>

@@ -29,16 +29,13 @@ class TestDateTimeManager(TestCase):
     def test_do_it_every(self):
         dtm = DateTimeManager()
         result_list = []
-        quit_variable = []
         count = 2
 
         def func():
             nonlocal count
             count = count - 1
-            if count == 0:
-                nonlocal quit_variable
-                quit_variable.append(1)
-            result_list.append(1)
+            result_list.append(count)
+            return count
 
-        dtm.do_it_every(func, dttimedelta(seconds=1), quit_variable)
+        dtm.do_it_every(func, dttimedelta(seconds=1))
         assert len(result_list) == 2

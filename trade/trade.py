@@ -21,12 +21,12 @@ _hc = ClientHttpAccessConstant
 def thread_begin_trade():
     trade_model = [(thread_buy_after_drop, _tcc.idm_buy_after_drop,
                     {ModelConstant.bsm_drop_days: 2})]
-    tradeloop = trade(trade_model=trade_model,
+    tradeloop = Trade(trade_model=trade_model,
                       datetime_manager=DateTimeManager())
     tradeloop.handle_msg()
 
 
-class trade:
+class Trade:
     def __init__(self, trade_model=None, datetime_manager=None):
         self.dtm = datetime_manager
 
@@ -44,13 +44,6 @@ class trade:
         # Run loop
         self.prepare()
         self.handle_msg()
-
-        self.msg_map = {
-            _hc.buy: self.buy_stock,
-            _hc.sell: self.sell_stock,
-            _hc.cancel_entrust: self.cancel_entrust,
-            _hc.query_account_info: self.query_account_info
-        }
 
     def init_trade_context(self):
         model_queue_dict = {}
@@ -70,8 +63,8 @@ class trade:
             args=(self.trade_context,),
             kwargs={
                 _tcc.push_realtime_interval: 1,
-                _tcc.trade1_timedelta: dttimedelta(seconds=60),
-                _tcc.trade2_timedelta: dttimedelta(seconds=30)
+                _tcc.trade1_timedelta: (dttimedelta(seconds=60), dttimedelta(seconds=60)),
+                _tcc.trade2_timedelta: (dttimedelta(seconds=30), dttimedelta(seconds=30))
             })
         data_server_thread.start()
 
@@ -93,6 +86,7 @@ class trade:
                     _tcc.msg_cancel_entrust, _tcc.msg_query_account_info]
         if msg.operation in operlist:
             visit_client_server(msg.param)
+
         raise Exception(f'Unknown msg: {msg}')
 
 

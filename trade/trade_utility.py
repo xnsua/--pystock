@@ -1,5 +1,3 @@
-import datetime as dt
-
 from common import helper as hp
 from trade.trade_constant import StockTimeConstant
 
@@ -12,11 +10,12 @@ def find_stage(time_):
     raise Exception(f'Cannot find time stage for time {time_}')
 
 
-def is_in_expanded_stage(time_, stage, time_delta=dt.timedelta()):
+def is_in_expanded_stage(time_, stage, time_delta_before, time_delta_after):
     t1, t2 = StockTimeConstant.trade_stage_dict[stage]
     dt1 = hp.to_datetime(t1)
     dt2 = hp.to_datetime(t2)
-    dt1a = dt1 - time_delta
-    dt2a = dt2 + time_delta
+    dt1a = dt1 - time_delta_before
+    dt2a = dt2 + time_delta_after
     # noinspection PyTypeChecker
-    return dt1a <= hp.to_datetime(time_) <= dt2a
+    val = dt1a <= hp.to_datetime(time_) <= dt2a
+    return val

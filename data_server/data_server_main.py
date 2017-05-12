@@ -1,11 +1,10 @@
-import datetime as dt
 import queue
-import sys
 
 import pandas as pd
 
-from common.helper import LogicException, to_logstr
-from common.log_helper import mylog
+from common.datetime_manager import DateTimeManager
+from common.helper import to_logstr
+from common.log_helper import mylog, jqd
 from data_server.stock_querier.sina_api import get_realtime_stock_info
 from trade.comm_message import CommMessage
 from trade.trade_constant import *
@@ -29,25 +28,26 @@ class DataServer:
     def __init__(self, trade_context: TradeContext, param_dict):
         self.trade_context = trade_context
         self.trade_context.thread_local.name = _tcc.id_data_server
-        self.dtm = self.trade_context.dtm
-        self.self_queue = self.trade_context.get_thread_queue()
+        self.dtm = self.trade_context.dtm  # type: DateTimeManager
+        self.self_queue = self.trade_context.get_thread_queue()  # type:queue.Queue
 
         self.param_dict = param_dict
 
         self.monitored_stock_map = {}
-        self.df_readtime_stock_info = None  # type: pd.DataFrame
+        self.df_realtime_stock_info = None  # type: pd.DataFrame
 
-        self.msg_function_dict = {_tcc.msg_set_monitored_stock: self.add_monitered_stock,
+        self.msg_function_dict = {_tcc.msg_set_monitored_stock: self.add_monitored_stock,
                                   _tcc.msg_quit_loop: self.quit_loop}
 
         self.quit = False
 
-    def add_monitered_stock(self, sender, param):
+    def add_monitored_stock(self, sender, param):
         self.monitored_stock_map[sender] = param
 
     # noinspection PyUnusedLocal
     def quit_loop(self, sender, param):
         self.quit = True
+        jqd('self.quit\n', self.quit, self.dtm.now())
 
     def update_realtime_stock_info(self):
         stocklist = []
@@ -56,36 +56,37 @@ class DataServer:
 
         if not stocklist:
             return None
-        self.df_readtime_stock_info = get_realtime_stock_info(stocklist)
-        return self.df_readtime_stock_info
+        self.df_realtime_stock_info = get_realtime_stock_info(stocklist)
+        return self.df_realtime_stock_info
 
     def run_loop(self):
         mylog.info('Running data server loop')
+        interval = self.param_dict[_tcc.push_realtime_interval]
+        self.dtm.set_timer()
+        while 1:
+            try:
+                # Handle all message first
+                while 1:
+                    realtimeout = interval.total_seconds() / self.dtm.speed
+                    msg = self.self_queue.get(timeout=realtimeout)
+                    self.dispatch_msg(msg)
 
-        start_time = self.dtm.now()
-        for count in range(sys.maxsize):
-            if not self.quit:
-                if self.handle_msg():
-                    continue
+            except queue.Empty:
+                if self.quit:
+                    break
                 self.push_realtime_stock_info()
 
-                elapse_seconds = (self.dtm.now() - start_time).total_seconds()
-                push_interval_time = self.param_dict[_tcc.push_realtime_interval]
-                if elapse_seconds < count * push_interval_time:
-                    self.dtm.sleep(count * push_interval_time - elapse_seconds)
-            else:
-                break
-
     def in_expand_trade_time(self):
-        td1 = dt.timedelta(seconds=60)  # Test use this value
-        td2 = dt.timedelta(seconds=30)  # Test use this value
-        in_stage1 = is_in_expanded_stage(self.dtm.time(), _stc.trade1, td1)
-        in_stage2 = is_in_expanded_stage(self.dtm.time(), _stc.trade2, td2)
+        td1 = self.param_dict[_tcc.trade1_timedelta]
+        td2 = self.param_dict[_tcc.trade2_timedelta]
+        in_stage1 = is_in_expanded_stage(self.dtm.time(), _stc.trade1, *td1)
+        in_stage2 = is_in_expanded_stage(self.dtm.time(), _stc.trade2, *td2)
         if not in_stage1 and not in_stage2:
             return False
         return True
 
     def push_realtime_stock_info(self):
+        # jqd('PPP begin', self.dtm.now())
         if self.in_expand_trade_time() and self.monitored_stock_map:
             dfstockinfo = self.update_realtime_stock_info()
             for sender, liststock in self.monitored_stock_map.items():
@@ -95,6 +96,7 @@ class DataServer:
                 else:
                     mylog.warn('Cannot find push data')
 
+                    # jqd('PPP End', self.dtm.now())
     def handle_msg(self):
         try:
             msg = self.self_queue.get(block=False)
@@ -114,14 +116,6 @@ class DataServer:
         except Exception as e:
             msg.put_result((Exception.__name__, e))
             mylog.error(to_logstr(e))
-
-    def find_queue_by_sender(self, sender):
-        if sender == _tcc.id_trade_manager:
-            return self.trade_manager_queue
-        try:
-            return self.model_queue_dict[sender]
-        except:
-            raise LogicException(f'Can not find out queue of sender {sender}')
 
     def find_func_by_operation(self, operation):
         return self.msg_function_dict[operation]

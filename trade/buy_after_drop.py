@@ -12,9 +12,9 @@ from trade.trade_context import TradeContext
 _tcc = TradeCommicationConstant
 
 
-def thread_buy_after_drop(**param):
+def thread_buy_after_drop(trade_context, **param):
     try:
-        obj = BuyAfterDrop(param)
+        obj = BuyAfterDrop(trade_context, param)
         obj.run_loop()
     except Exception as e:
         mylog.fatal(to_logstr(e))
@@ -53,8 +53,8 @@ class BuyAfterDrop:
         msg.put_result(rval)
 
     def find_operation(self, operation_name):
-        operdict = {_tcc.msg_push_realtime_stocks: self.on_realtime_stock_info}
-        return operdict[operation_name]
+        operation_dict = {_tcc.msg_push_realtime_stocks: self.on_realtime_stock_info}
+        return operation_dict[operation_name]
 
 
 def main():

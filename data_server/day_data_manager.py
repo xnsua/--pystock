@@ -28,7 +28,7 @@ def update_k_data(stockcode: str, path):
         return dfread
 
     dfupdate = ts.get_k_data(stockcode, start=str(query_start_date))
-    dfupdate = dfupdate.set_index('date')
+    dfupdate.set_index('date', inplace=True)
 
     dfconcat = pd.concat([dfread, dfupdate],
                          ignore_index=False)  # type: pd.DataFrame

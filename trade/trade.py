@@ -9,8 +9,8 @@ from data_server.data_server_main import thread_data_server_loop
 from stock_basic.client_access import visit_client_server
 from trade.buy_after_drop import thread_buy_after_drop
 from trade.comm_message import CommMessage
-from trade.trade_constant import *
 from trade.trade_context import TradeContext
+from trade.trade_helper import *
 
 pd.options.display.max_rows = 10
 

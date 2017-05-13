@@ -8,8 +8,8 @@ from common.datetime_manager import DateTimeManager
 from common.log_helper import jqd
 from data_server.data_server_main import thread_data_server_loop
 from stock_basic.stock_helper import etf_t0
-from trade.trade_constant import *
 from trade.trade_context import TradeContext
+from trade.trade_helper import *
 
 _tcc = TradeCommicationConstant
 

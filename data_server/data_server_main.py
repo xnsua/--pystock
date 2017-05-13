@@ -7,8 +7,8 @@ from common.helper import to_logstr
 from common.log_helper import mylog, jqd
 from data_server.stock_querier.sina_api import get_realtime_stock_info
 from trade.comm_message import CommMessage
-from trade.trade_constant import *
 from trade.trade_context import TradeContext
+from trade.trade_helper import *
 from trade.trade_utility import is_in_expanded_stage
 
 _tcc = TradeCommicationConstant
@@ -95,7 +95,6 @@ class DataServer:
                     self.trade_context.push_realtime_info(sender, df)
                 else:
                     mylog.warn('Cannot find push data')
-
                     # jqd('PPP End', self.dtm.now())
     def handle_msg(self):
         try:

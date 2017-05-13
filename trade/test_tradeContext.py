@@ -4,8 +4,8 @@ from unittest import TestCase
 
 from common.datetime_manager import DateTimeManager
 from common.helper import dt_from_time
-from trade.trade_constant import TradeCommicationConstant
 from trade.trade_context import TradeContext
+from trade.trade_helper import TradeCommicationConstant
 
 _tcc = TradeCommicationConstant
 

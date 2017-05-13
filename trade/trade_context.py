@@ -3,7 +3,7 @@ import threading
 
 from common.helper import ObjectCabinet
 from trade.comm_message import CommMessage
-from trade.trade_constant import ClientHttpAccessConstant, TradeCommicationConstant
+from trade.trade_helper import ClientHttpAccessConstant, TradeCommicationConstant
 
 _hc = ClientHttpAccessConstant
 _tcc = TradeCommicationConstant

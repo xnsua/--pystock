@@ -1,5 +1,5 @@
 from common import helper as hp
-from trade.trade_constant import StockTimeConstant
+from trade.trade_helper import StockTimeConstant
 
 
 def find_stage(time_):

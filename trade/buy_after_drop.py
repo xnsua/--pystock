@@ -6,8 +6,8 @@ from common.log_helper import jqd, mylog
 from data_server.day_data_manager import update_etf
 from stock_basic.stock_helper import etf_t1, etf_t0
 from trade.comm_message import CommMessage
-from trade.trade_constant import *
 from trade.trade_context import TradeContext
+from trade.trade_helper import *
 
 _tcc = TradeCommicationConstant
 

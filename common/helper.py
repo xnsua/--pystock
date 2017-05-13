@@ -5,6 +5,7 @@ import re
 import traceback
 from pathlib import Path
 
+
 # <editor-fold desc="FileAndDir">
 
 
@@ -50,14 +51,14 @@ def call_after_first(func):
     func()
 
 
+call_after_first.first_time = True
+
+
 def get_list_from_file(filename):
     fcontent = (Path(filename)).read_text()
     listcontent = fcontent.split('\n')
     listcontent = filter(bool, listcontent)
     return listcontent
-
-
-call_after_first.first_time = True
 
 
 def is_file_outdated(path, span):
@@ -192,6 +193,12 @@ def seconds_from_epoch():
 def milliseconds_from_epoch():
     import time
     return time.time() * 1000
+
+
+def loop_for_seconds(func, seconds):
+    start_dt = dtnow()
+    while (dtnow() - start_dt).total_seconds() < seconds:
+        func()
 
 
 # </editor-fold>

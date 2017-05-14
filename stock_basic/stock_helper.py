@@ -1,14 +1,15 @@
 import datetime as dt
 
-import tushare
+import pandas as pd
 
-from common import cache_util
-from common.helper import ndays_later
+from common import plPath
+from common.helper import dtdate, ndays_ago
 
-stock_startday = dt.date(1990, 12, 19)
-str_stock_startday = str(stock_startday)
+# <editor-fold desc="Stock constants">
+stock_start_day = dt.date(1990, 12, 19)
+str_stock_start_day = str(stock_start_day)
 
-stock_starttime = dt.datetime(1990, 12, 19)
+stock_start_time = dt.datetime(1990, 12, 19)
 stock_in_etf50 = ['600000', '600016', '600028', '600029',
                   '600030', '600036', '600048', '600050',
                   '600100', '600104', '600109', '600111',
@@ -38,15 +39,52 @@ etf_t1 = ['sh510010', 'sh510020', 'sh510030', 'sh510050', 'sh510060',
           'sh512340', 'sh512500', 'sh512510', 'sh512580', 'sh512600']
 
 
-@cache_util.cache(cache_time_delta=dt.timedelta(days=1))
-def is_trade_day(day=dt.date.today()):
-    df = tushare.trade_cal()
-    val = df[df.calendarDate == str(day)].iloc[0, 1]
-    return val
+# </editor-fold>
 
+
+# <editor-fold desc="Trade day">
+class TradeDay:
+    def __init__(self):
+        self.df = self.read_df()
+        self.date_map = self.build_date_map()
+
+    def read_df(self):
+        path = plPath(__file__).parent / 'trade_day.csv'
+        return pd.read_csv(str(path), index_col='index')
+
+    def build_date_map(self):
+        date_map = {}
+        for i in range(len(self.df.index)):
+            date_map[self.df.iat[i, 0]] = i
+        return date_map
+
+    def is_trade_day(self, date_: dtdate):
+        row_num = self.date_map[str(date_)]
+        return self.df.iat[row_num, 1]
+
+    def last_n_trade_day(self, date_: dtdate, days_num):
+        row_num = self.date_map[str(date_)]
+        n_trade_days = []
+        while 1:
+            if len(n_trade_days) == days_num:
+                break
+            if self.df.iat[row_num, 1]:
+                date_str = self.df.iat[row_num, 0]
+                n_trade_days.append(dt.date(*map(int, date_str.split('-'))))
+            row_num -= 1
+        return n_trade_days
+
+
+_trade_day = TradeDay()
+is_trade_day = _trade_day.is_trade_day
+last_n_trade_day = _trade_day.last_n_trade_day
+
+
+# </editor-fold>
 
 def main():
-    val = is_trade_day(ndays_later(2))
+    v = TradeDay()
+    val = v.last_n_trade_day(ndays_ago(2), 9)
     print(val)
 
 

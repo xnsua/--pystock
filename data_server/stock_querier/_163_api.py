@@ -12,7 +12,7 @@ from stock_basic import stock_helper
 # The 163 website add 0 to the stock_code to imply SH stock
 # Add the 1 to the stock_code to imply the SZ stock
 def download_stock_history(stock_code, savepath,
-                           startdate=stock_helper.stock_startday,
+                           startdate=stock_helper.stock_start_day,
                            enddate=dt.date.today()):
     # noinspection PyTypeChecker
     df = wget_stock_history(stock_code, startdate, enddate)

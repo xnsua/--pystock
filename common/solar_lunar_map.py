@@ -1,7 +1,7 @@
 import datetime as dt
 
+from common import plPath
 from common.helper import read_string_from_file
-from config_module import myconfig
 
 
 class Lunar:
@@ -11,13 +11,15 @@ class Lunar:
         self.day = 0
         self.leap_month = 0
 
-solumap = {}
+
+solar_lunar_map = {}
 
 
+# noinspection SpellCheckingInspection
 def load_map():
     # noinspection PyTypeChecker
     fcon = read_string_from_file(
-        (myconfig.project_root / 'data_server' / 'solar_lunar_map.txt'))
+        (plPath(__file__).parent / 'solar_lunar_map.txt'))
     lines = fcon.split('\n')
     for item in lines:
         if item:
@@ -27,15 +29,16 @@ def load_map():
             lunar_date = Lunar()
             lunar_date.year, lunar_date.month, lunar_date.day, lunar_date.leap_month = \
                 [int(i) for i in solu[1].split('-')]
-            solumap[solar_date] = lunar_date
-            solumap[lunar_date] = solar_date
-    return solumap
+            solar_lunar_map[solar_date] = lunar_date
+            solar_lunar_map[lunar_date] = solar_date
+    return solar_lunar_map
+
 
 
 def main():
-    global solumap
-    solumap = load_map()
-    print(solumap)
+    global solar_lunar_map
+    solar_lunar_map = load_map()
+    print(solar_lunar_map)
 
 
 if __name__ == '__main__':

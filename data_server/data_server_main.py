@@ -22,8 +22,10 @@ def thread_data_server_loop(trade_context, **kwargs):
         data_server.run_loop()
     except Exception as e:
         mylog.fatal(to_logstr(e))
+        alert_exception(10)
 
 
+# noinspection PyUnusedLocal
 class DataServer:
     def __init__(self, trade_context: TradeContext, param_dict):
         self.trade_context = trade_context
@@ -41,11 +43,11 @@ class DataServer:
 
         self.quit = False
 
-    def add_monitored_stock(self, sender, param):
+    def add_monitored_stock(self, sender, param, msg_dt):
         self.monitored_stock_map[sender] = param
 
     # noinspection PyUnusedLocal
-    def quit_loop(self, sender, param):
+    def quit_loop(self, sender, param, msg_dt):
         self.quit = True
         jqd('self.quit\n', self.quit, self.dtm.now())
 
@@ -108,9 +110,10 @@ class DataServer:
         sender = msg.sender
         operation = msg.operation
         param = msg.param
+        msg_dt = msg.msg_dt
         try:
             func = self.find_func_by_operation(operation)
-            rval = func(sender, param)
+            rval = func(sender, param, msg_dt)
             msg.put_result(rval)
         except Exception as e:
             msg.put_result((Exception.__name__, e))

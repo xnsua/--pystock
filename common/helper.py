@@ -5,7 +5,6 @@ import re
 import traceback
 from pathlib import Path
 
-
 # <editor-fold desc="FileAndDir">
 
 
@@ -108,6 +107,11 @@ def ndays_ago(n, olddate=None):
 dtdate = dt.date
 dtdatetime = dt.datetime
 dttimedelta = dt.timedelta
+
+
+def dtdaterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + dttimedelta(n)
 
 
 def dttoday():

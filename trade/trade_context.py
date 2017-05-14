@@ -23,15 +23,16 @@ class TradeContext:
     def post_msg(self, dest, operation, param):
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
-        msg = CommMessage(self.thread_local.name, operation, param, None)
+        msg = CommMessage(self.thread_local.name, operation, param,
+                          result_queue=None, msg_time=self.dtm.now())
         dest_queue.put(msg)
 
     def send_msg(self, dest, operation, param):
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
         with self.queue_cabinet.use_one() as result_queue:
-            msg = CommMessage(self.thread_local.name, operation,
-                              param, result_queue)
+            msg = CommMessage(self.thread_local.name, operation, param,
+                              result_queue=result_queue, msg_time=self.dtm.now())
             dest_queue.put(msg)
             result = result_queue.get()
         return result

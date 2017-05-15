@@ -4,7 +4,7 @@ import threading
 import pandas as pd
 
 from common.datetime_manager import DateTimeManager
-from common.helper import dttimedelta
+from common.helper import dt
 from data_server.data_server_main import thread_data_server_loop
 from stock_basic.client_access import visit_client_server
 from trade.buy_after_drop import thread_buy_after_drop
@@ -63,8 +63,8 @@ class Trade:
             args=(self.trade_context,),
             kwargs={
                 _tcc.push_realtime_interval: 1,
-                _tcc.trade1_timedelta: (dttimedelta(seconds=60), dttimedelta(seconds=60)),
-                _tcc.trade2_timedelta: (dttimedelta(seconds=30), dttimedelta(seconds=30))
+                _tcc.trade1_timedelta: (dt.timedelta(seconds=60), dt.timedelta(seconds=60)),
+                _tcc.trade2_timedelta: (dt.timedelta(seconds=30), dt.timedelta(seconds=30))
             })
         data_server_thread.start()
 

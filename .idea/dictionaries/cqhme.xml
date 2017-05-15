@@ -3,6 +3,7 @@
     <words>
       <w>buyrecord</w>
       <w>datalen</w>
+      <w>daterange</w>
       <w>drdata</w>
       <w>dropcount</w>
       <w>entrustment</w>
@@ -14,6 +15,7 @@
       <w>mfree</w>
       <w>mfrozen</w>
       <w>mtotal</w>
+      <w>ndays</w>
       <w>ndrop</w>
       <w>realtime</w>
       <w>rval</w>

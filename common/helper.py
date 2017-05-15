@@ -1,9 +1,12 @@
-import datetime as dt
+import datetime
 import os
 import queue
 import re
 import traceback
 from pathlib import Path
+
+dt = datetime
+
 
 # <editor-fold desc="FileAndDir">
 
@@ -98,20 +101,18 @@ def ndays_later(n, olddate=None):
     return olddate + dt.timedelta(days=n)
 
 
-def ndays_ago(n, olddate=None):
-    if not olddate:
-        olddate = dt.date.today()
-    return olddate - dt.timedelta(days=n)
+def ndays_ago(n, old_date=None):
+    if not old_date:
+        old_date = dt.date.today()
+    return old_date - dt.timedelta(days=n)
 
 
-dtdate = dt.date
-dtdatetime = dt.datetime
-dttimedelta = dt.timedelta
-
-
-def dtdaterange(start_date, end_date):
+def _dt_daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
-        yield start_date + dttimedelta(n)
+        yield start_date + dt.timedelta(n)
+
+
+dt.daterange = _dt_daterange
 
 
 def dttoday():

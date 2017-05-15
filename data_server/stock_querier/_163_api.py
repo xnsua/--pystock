@@ -32,6 +32,9 @@ def wget_stock_history(stock_code, startdate=dt.datetime(1990, 1, 1),
     return df
 
 
+def get_etf_info():
+    pass
+
 def main():
     download_stock_history('0510900', 'jqtt1.csv',
                            startdate=common.helper.ndays_ago(50))

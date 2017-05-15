@@ -3,7 +3,7 @@ import datetime as dt
 import pandas as pd
 
 from common import plPath
-from common.helper import dtdate, ndays_ago
+from common.helper import dt, ndays_ago
 
 # <editor-fold desc="Stock constants">
 stock_start_day = dt.date(1990, 12, 19)
@@ -58,11 +58,11 @@ class TradeDay:
             date_map[self.df.iat[i, 0]] = i
         return date_map
 
-    def is_trade_day(self, date_: dtdate):
+    def is_trade_day(self, date_: dt.date):
         row_num = self.date_map[str(date_)]
         return self.df.iat[row_num, 1]
 
-    def last_n_trade_day(self, date_: dtdate, days_num):
+    def last_n_trade_day(self, date_: dt.date, days_num):
         row_num = self.date_map[str(date_)]
         n_trade_days = []
         while 1:
@@ -72,7 +72,7 @@ class TradeDay:
                 date_str = self.df.iat[row_num, 0]
                 n_trade_days.append(dt.date(*map(int, date_str.split('-'))))
             row_num -= 1
-        return n_trade_days
+        return list(reversed(n_trade_days))
 
 
 _trade_day = TradeDay()

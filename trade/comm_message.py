@@ -17,7 +17,7 @@ class CommMessage:
 
 
 def main():
-    print(CommMessage('a', 'b', 'c', 'c'))
+    pass
 
 
 if __name__ == '__main__':

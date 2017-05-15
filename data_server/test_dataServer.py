@@ -31,9 +31,9 @@ class TestDataServer(TestCase):
         self.trade_context.dtm = DateTimeManager(hp.to_datetime(dt.time(9, 28, 58)), 2)
         # For speed2 each call need 200ms
         kwargs = {
-            _tcc.push_realtime_interval: hp.dttimedelta(seconds=1),
-            _tcc.trade1_timedelta: (hp.dttimedelta(seconds=60), hp.dttimedelta(seconds=60)),
-            _tcc.trade2_timedelta: (hp.dttimedelta(seconds=30), hp.dttimedelta(seconds=30))}
+            _tcc.push_realtime_interval: hp.dt.timedelta(seconds=1),
+            _tcc.trade1_timedelta: (hp.dt.timedelta(seconds=60), hp.dt.timedelta(seconds=60)),
+            _tcc.trade2_timedelta: (hp.dt.timedelta(seconds=30), hp.dt.timedelta(seconds=30))}
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
             args=(self.trade_context,),
@@ -61,9 +61,9 @@ class TestDataServer(TestCase):
         self.trade_context.dtm = DateTimeManager(hp.to_datetime(dt.time(11, 29, 58)), 2)
         # For speed2 each call need 200ms
         kwargs = {
-            _tcc.push_realtime_interval: hp.dttimedelta(seconds=1),
-            _tcc.trade1_timedelta: (hp.dttimedelta(seconds=60), hp.dttimedelta(seconds=0)),
-            _tcc.trade2_timedelta: (hp.dttimedelta(seconds=30), hp.dttimedelta(seconds=30))}
+            _tcc.push_realtime_interval: hp.dt.timedelta(seconds=1),
+            _tcc.trade1_timedelta: (hp.dt.timedelta(seconds=60), hp.dt.timedelta(seconds=0)),
+            _tcc.trade2_timedelta: (hp.dt.timedelta(seconds=30), hp.dt.timedelta(seconds=30))}
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
             args=(self.trade_context,),
@@ -89,9 +89,9 @@ class TestDataServer(TestCase):
         self.trade_context.dtm = DateTimeManager(hp.to_datetime(dt.time(14, 59, 58)), 2)
         # For speed2 each call need 200ms
         kwargs = {
-            _tcc.push_realtime_interval: hp.dttimedelta(seconds=1),
-            _tcc.trade1_timedelta: (hp.dttimedelta(seconds=60), hp.dttimedelta(seconds=0)),
-            _tcc.trade2_timedelta: (hp.dttimedelta(seconds=30), hp.dttimedelta(seconds=0))}
+            _tcc.push_realtime_interval: hp.dt.timedelta(seconds=1),
+            _tcc.trade1_timedelta: (hp.dt.timedelta(seconds=60), hp.dt.timedelta(seconds=0)),
+            _tcc.trade2_timedelta: (hp.dt.timedelta(seconds=30), hp.dt.timedelta(seconds=0))}
         data_server_thread = threading.Thread(
             target=thread_data_server_loop,
             args=(self.trade_context,),

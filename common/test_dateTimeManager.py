@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from common.datetime_manager import DateTimeManager
-from common.helper import dtnow, dt_from_time, sleep_for_seconds, dttimedelta
+from common.helper import dtnow, dt_from_time, sleep_for_seconds, dt
 
 
 class TestDateTimeManager(TestCase):
@@ -37,5 +37,5 @@ class TestDateTimeManager(TestCase):
             result_list.append(count)
             return count
 
-        dtm.do_it_every(func, dttimedelta(seconds=1))
+        dtm.do_it_every(func, dt.timedelta(seconds=1))
         assert len(result_list) == 2

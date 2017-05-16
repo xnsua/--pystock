@@ -41,7 +41,8 @@ def update_k_data(stock_code: str, path):
     return df_concat
 
 
-def read_etf(stock_code):
+# <editor-fold desc="Etf">
+def read_etf_history(stock_code):
     stock_code = stock_code.replace('SH.', '')
     stock_code = stock_code.replace('SZ.', '')
     path = myconfig.stock_day_data_etf_path
@@ -53,7 +54,7 @@ def read_etf(stock_code):
     return df_read
 
 
-def update_etfs():
+def update_etf_histories():
     """ Return updated etf """
     etf_path = myconfig.stock_day_data_etf_path
     rval = {}
@@ -66,12 +67,18 @@ def update_etfs():
     return rval
 
 
-def read_etfs():
+def read_etf_histories():
     rval = {}
     for val in stock_helper.etf_t1:
         val = val[2:]
-        rval[val] = read_etf(val)
+        rval[val] = read_etf_history(val)
     for val in stock_helper.etf_t0:
         val = val[2:]
-        rval[val] = read_etf(val)
+        rval[val] = read_etf_history(val)
     return rval
+
+
+def read_etf_infos():
+    pass
+
+# </editor-fold>

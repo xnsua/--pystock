@@ -5,7 +5,6 @@ import pyaudio
 
 from common.helper import loop_for_seconds
 from config_module import myconfig
-from jqs import chunk
 
 
 class TradeCommicationConstant:
@@ -101,6 +100,7 @@ class ClientHttpAccessConstant:
 
 
 def play_wav(filename):
+    chunk = 1024
     # open a wav format music
     f = wave.open(filename, "rb")
     # instantiate PyAudio

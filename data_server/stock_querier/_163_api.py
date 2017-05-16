@@ -2,9 +2,9 @@ import datetime as dt
 import io
 
 import pandas as pd
+import pyquery
 import requests
 
-import common.helper
 from common.web_helper import firefox_get_url
 from stock_basic import stock_helper
 
@@ -32,12 +32,26 @@ def wget_stock_history(stock_code, startdate=dt.datetime(1990, 1, 1),
     return df
 
 
-def get_etf_info():
-    pass
+def get_etf_info(etf_code):
+    # http://quotes.money.163.com/fund/159917.html
+    url = f'http://quotes.money.163.com/fund/{etf_code}.html'
+    resp = firefox_get_url(requests.session(), url)
+    dom = pyquery.PyQuery(resp.text)
+    text = (dom('body > div > div.fn_data_title').text())
+    parts = text.split(' ')
+    net_assert = parts[(parts.index('总净资产:')) + 1]
+    if net_assert.find('万') != -1:
+        net_assert = float(net_assert.replace('万', '')) * 10000
+    elif net_assert.find('亿') != -1:
+        net_assert = float(net_assert.replace('亿', '')) * 10000 * 10000
+    else:
+        raise Exception(f'Query etf info for {etf_code} failed, text is {text}')
+    print(net_assert)
+
 
 def main():
-    download_stock_history('0510900', 'jqtt1.csv',
-                           startdate=common.helper.ndays_ago(50))
+    get_etf_info('510900')
+    # get_etf_info('510900')
     pass
 
 

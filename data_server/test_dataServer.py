@@ -1,4 +1,3 @@
-import datetime as dt
 import queue
 import threading
 from unittest import TestCase
@@ -8,8 +7,8 @@ from common.datetime_manager import DateTimeManager
 from common.log_helper import jqd
 from data_server.data_server_main import thread_data_server_loop
 from stock_basic.stock_helper import etf_t0
-from trade.trade_context import TradeContext
-from trade.trade_helper import *
+from trading.trade_context import TradeContext
+from trading.trade_helper import *
 
 _tcc = TradeCommicationConstant
 
@@ -28,7 +27,7 @@ class TestDataServer(TestCase):
         self.trade_context.thread_local.name = _tcc.id_trade_manager
 
     def test_interval_pre_trade1(self):
-        self.trade_context.dtm = DateTimeManager(hp.to_datetime(dt.time(9, 28, 58)), 2)
+        self.trade_context.dtm = DateTimeManager(hp.dt_from_time(9, 28, 58), 2)
         # For speed2 each call need 200ms
         kwargs = {
             _tcc.push_realtime_interval: hp.dt.timedelta(seconds=1),
@@ -58,7 +57,7 @@ class TestDataServer(TestCase):
             assert val.operation == _tcc.msg_push_realtime_stocks
 
     def test_interval_between_trade(self):
-        self.trade_context.dtm = DateTimeManager(hp.to_datetime(dt.time(11, 29, 58)), 2)
+        self.trade_context.dtm = DateTimeManager(hp.dt_from_time(11, 29, 58), 2)
         # For speed2 each call need 200ms
         kwargs = {
             _tcc.push_realtime_interval: hp.dt.timedelta(seconds=1),
@@ -86,7 +85,7 @@ class TestDataServer(TestCase):
             assert val.operation == _tcc.msg_push_realtime_stocks
 
     def test_interval_after_trade(self):
-        self.trade_context.dtm = DateTimeManager(hp.to_datetime(dt.time(14, 59, 58)), 2)
+        self.trade_context.dtm = DateTimeManager(hp.dt_from_time(14, 59, 58), 2)
         # For speed2 each call need 200ms
         kwargs = {
             _tcc.push_realtime_interval: hp.dt.timedelta(seconds=1),

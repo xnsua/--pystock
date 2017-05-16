@@ -4,9 +4,8 @@ from datetime import datetime
 
 import dateutil
 
-from common import json_helper
+from common import json_helper, plPath
 from common.base_functions import UtilObjectBase
-from common.helper import save_string_to_file, read_string_from_file
 
 
 class ManagerInfo(UtilObjectBase):
@@ -45,11 +44,11 @@ class FundInfo(UtilObjectBase):
         return json.dumps(self, default=json_helper.json_default_encoder, ensure_ascii=False, indent=4)
 
     def to_file(self, filename):
-        save_string_to_file(self.to_json(), filename)
+        plPath(filename).write_text(filecontent, 'utf-8')
 
     @classmethod
     def from_file(cls, filename):
-        fcontent = read_string_from_file(filename)
+        fcontent = plPath(filename).read_text(encoding='utf-8')
         return cls.from_string(fcontent)
 
     @classmethod

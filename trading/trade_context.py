@@ -2,8 +2,8 @@ import queue
 import threading
 
 from common.helper import ObjectCabinet
-from trade.comm_message import CommMessage
-from trade.trade_helper import ClientHttpAccessConstant, TradeCommicationConstant
+from trading.comm_message import CommMessage
+from trading.trade_helper import ClientHttpAccessConstant, TradeCommicationConstant
 
 _hc = ClientHttpAccessConstant
 _tcc = TradeCommicationConstant

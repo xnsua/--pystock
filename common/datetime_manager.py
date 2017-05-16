@@ -2,22 +2,22 @@ import datetime as dt
 import sys
 import time
 
-from common.helper import dtnow
+from common.helper import dt_now
 
 
 class DateTimeManager:
     def __init__(self, start_dt=None, speed=1):
         assert not (start_dt is None and speed != 1)
         self.start_dt = start_dt
-        self.real_start_time = dtnow()
+        self.real_start_time = dt_now()
 
         self.speed = speed
         self.timer_start = self.now()
 
     def now(self):
         if not self.start_dt:
-            return dtnow()
-        timedelta1 = dtnow() - self.real_start_time
+            return dt_now()
+        timedelta1 = dt_now() - self.real_start_time
         sec1 = timedelta1.total_seconds()
         sec2 = sec1 * self.speed
         timedelta2 = dt.timedelta(seconds=sec2)

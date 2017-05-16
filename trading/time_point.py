@@ -2,7 +2,7 @@ import datetime
 
 import sortedcontainers
 
-from common.helper import dttoday
+from common.helper import dt_today
 
 
 class TimePoints:
@@ -19,8 +19,8 @@ class TimePoints:
             time_point = self.time_points.iloc[index]
             if vtime > time_point \
                     and self.time_points_used.get(time_point,
-                                                  None) != dttoday():
-                self.time_points_used[time_point] = dttoday()
+                                                  None) != dt_today():
+                self.time_points_used[time_point] = dt_today()
                 time_point_name = self.time_points[time_point]
                 if not time_point_name:
                     return 'default_time_point'
@@ -34,8 +34,8 @@ def test_time_point():
                      datetime.time(1, 3, 1): 't3',
                      })
     assert 't1' == tp.hit(
-        datetime.datetime.combine(dttoday(), datetime.time(1, 1, 2)))
+        datetime.datetime.combine(dt_today(), datetime.time(1, 1, 2)))
     assert not tp.hit(
-        datetime.datetime.combine(dttoday(), datetime.time(1, 1, 2)))
+        datetime.datetime.combine(dt_today(), datetime.time(1, 1, 2)))
     assert 't3' == tp.hit(
-        datetime.datetime.combine(dttoday(), datetime.time(1, 3, 2)))
+        datetime.datetime.combine(dt_today(), datetime.time(1, 3, 2)))

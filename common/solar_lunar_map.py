@@ -1,7 +1,6 @@
 import datetime as dt
 
 from common import plPath
-from common.helper import read_string_from_file
 
 
 class Lunar:

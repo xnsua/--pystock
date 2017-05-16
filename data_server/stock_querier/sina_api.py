@@ -1,6 +1,7 @@
 import re
+import time
 
-from common.helper import sleep_for_milliseconds, dtnow
+from common.helper import dt_now
 from common.web_helper import firefox_quick_get_url
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
@@ -47,8 +48,8 @@ pd.set_option('precision', 5)
 def main():
     while 1:
         ret = get_realtime_stock_info('sh' + v for v in ['510900'])
-        sleep_for_milliseconds(1000)
-        print(dtnow())
+        time.sleep(1000)
+        print(dt_now())
         print(ret.ix[0, 'price'])
 
 

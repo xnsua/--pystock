@@ -1,13 +1,13 @@
 from contextlib import suppress
 from queue import Empty
 
-from common.helper import to_logstr
+from common.helper import to_log_str
 from common.log_helper import jqd, mylog
-from data_server.day_data_manager import update_etfs
+from data_server.day_data_manager import update_etf_histories
 from stock_basic.stock_helper import etf_t1, etf_t0
-from trade.comm_message import CommMessage
-from trade.trade_context import TradeContext
-from trade.trade_helper import *
+from trading.comm_message import CommMessage
+from trading.trade_context import TradeContext
+from trading.trade_helper import *
 
 _tcc = TradeCommicationConstant
 
@@ -17,7 +17,7 @@ def thread_buy_after_drop(trade_context, **param):
         obj = BuyAfterDrop(trade_context, param)
         obj.run_loop()
     except Exception as e:
-        mylog.fatal(to_logstr(e))
+        mylog.fatal(to_log_str(e))
         alert_exception(10)
 
 class BuyAfterDrop:
@@ -31,7 +31,7 @@ class BuyAfterDrop:
         self.etf_day_data = None
 
     def prepare(self):
-        self.etf_day_data = update_etfs()
+        self.etf_day_data = update_etf_histories()
         self.trade_context.add_monitored_stock([*etf_t1, *etf_t0])
 
     def run_loop(self):

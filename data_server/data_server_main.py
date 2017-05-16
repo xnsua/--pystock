@@ -3,13 +3,13 @@ import queue
 import pandas as pd
 
 from common.datetime_manager import DateTimeManager
-from common.helper import to_logstr
+from common.helper import to_log_str
 from common.log_helper import mylog, jqd
 from data_server.stock_querier.sina_api import get_realtime_stock_info
-from trade.comm_message import CommMessage
-from trade.trade_context import TradeContext
-from trade.trade_helper import *
-from trade.trade_utility import is_in_expanded_stage
+from trading.comm_message import CommMessage
+from trading.trade_context import TradeContext
+from trading.trade_helper import *
+from trading.trade_utility import is_in_expanded_stage
 
 _tcc = TradeCommicationConstant
 _stc = StockTimeConstant
@@ -21,7 +21,7 @@ def thread_data_server_loop(trade_context, **kwargs):
         trade_context.thread_local.name = _tcc.id_data_server
         data_server.run_loop()
     except Exception as e:
-        mylog.fatal(to_logstr(e))
+        mylog.fatal(to_log_str(e))
         alert_exception(10)
 
 
@@ -117,7 +117,7 @@ class DataServer:
             msg.put_result(rval)
         except Exception as e:
             msg.put_result((Exception.__name__, e))
-            mylog.error(to_logstr(e))
+            mylog.error(to_log_str(e))
 
     def find_func_by_operation(self, operation):
         return self.msg_function_dict[operation]

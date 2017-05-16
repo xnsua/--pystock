@@ -1,7 +1,7 @@
 import datetime
 
-from trade.trade_helper import StockTimeConstant
-from trade.trade_utility import find_stage
+from trading.trade_helper import StockTimeConstant
+from trading.trade_utility import find_stage
 
 _stc = StockTimeConstant
 

@@ -1,67 +1,11 @@
-import datetime
+import datetime as dt
 import os
 import queue
 import re
 import traceback
-from pathlib import Path
-
-dt = datetime
 
 
 # <editor-fold desc="FileAndDir">
-
-
-def rmdir_ifexist(path):
-    try:
-        os.rmdir(path)
-    except FileNotFoundError:
-        pass
-
-
-def remove_ifexist(path):
-    try:
-        os.remove(path)
-    except FileNotFoundError:
-        pass
-
-
-def mkdir_ifnotexist(path):
-    try:
-        os.mkdir(path)
-    except FileExistsError:
-        pass
-
-
-def save_bin_to_file(filename: str, b: bytes):
-    with open(filename, 'wb') as file:
-        file.write(b)
-    return
-
-
-def save_string_to_file(filecontent, filename):
-    Path(filename).write_text(filecontent, 'utf-8')
-
-
-def read_string_from_file(filename):
-    return Path(filename).read_text(encoding='utf-8')
-
-
-def call_after_first(func):
-    if call_after_first.first_time:
-        call_after_first.first_time = False
-        return
-    func()
-
-
-call_after_first.first_time = True
-
-
-def get_list_from_file(filename):
-    fcontent = (Path(filename)).read_text()
-    listcontent = fcontent.split('\n')
-    listcontent = filter(bool, listcontent)
-    return listcontent
-
 
 def is_file_outdated(path, span):
     if not os.path.exists(path):
@@ -69,8 +13,8 @@ def is_file_outdated(path, span):
     file_dt = os.path.getmtime(path)
     file_dt = dt.datetime.fromtimestamp(file_dt)
     now = dt.datetime.now()
-    curspan = now - file_dt
-    if curspan > span:
+    cur_span = now - file_dt
+    if cur_span > span:
         return True
     return False
 
@@ -81,8 +25,8 @@ def get_file_modify_time(path):
 
 
 def get_file_create_time(path):
-    filedt = os.path.getctime(path)
-    return dt.datetime.fromtimestamp(filedt)
+    file_dt = os.path.getctime(path)
+    return file_dt.datetime.fromtimestamp(file_dt)
 
 
 # </editor-fold>
@@ -95,10 +39,10 @@ def time_exec(func):
     print(dt.datetime.now() - start)
 
 
-def ndays_later(n, olddate=None):
-    if not olddate:
-        olddate = dt.date.today()
-    return olddate + dt.timedelta(days=n)
+def ndays_later(n, old_date=None):
+    if not old_date:
+        old_date = dt.date.today()
+    return old_date + dt.timedelta(days=n)
 
 
 def ndays_ago(n, old_date=None):
@@ -107,194 +51,62 @@ def ndays_ago(n, old_date=None):
     return old_date - dt.timedelta(days=n)
 
 
-def _dt_daterange(start_date, end_date):
+def dt_date_range(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + dt.timedelta(n)
 
 
-dt.daterange = _dt_daterange
-
-
-def dttoday():
+def dt_today():
     return dt.date.today()
 
 
-def dtnow():
+def dt_now():
     return dt.datetime.now()
 
 
-def dtnowtime():
+def dt_now_time():
     return dt.datetime.now().time()
 
 
-def seconds_of(val):
-    if type(val) == dt.time:
-        return val.hour * 3600 + val.minute * 60 + val.second + val.microsecond / 1000_000
-    raise Exception(f'Unsupported type {type(val)}')
-
-
-def to_datetime(dateortime):
-    if type(dateortime) == dt.date:
-        return dt.datetime(dateortime.year, dateortime.month, dateortime.day)
-    elif type(dateortime) == dt.time:
-        return dt.datetime.combine(dttoday(), dateortime)
-    raise LogicException(f'{dateortime} has wrong type')
-
-
 def dt_from_time(a, b, c):
-    return dt.datetime.combine(dttoday(), dt.time(a, b, c))
+    return dt.datetime.combine(dt_today(), dt.time(a, b, c))
 
 
 def to_seconds_str(o) -> str:
     return o.strftime('%y-%m-%d %H:%M:%S')
 
 
-def to_min_str(o) -> str:
-    return o.strftime('%y-%m-%d %H:%M')
-
-
-def to_day_str(o) -> str:
-    return o.strftime('%y-%m-%d')
-
-
-def to_microseconds_str(o, seconds_dight=3) -> str:
-    ss = o.strftime('%y-%m-%d %H:%M:%S.%f')
-    if seconds_dight == 0:
+def to_microseconds_str(o, second_digits=3) -> str:
+    ss = o.strftime('%Y-%m-%d %H:%M:%S.%f')
+    if second_digits == 0:
         ss = ss[:-7]
         return ss
-    if seconds_dight == 6:
+    if second_digits == 6:
         return ss
-    ss = ss[:seconds_dight - 6]
+    ss = ss[:second_digits - 6]
     return ss
-
-
-def is_today(value):
-    if type(value) == dt.datetime:
-        return value.date() == dt.date.today()
-    elif type(value) == dt.date:
-        return value == dt.date.today()
-    return False
 
 
 def find_date_substr(source: str):
     return re.search(r'\d{4}-\d{1,2}-\d{1,2}', source).group()
 
 
-def sleep_for_milliseconds(millisecond):
-    import time
-    time.sleep(millisecond / 1000)
-
-
-def sleep_for_seconds(seconds):
-    import time
-    time.sleep(seconds)
-
-
-def seconds_from_epoch():
-    import time
-    return time.time()
-
-
-def milliseconds_from_epoch():
-    import time
-    return time.time() * 1000
-
-
 def loop_for_seconds(func, seconds):
-    start_dt = dtnow()
-    while (dtnow() - start_dt).total_seconds() < seconds:
+    start_dt = dt_now()
+    while (dt_now() - start_dt).total_seconds() < seconds:
         func()
 
 
 # </editor-fold>
 
-# noinspection PyUnusedLocal
-# Used in lambda
-def assign(dest, src):
-    dest = src
-    return dest
-
-
-# <editor-fold desc="Exception">
-class LogicException(Exception):
-    pass
-
-
-def retry_on_claim_exception(exception):
-    return isinstance(exception, ClaimException)
-
-
-# <editor-fold desc="ClaimException">
-class ClaimException(Exception):
-    pass
-
-
-def claim_msg(msg=''):
-    raise ClaimException(f'Failed :: {msg}')
-
-
-def claim_true(val, msg=''):
-    if not val:
-        raise ClaimException(f'Failed:: {val} :: {msg}')
-
-
-def claim_false(val, msg=''):
-    if val:
-        raise ClaimException(f'Failed:: Not {val} :: {msg}')
-
-
-def claim_len(val1, val2, msg=''):
-    if not len(val1) == val2:
-        raise ClaimException(f'Failed:: Length of {val1} == {val2} :: {msg}')
-
-
-def claim_eq(val1, val2, msg=''):
-    if not val1 == val2:
-        raise ClaimException(f'Failed:: {val1} == {val2} :: {msg}')
-
-
-def claim_noteq(val1, val2, msg=''):
-    if val1 == val2:
-        raise ClaimException(f'Failed:: {val1} != {val2} :: {msg}')
-
-
-def claim_gt(val1, val2, msg=''):
-    if not val1 > val2:
-        raise ClaimException(f'Failed:: {val1} > {val2} :: {msg}')
-
-
-def claim_lt(val1, val2, msg=''):
-    if not val1 < val2:
-        raise ClaimException(f'Failed:: {val1} < {val2} :: {msg}')
-
-
-def claim_ge(val1, val2, msg=''):
-    if not val1 >= val2:
-        raise ClaimException(f'Failed:: {val1} >= {val2} :: {msg}')
-
-
-def claim_le(val1, val2, msg=''):
-    if not val1 <= val2:
-        raise ClaimException(f'Failed:: {val1} <= {val2} :: {msg}')
-
-
-def claim_contain(collection, val, msg=''):
-    if val not in collection:
-        raise ClaimException(
-            f'Failed:: {collection} contains {val} :: {msg}')
-
-
-# </editor-fold>
-
-def to_logstr(e):
+# <editor-fold desc="Basic">
+def to_log_str(e):
     if isinstance(e, Exception):
         tbstr = ''.join(traceback.format_tb(e.__traceback__))
         tbstr = tbstr + str(e)
         return f'Exception encountered: \n{tbstr}'
-    raise Exception(f'Unsupport type {type(e)} value:{e}')
+    raise Exception(f'Unsupported type {type(e)} value:{e}')
 
-
-# </editor-fold>
 
 def type_info(val):
     if type(val) == list:
@@ -319,6 +131,9 @@ def type_info(val):
         return info
 
 
+# </editor-fold>
+
+# <editor-fold desc="Data Structure">
 class ObjectCabinet:
     def __init__(self, generator, clear_func):
         self.queue = queue.Queue()
@@ -351,3 +166,5 @@ class ObjectCabinet:
                 self.cabinet.put_one(self.current_obj)
 
         return Context(self)
+
+# </editor-fold>

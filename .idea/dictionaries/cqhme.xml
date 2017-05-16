@@ -4,24 +4,42 @@
       <w>buyrecord</w>
       <w>datalen</w>
       <w>daterange</w>
+      <w>dayentrust</w>
+      <w>dayfinentrust</w>
+      <w>deliveryentrust</w>
       <w>drdata</w>
       <w>dropcount</w>
+      <w>end_dat</w>
       <w>entrustment</w>
       <w>etfs</w>
       <w>exchangelist</w>
+      <w>hisentrust</w>
+      <w>hisfinentrust</w>
+      <w>infos</w>
       <w>isbuy</w>
+      <w>lclose</w>
       <w>mavailable</w>
       <w>mdrawable</w>
       <w>mfree</w>
       <w>mfrozen</w>
+      <w>midnoon</w>
+      <w>moneymovement</w>
       <w>mtotal</w>
+      <w>myshare</w>
       <w>ndays</w>
       <w>ndrop</w>
+      <w>pchg</w>
       <w>realtime</w>
       <w>rval</w>
+      <w>save_pat</w>
       <w>sqlite</w>
+      <w>start_dat</w>
       <w>subdata</w>
       <w>substr</w>
+      <w>topen</w>
+      <w>vaturnover</w>
+      <w>voturnover</w>
+      <w>wget</w>
     </words>
   </dictionary>
 </component>

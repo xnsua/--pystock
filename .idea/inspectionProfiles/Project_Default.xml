@@ -7,6 +7,7 @@
       <option name="ignoredIdentifiers">
         <list>
           <option value="pathlib.PurePath.mkdir" />
+          <option value="pathlib.PurePath.read_text" />
         </list>
       </option>
     </inspection_tool>

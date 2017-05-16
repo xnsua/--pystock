@@ -7,7 +7,7 @@ from common.helper import loop_for_seconds
 from config_module import myconfig
 
 
-class TradeCommicationConstant:
+class TradeCommunicationConstant:
     id_data_server = 'id_data_server'
     id_trade_manager = 'id_trade_manager'
     model_name = 'model_name'
@@ -67,11 +67,12 @@ class StockTimeConstant:
                         after_trade: after_trade_time}
 
 
-class StockTerms:
+class StockTerm:
     open = 'open'
     close = 'close'
     low = 'low'
     high = 'high'
+    scale = 'scale'
 
 
 class ClientHttpAccessConstant:

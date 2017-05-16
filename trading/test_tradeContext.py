@@ -5,9 +5,9 @@ from unittest import TestCase
 from common.datetime_manager import DateTimeManager
 from common.helper import dt_from_time
 from trading.trade_context import TradeContext
-from trading.trade_helper import TradeCommicationConstant
+from trading.trade_helper import TradeCommunicationConstant
 
-_tcc = TradeCommicationConstant
+_tcc = TradeCommunicationConstant
 
 
 class TestTradeContext(TestCase):

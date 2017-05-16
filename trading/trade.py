@@ -14,7 +14,7 @@ from trading.trade_helper import *
 
 pd.options.display.max_rows = 10
 
-_tcc = TradeCommicationConstant
+_tcc = TradeCommunicationConstant
 _hc = ClientHttpAccessConstant
 
 

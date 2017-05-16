@@ -26,7 +26,6 @@ class CacheDatabase:
         else:
             exec_str = f"select * from cache_table where key == '{key}' " \
                        f"and store_dt >= '{str(start_date_time)}'"
-        print(exec_str)
         cursor = self.db_conn.execute(exec_str)
         rows = [val for val in cursor]
         if len(rows) == 1:
@@ -49,11 +48,10 @@ class CacheDatabase:
         return result_dict
 
     def update(self, key, value):
+        value = value.replace("'", "''")
         time_str = str(dt.datetime.now())
-        print('time_str', time_str)
         execute_str = f"INSERT OR REPLACE into cache_table values " \
                       f"('{key}','{value}','{time_str}');"
-        print(execute_str)
         val = self.db_conn.execute(execute_str)
         self.db_conn.commit()
 
@@ -64,6 +62,21 @@ class CacheDatabase:
 cache_db = CacheDatabase(myconfig.project_root / 'cache.db')
 
 
+def test_quoted_string():
+    path = myconfig.project_root / 'test_cache_db.db'
+    with suppress(FileNotFoundError):
+        os.remove(path)
+    db = CacheDatabase(path)
+    db.update('k1', "'")
+    val = db.query('k1')
+    assert val == "'"
+    db.update('k1', '"')
+    val = db.query('k1')
+    assert val == '"'
+
+    db.close()
+    with suppress(FileNotFoundError):
+        os.remove(path)
 def test_cache_database():
     path = myconfig.project_root / 'test_cache_db.db'
     with suppress(FileNotFoundError):
@@ -88,10 +101,10 @@ def test_cache_database():
     assert not val
 
     val = db.query_many(['k1', 'k2'])
-    assert set(val) == set(['k1', 'k2'])
+    assert set(val) == {'k1', 'k2'}
 
     val = db.query_many(['k1', 'k2'], start_date_time=dt1)
-    assert set(val) == set(['k2'])
+    assert set(val) == {'k2'}
 
     val = db.query_many(['k1', 'k2'], start_date_time=dt2)
     assert not len(val)
@@ -102,7 +115,7 @@ def test_cache_database():
 
 
 def main():
-    test_cache_database()
+    test_quoted_string()
 
 
 if __name__ == '__main__':

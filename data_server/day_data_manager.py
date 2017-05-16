@@ -1,3 +1,4 @@
+import ast
 import datetime as dt
 import pathlib as pl
 
@@ -6,6 +7,8 @@ import tushare as ts
 
 from common.helper import ndays_later, ndays_ago
 from config_module import myconfig
+from data_server.stock_querier import w163_api
+from data_server.stock_querier.cache_database import cache_db
 from stock_basic import stock_helper
 from stock_basic.stock_helper import stock_start_day, is_trade_day
 
@@ -78,7 +81,13 @@ def read_etf_histories():
     return rval
 
 
-def read_etf_infos():
-    pass
+def query_etf_info(etf_code):
+    key = 'key_etf_' + etf_code
+    val = cache_db.query(key, ndays_ago(7))
+    if val:
+        return ast.literal_eval(val)
+
+    info = w163_api.query_etf_info(etf_code)
+    cache_db.update(key, str(info))
 
 # </editor-fold>

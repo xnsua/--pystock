@@ -9,7 +9,7 @@ from trading.comm_message import CommMessage
 from trading.trade_context import TradeContext
 from trading.trade_helper import *
 
-_tcc = TradeCommicationConstant
+_tcc = TradeCommunicationConstant
 
 
 def thread_buy_after_drop(trade_context, **param):

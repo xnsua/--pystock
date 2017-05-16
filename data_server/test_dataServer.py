@@ -10,7 +10,7 @@ from stock_basic.stock_helper import etf_t0
 from trading.trade_context import TradeContext
 from trading.trade_helper import *
 
-_tcc = TradeCommicationConstant
+_tcc = TradeCommunicationConstant
 
 
 class TestDataServer(TestCase):

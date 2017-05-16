@@ -76,7 +76,7 @@ def to_seconds_str(o) -> str:
     return o.strftime('%y-%m-%d %H:%M:%S')
 
 
-def to_microseconds_str(o, second_digits=3) -> str:
+def to_datetime_str(o, second_digits=3) -> str:
     ss = o.strftime('%Y-%m-%d %H:%M:%S.%f')
     if second_digits == 0:
         ss = ss[:-7]
@@ -102,9 +102,9 @@ def loop_for_seconds(func, seconds):
 # <editor-fold desc="Basic">
 def to_log_str(e):
     if isinstance(e, Exception):
-        tbstr = ''.join(traceback.format_tb(e.__traceback__))
-        tbstr = tbstr + str(e)
-        return f'Exception encountered: \n{tbstr}'
+        log_str = ''.join(traceback.format_tb(e.__traceback__))
+        log_str = log_str + str(e)
+        return f'Exception encountered: \n{log_str}'
     raise Exception(f'Unsupported type {type(e)} value:{e}')
 
 

@@ -17,8 +17,7 @@ solar_lunar_map = {}
 # noinspection SpellCheckingInspection
 def load_map():
     # noinspection PyTypeChecker
-    fcon = read_string_from_file(
-        (plPath(__file__).parent / 'solar_lunar_map.txt'))
+    fcon = (plPath(__file__).parent / 'solar_lunar_map.txt').read_text()
     lines = fcon.split('\n')
     for item in lines:
         if item:

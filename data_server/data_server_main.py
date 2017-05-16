@@ -11,7 +11,7 @@ from trading.trade_context import TradeContext
 from trading.trade_helper import *
 from trading.trade_utility import is_in_expanded_stage
 
-_tcc = TradeCommicationConstant
+_tcc = TradeCommunicationConstant
 _stc = StockTimeConstant
 
 

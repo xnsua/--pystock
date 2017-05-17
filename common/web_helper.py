@@ -27,26 +27,23 @@ def firefox_quick_get_url(url, headers=None):
     return firefox_get_url(session_nocache, url, headers)
 
 
-def firefox_quick_download_file(url, filepath, headers=None):
+def firefox_quick_download_file(url, file_path, headers=None):
     if headers is None:
         headers = {}
-    return firefox_download_file(session_nocache, url, filepath, headers)
+    return firefox_download_file(session_nocache, url, file_path, headers)
 
 
-def firefox_download_file(session, url, filepath, headers_=None):
+def firefox_download_file(session, url, file_path, headers_=None):
     if headers_ is None:
         headers_ = {}
     r = session.get(url, headers=headers_, stream=True)
     if r.status_code == 200:
-        with open(filepath, 'wb') as f:
+        with open(file_path, 'wb') as f:
             for chunk in r.iter_content(1024):
                 f.write(chunk)
 
 
 def main():
-    # firefox_download_file(requests.Session(),
-    #                       'http://quotes.money.163.com/service/chddata.html?code=1000001&start=19910102&end=20170214&fields=TCLOSE;HIGH;LOW;TOPEN;LCLOSE;CHG;PCHG;TURNOVER;VOTURNOVER;VATURNOVER;TCAP;MCAP',
-    #                       'jqtt.down')
     pass
 
 

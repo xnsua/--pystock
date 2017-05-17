@@ -1,6 +1,6 @@
 import queue
 
-import pandas as pd
+import pandas
 
 from common.datetime_manager import DateTimeManager
 from common.helper import to_log_str
@@ -8,17 +8,14 @@ from common.log_helper import mylog, jqd
 from data_server.stock_querier.sina_api import get_realtime_stock_info
 from trading.comm_message import CommMessage
 from trading.trade_context import TradeContext
-from trading.trade_helper import *
+from trading.trade_helper import ktc_, alert_exception, ksti_
 from trading.trade_utility import is_in_expanded_stage
-
-_tcc = TradeCommunicationConstant
-_stc = StockTimeConstant
 
 
 def thread_data_server_loop(trade_context, **kwargs):
     try:
         data_server = DataServer(trade_context, kwargs)
-        trade_context.thread_local.name = _tcc.id_data_server
+        trade_context.thread_local.name = ktc_.id_data_server
         data_server.run_loop()
     except Exception as e:
         mylog.fatal(to_log_str(e))
@@ -29,17 +26,17 @@ def thread_data_server_loop(trade_context, **kwargs):
 class DataServer:
     def __init__(self, trade_context: TradeContext, param_dict):
         self.trade_context = trade_context
-        self.trade_context.thread_local.name = _tcc.id_data_server
+        self.trade_context.thread_local.name = ktc_.id_data_server
         self.dtm = self.trade_context.dtm  # type: DateTimeManager
         self.self_queue = self.trade_context.get_current_thread_queue()  # type:queue.Queue
 
         self.param_dict = param_dict
 
         self.monitored_stock_map = {}
-        self.df_realtime_stock_info = None  # type: pd.DataFrame
+        self.df_realtime_stock_info = None  # type: pandas.DataFrame
 
-        self.msg_function_dict = {_tcc.msg_set_monitored_stock: self.add_monitored_stock,
-                                  _tcc.msg_quit_loop: self.quit_loop}
+        self.msg_function_dict = {ktc_.msg_set_monitored_stock: self.add_monitored_stock,
+                                  ktc_.msg_quit_loop: self.quit_loop}
 
         self.quit = False
 
@@ -63,7 +60,7 @@ class DataServer:
 
     def run_loop(self):
         mylog.info('Running data server loop')
-        interval = self.param_dict[_tcc.push_realtime_interval]
+        interval = self.param_dict[ktc_.push_realtime_interval]
         self.dtm.set_timer()
         while 1:
             try:
@@ -79,10 +76,10 @@ class DataServer:
                 self.push_realtime_stock_info()
 
     def in_expand_trade_time(self):
-        td1 = self.param_dict[_tcc.trade1_timedelta]
-        td2 = self.param_dict[_tcc.trade2_timedelta]
-        in_stage1 = is_in_expanded_stage(self.dtm.time(), _stc.trade1, *td1)
-        in_stage2 = is_in_expanded_stage(self.dtm.time(), _stc.trade2, *td2)
+        td1 = self.param_dict[ktc_.trade1_timedelta]
+        td2 = self.param_dict[ktc_.trade2_timedelta]
+        in_stage1 = is_in_expanded_stage(self.dtm.time(), ksti_.trade1, *td1)
+        in_stage2 = is_in_expanded_stage(self.dtm.time(), ksti_.trade2, *td2)
         if not in_stage1 and not in_stage2:
             return False
         return True

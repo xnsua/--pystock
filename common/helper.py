@@ -3,9 +3,11 @@ import os
 import queue
 import re
 import traceback
-
-
 # <editor-fold desc="FileAndDir">
+import wave
+
+import pyaudio
+
 
 def is_file_outdated(path, span):
     if not os.path.exists(path):
@@ -168,3 +170,28 @@ class ObjectCabinet:
         return Context(self)
 
 # </editor-fold>
+def play_wav(filename):
+    chunk = 1024
+    # open a wav format music
+    f = wave.open(filename, "rb")
+    # instantiate PyAudio
+    p = pyaudio.PyAudio()
+    # open stream
+    stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
+                    channels=f.getnchannels(),
+                    rate=f.getframerate(),
+                    output=True)
+    # read data
+    data = f.readframes(chunk)
+
+    # play stream
+    while data:
+        stream.write(data)
+        data = f.readframes(chunk)
+
+    # stop stream
+    stream.stop_stream()
+    stream.close()
+
+    # close PyAudio
+    p.terminate()

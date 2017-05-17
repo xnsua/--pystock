@@ -3,6 +3,7 @@ import time
 
 from common.helper import dt_now
 from common.web_helper import firefox_quick_get_url
+from trading.scipy_helper import pdDF
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
@@ -26,8 +27,8 @@ def get_realtime_stock_info(stock_list):
             content = content[0:6]
             content.append(content.pop(0))
             attrs.append(content)
-        df = pd.DataFrame(attrs, index=stock_codes, columns=_column_names,
-                          dtype=float)
+        df = pdDF(attrs, index=stock_codes, columns=_column_names,
+                  dtype=float)
         df['name'] = df['name'].astype(str)
         return df
 

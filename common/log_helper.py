@@ -119,10 +119,10 @@ class MyLog:
     def fatal_if(self, condition, errstr):
         if condition:
             self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
-        raise FatalException(errstr)
+            raise FatalException(errstr)
 
 
-mylog = MyLog(filename='py_stock.log')
+mylog = MyLog(filename='py_stock.log', log_begin_end=True)
 
 
 def jqd(*args):

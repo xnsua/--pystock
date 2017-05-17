@@ -1,3 +1,4 @@
+import ast
 import datetime as dt
 import os
 import sqlite3
@@ -32,6 +33,22 @@ class CacheDatabase:
             return rows[0][1]
         return None
 
+    def query_dict(self, key, start_date_time):
+        val = self.query(key, start_date_time)
+        if not val: return None
+
+        val = ast.literal_eval(val)
+        assert type(val) is dict
+        return val
+
+    def query_list(self, key, start_date_time):
+        val = self.query(key, start_date_time)
+        if not val: return None
+
+        val = ast.literal_eval(val)
+        assert type(val) is dict
+        return val
+
     def query_many(self, keys, start_date_time=None):
         if start_date_time is None:
             time_filter_str = ''
@@ -48,6 +65,7 @@ class CacheDatabase:
         return result_dict
 
     def update(self, key, value):
+        value = str(value)
         value = value.replace("'", "''")
         time_str = str(dt.datetime.now())
         execute_str = f"INSERT OR REPLACE into cache_table values " \

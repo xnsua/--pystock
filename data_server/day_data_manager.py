@@ -1,4 +1,3 @@
-import ast
 import datetime as dt
 import pathlib as pl
 
@@ -6,11 +5,14 @@ import pandas as pd
 import tushare as ts
 
 from common.helper import ndays_later, ndays_ago
+from common.simple_retry import SimpleRetry
 from config_module import myconfig
 from data_server.stock_querier import w163_api
 from data_server.stock_querier.cache_database import cache_db
 from stock_basic import stock_helper
-from stock_basic.stock_helper import stock_start_day, is_trade_day
+from stock_basic.stock_helper import stock_start_day
+from trading.scipy_helper import pdDF
+from trading.trade_helper import is_trade_day
 
 
 def update_k_data(stock_code: str, path):
@@ -22,7 +24,7 @@ def update_k_data(stock_code: str, path):
         last_date = dt.datetime.strptime(df_read.index.values[-1:][0],
                                          '%Y-%m-%d').date()
     except FileNotFoundError:
-        df_read = pd.DataFrame()
+        df_read = pdDF()
         last_date = ndays_ago(1, stock_start_day)
 
     # Skip the non_trade_day
@@ -35,11 +37,10 @@ def update_k_data(stock_code: str, path):
         return df_read
     if now.date() == query_start_date and now.hour < 16:
         return df_read
-
     df_update = ts.get_k_data(stock_code, start=str(query_start_date))
     df_update.set_index('date', inplace=True)
     df_concat = pd.concat([df_read, df_update],
-                          ignore_index=False)  # type: pd.DataFrame
+                          ignore_index=False)  # type: pdDF
     df_concat.to_csv(filename)
     return df_concat
 
@@ -53,7 +54,7 @@ def read_etf_history(stock_code):
     try:
         df_read = pd.read_csv(filename, index_col='date')
     except FileNotFoundError:
-        df_read = pd.DataFrame()
+        df_read = pdDF()
     return df_read
 
 
@@ -83,11 +84,12 @@ def read_etf_histories():
 
 def query_etf_info(etf_code):
     key = 'key_etf_' + etf_code
-    val = cache_db.query(key, ndays_ago(7))
-    if val:
-        return ast.literal_eval(val)
+    val = cache_db.query_dict(key, ndays_ago(7))
+    if val: return val
 
-    info = w163_api.query_etf_info(etf_code)
+    retrier = SimpleRetry(max_retry_times=2, wait_base_time=3)
+    info = retrier(w163_api.wget_etf_info)(etf_code)
     cache_db.update(key, str(info))
+    return info
 
 # </editor-fold>

@@ -1,9 +1,10 @@
 import datetime
-import wave
+import datetime as dt
 
-import pyaudio
+import pandas as pd
 
-from common.helper import loop_for_seconds
+from common import plPath
+from common.helper import loop_for_seconds, play_wav
 from config_module import myconfig
 
 
@@ -67,7 +68,7 @@ class StockTimeConstant:
                         after_trade: after_trade_time}
 
 
-class StockTerm:
+class StockTermConstant:
     open = 'open'
     close = 'close'
     low = 'low'
@@ -100,33 +101,52 @@ class ClientHttpAccessConstant:
     deliveryentrust = "deliveryentrust"
 
 
-def play_wav(filename):
-    chunk = 1024
-    # open a wav format music
-    f = wave.open(filename, "rb")
-    # instantiate PyAudio
-    p = pyaudio.PyAudio()
-    # open stream
-    stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
-                    channels=f.getnchannels(),
-                    rate=f.getframerate(),
-                    output=True)
-    # read data
-    data = f.readframes(chunk)
-
-    # play stream
-    while data:
-        stream.write(data)
-        data = f.readframes(chunk)
-
-    # stop stream
-    stream.stop_stream()
-    stream.close()
-
-    # close PyAudio
-    p.terminate()
+kca_ = ClientHttpAccessConstant
+ktc_ = TradeCommunicationConstant
+kst_ = StockTermConstant
+ksti_ = StockTimeConstant
+kmc_ = ModelConstant
 
 
 def alert_exception(seconds=3):
     val = ((myconfig.project_root / 'others' / 'alarm.wav').resolve())
     loop_for_seconds(lambda: play_wav(str(val)), seconds)
+
+
+# <editor-fold desc="TradeDay">
+class TradeDay:
+    def __init__(self):
+        self.df = self.read_df()
+        self.date_map = self.build_date_map()
+
+    def read_df(self):
+        path = plPath(__file__).parent / 'trade_day.csv'
+        return pd.read_csv(str(path), index_col='index')
+
+    def build_date_map(self):
+        date_map = {}
+        for i in range(len(self.df.index)):
+            date_map[self.df.iat[i, 0]] = i
+        return date_map
+
+    def is_trade_day(self, date_: dt.date):
+        row_num = self.date_map[str(date_)]
+        return self.df.iat[row_num, 1]
+
+    def last_n_trade_day(self, date_: dt.date, days_num):
+        row_num = self.date_map[str(date_)]
+        n_trade_days = []
+        while 1:
+            if len(n_trade_days) == days_num:
+                break
+            if self.df.iat[row_num, 1]:
+                date_str = self.df.iat[row_num, 0]
+                n_trade_days.append(dt.date(*map(int, date_str.split('-'))))
+            row_num -= 1
+        return list(reversed(n_trade_days))
+
+
+_trade_day = TradeDay()
+is_trade_day = _trade_day.is_trade_day
+last_n_trade_day = _trade_day.last_n_trade_day
+# </editor-fold>

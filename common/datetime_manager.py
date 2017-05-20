@@ -1,6 +1,7 @@
 import datetime as dt
 import sys
 import time
+from datetime import timedelta
 
 from common.helper import dt_now
 
@@ -50,3 +51,7 @@ class DateTimeManager:
             sleep_time = timedelta_ * i - (self.now() - start)
             if sleep_time.total_seconds() > 0:
                 self.sleep(sleep_time.total_seconds())
+
+    def to_real_timedelta(self, time_delta_: timedelta):
+        seconds = time_delta_.total_seconds() / self.speed
+        return timedelta(seconds=seconds)

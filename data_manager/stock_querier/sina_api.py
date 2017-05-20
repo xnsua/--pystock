@@ -2,8 +2,8 @@ import re
 import time
 
 from common.helper import dt_now
+from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
-from trading.scipy_helper import pdDF
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 

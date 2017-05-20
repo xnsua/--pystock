@@ -1,27 +1,33 @@
 from statistics import mean
 
-from common.log_helper import mylog
-from stock_basic.stock_helper import etf_with_amount
-from trading.models.model_base import ModelBase
-from trading.scipy_helper import pdDF
-from trading.trade_helper import last_n_trade_day
+from common.log_helper import mylog, jqd
+from common.scipy_helper import pdDF
+from stock_utility.stock_data_constants import etf_with_amount
+from stock_utility.trade_day import last_n_trade_day
+from trading.models.model_base import AbstractModel
+from trading.trade_context import TradeContext
 
 logger = mylog
 
 
-class ModelBuyAfterDrop(ModelBase):
-    def __init__(self):
+class ModelBuyAfterDrop(AbstractModel):
+    def __init__(self, trade_context: TradeContext):
         super().__init__()
-        pass
+        self.context = trade_context
+
+    def log(self, msg):
+        jqd(f'{self.context.thread_local.name}:: {msg}')
 
     def init_model(self):
-        self.context.add_monitored_stock([etf_with_amount])
+        self.log('Init model')
+        self.context.add_monitored_stock(etf_with_amount)
 
     def on_bid_over(self):
+        self.log('On bid over')
         pass
 
-
     def handle_bar(self):
+        self.log('Handle bar')
         pass
 
 

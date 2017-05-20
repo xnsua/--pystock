@@ -1,5 +1,5 @@
 from common.web_helper import firefox_quick_get_url
-from trading.trade_helper import ClientHttpAccessConstant
+from trading.base_structure.trade_constants import ClientHttpAccessConstant
 
 _c = ClientHttpAccessConstant
 

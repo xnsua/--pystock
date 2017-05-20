@@ -15,6 +15,3 @@ class AbstractModel(metaclass=abc.ABCMeta):
         pass
 
 
-class ModelBase(AbstractModel):
-    def __init__(self):
-        self.context = None

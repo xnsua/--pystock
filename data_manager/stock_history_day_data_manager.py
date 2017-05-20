@@ -1,17 +1,17 @@
-import datetime as dt
+import datetime
 import pathlib as pl
 
 import pandas as pd
 import tushare as ts
 
 from common.helper import ndays_later, ndays_ago
+from common.my_old.cache_database import cache_db
+from common.scipy_helper import pdDF
 from common.simple_retry import SimpleRetry
 from config_module import myconfig
-from data_server.stock_querier import w163_api
-from data_server.stock_querier.cache_database import cache_db
-from stock_basic.stock_helper import stock_start_day
-from trading.scipy_helper import pdDF
-from trading.trade_helper import is_trade_day
+from data_manager.stock_querier import w163_api
+from stock_utility.stock_data_constants import stock_start_day
+from stock_utility.trade_day import is_trade_day
 
 
 class DayBar:
@@ -35,7 +35,7 @@ class DayBar:
     def _update_k_data(stock_code: str, filename):
         try:
             df_read = pd.read_csv(filename, index_col='date')
-            last_date = dt.datetime.strptime(df_read.index.values[-1:][0],
+            last_date = datetime.datetime.strptime(df_read.index.values[-1:][0],
                                              '%Y-%m-%d').date()
         except FileNotFoundError:
             df_read = pdDF()
@@ -46,7 +46,7 @@ class DayBar:
         while not is_trade_day(query_start_date):
             query_start_date = ndays_later(1, query_start_date)
 
-        now = dt.datetime.now()
+        now = datetime.datetime.now()
         if now.date() < query_start_date:
             return df_read
         if now.date() == query_start_date and now.hour < 16:

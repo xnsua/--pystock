@@ -1,4 +1,4 @@
-class CommMessage:
+class TradeMessage:
     def __init__(self, sender, operation, param1, param2, result_queue, msg_time):
         self.sender = sender
         self.operation = operation
@@ -8,14 +8,15 @@ class CommMessage:
         self.msg_dt = msg_time
 
     def __repr__(self):
-        return f'CommMessage{{{self.sender}, {self.operation}, {self.param1}, {self.param2}}}'
+        return f'CommMessage{{{self.sender}, {self.operation}, {str(self.param1)[0:10]}*, {str(self.param2)[0:10]}*}}'
 
     def put_result(self, result):
-        self.result_queue.put(result)
+        if self.result_queue:
+            self.result_queue.put(result)
 
 
 def main():
-    pass
+    print(TradeMessage('aa', 'dff', 'dfd', 'd1111111111111111f', 'df', 'fdfd'))
 
 
 if __name__ == '__main__':

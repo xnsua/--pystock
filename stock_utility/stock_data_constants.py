@@ -1,12 +1,9 @@
-from common.helper import dt, ndays_ago
+import datetime
 
-# <editor-fold desc="Stock constants">
-from trading.trade_helper import TradeDay
-
-stock_start_day = dt.date(1990, 12, 19)
+stock_start_day = datetime.date(1990, 12, 19)
 str_stock_start_day = str(stock_start_day)
 
-stock_start_time = dt.datetime(1990, 12, 19)
+stock_start_time = datetime.datetime(1990, 12, 19)
 stock_in_etf50 = ['600000', '600016', '600028', '600029',
                   '600030', '600036', '600048', '600050',
                   '600100', '600104', '600109', '600111',
@@ -39,11 +36,3 @@ etf_with_amount = ['512000', '513100', '510360', '510510', '510330', '510180',
                    '510500', '510300', '510050', '510900', ]
 # </editor-fold>
 
-def main():
-    v = TradeDay()
-    val = v.last_n_trade_day(ndays_ago(2), 9)
-    print(val)
-
-
-if __name__ == '__main__':
-    main()

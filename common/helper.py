@@ -1,4 +1,4 @@
-import datetime as dt
+import datetime as datetime
 import os
 import queue
 import re
@@ -13,8 +13,8 @@ def is_file_outdated(path, span):
     if not os.path.exists(path):
         return True
     file_dt = os.path.getmtime(path)
-    file_dt = dt.datetime.fromtimestamp(file_dt)
-    now = dt.datetime.now()
+    file_dt = datetime.datetime.fromtimestamp(file_dt)
+    now = datetime.datetime.now()
     cur_span = now - file_dt
     if cur_span > span:
         return True
@@ -23,7 +23,7 @@ def is_file_outdated(path, span):
 
 def get_file_modify_time(path):
     file_dt = os.path.getmtime(path)
-    return dt.datetime.fromtimestamp(file_dt)
+    return datetime.datetime.fromtimestamp(file_dt)
 
 
 def get_file_create_time(path):
@@ -36,42 +36,42 @@ def get_file_create_time(path):
 
 # <editor-fold desc="Time">
 def time_exec(func):
-    start = dt.datetime.now()
+    start = datetime.datetime.now()
     func()
-    print(dt.datetime.now() - start)
+    print(datetime.datetime.now() - start)
 
 
 def ndays_later(n, old_date=None):
     if not old_date:
-        old_date = dt.date.today()
-    return old_date + dt.timedelta(days=n)
+        old_date = datetime.date.today()
+    return old_date + datetime.timedelta(days=n)
 
 
 def ndays_ago(n, old_date=None):
     if not old_date:
-        old_date = dt.date.today()
-    return old_date - dt.timedelta(days=n)
+        old_date = datetime.date.today()
+    return old_date - datetime.timedelta(days=n)
 
 
 def dt_date_range(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
-        yield start_date + dt.timedelta(n)
+        yield start_date + datetime.timedelta(n)
 
 
 def dt_today():
-    return dt.date.today()
+    return datetime.date.today()
 
 
 def dt_now():
-    return dt.datetime.now()
+    return datetime.datetime.now()
 
 
 def dt_now_time():
-    return dt.datetime.now().time()
+    return datetime.datetime.now().time()
 
 
 def dt_from_time(a, b, c):
-    return dt.datetime.combine(dt_today(), dt.time(a, b, c))
+    return datetime.datetime.combine(dt_today(), datetime.time(a, b, c))
 
 
 def to_seconds_str(o) -> str:

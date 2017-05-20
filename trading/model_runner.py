@@ -1,15 +1,8 @@
+from common.log_helper import jqd
+from trading.base_structure.trade_constants import ktc_
+from trading.base_structure.trade_message import TradeMessage
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
-from trading.trade_helper import ktc_
-
-
-# def thread_model(trade_context, model, **param):
-#     try:
-#         obj = ThreadModel(trade_context, model, param)
-#         obj.run_loop()
-#     except Exception:
-#         mylog.exception('Trade model exception')
-#         alert_exception(10)
 
 
 class ModelRunnerThread:
@@ -23,12 +16,18 @@ class ModelRunnerThread:
 
         self.model.init_model()
 
+    def log(self, msg):
+        jqd(f'{self.trade_context.thread_local.name}:: {msg}')
+
     def run_loop(self):
+        self.log('Run loop')
 
         while True:
-            msg = self.self_queue.get()
-
-            if msg == ktc_.msg_bid_over:
+            msg = self.self_queue.get()  # type: TradeMessage
+            self.log(str(msg))
+            if msg.operation == ktc_.msg_bid_over:
                 self.model.on_bid_over(msg.param1)
-            elif msg == ktc_.msg_realtime_push:
+            elif msg.operation == ktc_.msg_realtime_push:
                 self.model.handle_bar(msg.param1)
+            elif msg.operation == ktc_.msg_quit_loop:
+                break

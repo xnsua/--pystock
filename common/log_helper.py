@@ -3,7 +3,7 @@ import logging
 import os
 import pathlib as pl
 
-_formatter_without_threadid = logging.Formatter(
+_formatter_without_thread_id = logging.Formatter(
     '%(asctime)s.%(msecs)03d %(levelname)s: %(message)s.',
     "%m-%d %H:%M:%S")
 _formatter_with_threadid = logging.Formatter(
@@ -42,7 +42,7 @@ class MyLog:
             atexit.register(lambda: self.logger.info(
                 '-------------------- PROGRAM EXIT ------------------------------'))
 
-    def log_with_level(self, level_log, errstr, outputfilepos=True):
+    def log_with_level(self, level_log, err_str, outputfilepos=True):
         def find_caller():
             """
             Find the stack frame of the caller so that we can note the source
@@ -69,8 +69,8 @@ class MyLog:
         purefilename = pl.Path(caller[0]).name
         callerstr = str((purefilename, caller[1], caller[2]))
         if outputfilepos:
-            errstr = errstr + '.    ' + callerstr
-        if self.last_error_str == errstr and self.last_log_level == level_log:
+            err_str = err_str + '.    ' + callerstr
+        if self.last_error_str == err_str and self.last_log_level == level_log:
             timestr = dt.datetime.now().strftime('%d %H:%M:%S.%f')[:-4]
             self.same_error_time.append(timestr)
             if len(self.same_error_time) == 1:
@@ -79,58 +79,58 @@ class MyLog:
             if self.same_error_time:
                 self.last_log_level(f'---------- REPEAT END. LOG TIME::'
                                     f'{self.same_error_time}')
-            self.last_error_str = errstr
+            self.last_error_str = err_str
             self.last_log_level = level_log
             self.same_error_time = []
-            level_log(errstr)
+            level_log(err_str)
 
-    def info(self, errstr):
-        self.log_with_level(self.logger.info, errstr, outputfilepos=False)
+    def info(self, err_str):
+        self.log_with_level(self.logger.info, err_str, outputfilepos=False)
 
-    def debug(self, errstr):
-        self.log_with_level(self.logger.debug, errstr, outputfilepos=True)
+    def debug(self, err_str):
+        self.log_with_level(self.logger.debug, err_str, outputfilepos=True)
 
-    def warn(self, errstr):
-        self.log_with_level(self.logger.warning, errstr, outputfilepos=True)
+    def warn(self, err_str):
+        self.log_with_level(self.logger.warning, err_str, outputfilepos=True)
 
-    def error(self, errstr):
-        self.log_with_level(self.logger.error, errstr, outputfilepos=True)
+    def error(self, err_str):
+        self.log_with_level(self.logger.error, err_str, outputfilepos=True)
 
-    def fatal(self, errstr):
-        self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
-        raise LogFatalException(errstr)
+    def fatal(self, err_str):
+        self.log_with_level(self.logger.fatal, err_str, outputfilepos=True)
+        raise LogFatalException(err_str)
 
-    def exception(self, errstr):
-        self.log_with_level(self.logger.exception, errstr, outputfilepos=True)
+    def exception(self, err_str):
+        self.log_with_level(self.logger.exception, err_str, outputfilepos=True)
 
-    def info_if(self, condition, errstr):
+    def info_if(self, condition, err_str):
         if condition:
-            self.log_with_level(self.logger.info, errstr, outputfilepos=False)
+            self.log_with_level(self.logger.info, err_str, outputfilepos=False)
 
-    def debug_if(self, condition, errstr):
+    def debug_if(self, condition, err_str):
         if condition:
-            self.log_with_level(self.logger.debug, errstr, outputfilepos=True)
+            self.log_with_level(self.logger.debug, err_str, outputfilepos=True)
 
-    def warn_if(self, condition, errstr):
+    def warn_if(self, condition, err_str):
         if condition:
-            self.log_with_level(self.logger.warning, errstr, outputfilepos=True)
+            self.log_with_level(self.logger.warning, err_str, outputfilepos=True)
 
-    def error_if(self, condition, errstr):
+    def error_if(self, condition, err_str):
         if condition:
-            self.log_with_level(self.logger.error, errstr, outputfilepos=True)
+            self.log_with_level(self.logger.error, err_str, outputfilepos=True)
 
-    def fatal_if(self, condition, errstr):
+    def fatal_if(self, condition, err_str):
         if condition:
-            self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
-            raise LogFatalException(errstr)
+            self.log_with_level(self.logger.fatal, err_str, outputfilepos=True)
+            raise LogFatalException(err_str)
 
 
 mylog = MyLog(filename='py_stock.log', log_begin_end=True)
 
 
 def jqd(*args):
-    errstr = ' '.join(str(v) for v in args)
-    mylog.log_with_level(mylog.logger.debug, errstr, outputfilepos=True)
+    err_str = ' '.join(str(v) for v in args)
+    mylog.log_with_level(mylog.logger.debug, err_str, outputfilepos=True)
 
 
 def main():

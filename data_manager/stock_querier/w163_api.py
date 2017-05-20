@@ -5,16 +5,16 @@ import pandas as pd
 import pyquery
 import requests
 
+# The 163 website add 0 to the stock_code to imply SH stock_utility
+# Add the 1 to the stock_code to imply the SZ stock_utility
+from common.scipy_helper import pdDF
 from common.web_helper import firefox_get_url
-from stock_basic import stock_helper
-# The 163 website add 0 to the stock_code to imply SH stock
-# Add the 1 to the stock_code to imply the SZ stock
-from trading.scipy_helper import pdDF
-from trading.trade_helper import StockTermConstant
+from stock_utility import stock_data_constants
+from trading.base_structure.trade_constants import StockTermConstant
 
 
 def download_stock_history(stock_code, save_path,
-                           start_date=stock_helper.stock_start_day,
+                           start_date=stock_data_constants.stock_start_day,
                            end_date=dt.date.today()):
     # noinspection PyTypeChecker
     df = wget_stock_history(stock_code, start_date, end_date)

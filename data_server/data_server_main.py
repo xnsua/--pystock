@@ -17,16 +17,20 @@ def thread_data_server_loop(trade_context, **kwargs):
         data_server = DataServer(trade_context, kwargs)
         trade_context.thread_local.name = ktc_.id_data_server
         data_server.run_loop()
-    except Exception as e:
-        mylog.fatal(to_log_str(e))
+    except Exception:
+        mylog.exception()
         alert_exception(10)
 
 
 # noinspection PyUnusedLocal
 class DataServer:
+    dp_push_realtime_interval = 'dp_push_realtime_interval'
+
     def __init__(self, trade_context: TradeContext, param_dict):
         self.trade_context = trade_context
         self.trade_context.thread_local.name = ktc_.id_data_server
+
+        self.tls = self.trade_context.thread_local
         self.dtm = self.trade_context.dtm  # type: DateTimeManager
         self.self_queue = self.trade_context.get_current_thread_queue()  # type:queue.Queue
 
@@ -37,7 +41,7 @@ class DataServer:
 
         self.msg_function_dict = {ktc_.msg_set_monitored_stock: self.add_monitored_stock,
                                   ktc_.msg_quit_loop: self.quit_loop}
-
+        self.trade_stage_pushed = {ktc_.msg_before_trading: None, ktc_.msg_after_trading: None}
         self.quit = False
 
     def add_monitored_stock(self, sender, param, msg_dt):
@@ -60,7 +64,7 @@ class DataServer:
 
     def run_loop(self):
         mylog.info('Running data server loop')
-        interval = self.param_dict[ktc_.push_realtime_interval]
+        interval = self.param_dict[self.dp_push_realtime_interval]
         self.dtm.set_timer()
         while 1:
             try:
@@ -75,7 +79,15 @@ class DataServer:
                     break
                 self.push_realtime_stock_info()
 
+    def handle_stage_event(self):
+
+        if self.dtm.time() < ksti_.trade1_time[0]:
+            if self.trade_stage_pushed[self.k_before_trading] != self.dtm.today():
+                self.trade_stage_pushed[self.k_before_trading] = self.dtm.today()
+                self.trade_context.post_msg_to_all_model(ktc_.)
+
     def in_expand_trade_time(self):
+
         td1 = self.param_dict[ktc_.trade1_timedelta]
         td2 = self.param_dict[ktc_.trade2_timedelta]
         in_stage1 = is_in_expanded_stage(self.dtm.time(), ksti_.trade1, *td1)

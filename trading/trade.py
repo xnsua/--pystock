@@ -7,20 +7,20 @@ from common.datetime_manager import DateTimeManager
 from common.helper import dt
 from data_server.data_server_main import thread_data_server_loop
 from stock_basic.client_access import visit_client_server
-from trading.buy_after_drop import thread_buy_after_drop
 from trading.comm_message import CommMessage
+from trading.model_runner import thread_model
+from trading.models import model_buy_after_drop
 from trading.trade_context import TradeContext
 from trading.trade_helper import ktc_, ModelConstant
 
 pandas.options.display.max_rows = 10
 
+
 def thread_begin_trade():
-    trade_model = [(thread_buy_after_drop, ktc_.idm_buy_after_drop,
-                    {ModelConstant.bsm_drop_days: 2})]
+    trade_model = [(model_buy_after_drop, {ModelConstant.bsm_drop_days: 2})]
     trade_loop = Trade(trade_model=trade_model,
                        datetime_manager=DateTimeManager())
     trade_loop.handle_msg()
-
 
 class Trade:
     def __init__(self, trade_model=None, datetime_manager=None):
@@ -43,8 +43,8 @@ class Trade:
 
     def init_trade_context(self):
         model_queue_dict = {}
-        for target, model_name, param in self.trade_models:
-            model_queue_dict[model_name] = queue.Queue
+        for model_class, param in self.trade_models:
+            model_queue_dict[model_class.__name__] = queue.Queue
 
         queue_dict = {ktc_.id_trade_manager: self.trade_manager_queue,
                       ktc_.id_data_server: self.data_server_queue,
@@ -65,10 +65,10 @@ class Trade:
         data_server_thread.start()
 
         for val in self.trade_models:
-            target, model_name, param_dict = val
+            trade_model, param_dict = val
             thread = threading.Thread(
-                target=target,
-                args=(self.trade_context,),
+                target=thread_model,
+                args=(self.trade_context, trade_model),
                 kwargs=param_dict)
             thread.start()
 
@@ -84,6 +84,7 @@ class Trade:
             visit_client_server(msg.param)
 
         raise Exception(f'Unknown msg: {msg}')
+
 
 def main():
     thread_begin_trade()

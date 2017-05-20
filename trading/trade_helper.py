@@ -11,25 +11,22 @@ from config_module import myconfig
 class TradeCommunicationConstant:
     id_data_server = 'id_data_server'
     id_trade_manager = 'id_trade_manager'
-    model_name = 'model_name'
-    idm_buy_after_drop = 'idm_buy_after_drop'
-    model_queue_dict = 'model_queue_dict'
 
     msg_set_monitored_stock = 'msg_set_monitor_stock'
     msg_push_realtime_stocks = 'msg_push_realtime_stocks'
     msg_wait_result_queue = 'msg_wait_result_queue'
 
-    push_realtime_interval = 'push_realtime_interval'
-    trade1_timedelta = 'trade1_timedelta'
-    trade2_timedelta = 'trade2_timedelta'
 
-    datetime_manager = 'datetime_manager'
     msg_quit_loop = 'msg_quit_loop'
     msg_exception_occur = 'msg_exception_occur'
     msg_buy_stock = 'msg_buy_stock'
     msg_sell_stock = 'msg_sell_stock'
     msg_cancel_entrust = 'msg_cancel_entrust'
     msg_query_account_info = 'msg_query_account_info'
+
+    msg_before_trading = 'msg_before_trading'
+    msg_after_trading = 'msg_after_trading'
+
 
 
 class ModelConstant:
@@ -99,7 +96,15 @@ class ClientHttpAccessConstant:
     hisfinentrust = "hisfinentrust"
     moneymovement = "moneymovement"
     deliveryentrust = "deliveryentrust"
+    fixed_price = 'fixed_price'
+    market_price_and_cancel = 'market_price_and_cancel'
+    market_price_and_fixed = 'market_price_and_fixed'
 
+
+class PushInterval:
+    day = 'day'
+    minute = 'minute'
+    second = 'second'
 
 kca_ = ClientHttpAccessConstant
 ktc_ = TradeCommunicationConstant

@@ -11,7 +11,7 @@ _formatter_with_threadid = logging.Formatter(
     "%m-%d %H:%M:%S")
 
 
-class FatalException(Exception):
+class LogFatalException(Exception):
     pass
 
 
@@ -98,7 +98,10 @@ class MyLog:
 
     def fatal(self, errstr):
         self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
-        raise FatalException(errstr)
+        raise LogFatalException(errstr)
+
+    def exception(self, errstr):
+        self.log_with_level(self.logger.exception, errstr, outputfilepos=True)
 
     def info_if(self, condition, errstr):
         if condition:
@@ -119,7 +122,7 @@ class MyLog:
     def fatal_if(self, condition, errstr):
         if condition:
             self.log_with_level(self.logger.fatal, errstr, outputfilepos=True)
-            raise FatalException(errstr)
+            raise LogFatalException(errstr)
 
 
 mylog = MyLog(filename='py_stock.log', log_begin_end=True)

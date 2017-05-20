@@ -11,12 +11,6 @@ _tcc = TradeCommunicationConstant
 
 
 class TestTradeContext(TestCase):
-    # def __init__(self):
-    #     self.trade_manager_queue = None
-    #     self.data_server_queue = None
-    #     self.model_buy_after_drop = None
-    #     self.dtm_manager = None
-
     def setUp(self):
         self.trade_manager_queue = queue.Queue()
         self.data_server_queue = queue.Queue()

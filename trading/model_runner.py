@@ -1,52 +1,52 @@
-from contextlib import suppress
-from queue import Empty
 from statistics import mean
 
 from common.helper import to_log_str
 from common.log_helper import jqd, mylog
-from data_server.day_data_manager import update_etf_histories
 from stock_basic.stock_helper import etf_with_amount
 from trading.comm_message import CommMessage
+from trading.models import model_buy_after_drop
 from trading.scipy_helper import pdDF
 from trading.trade_context import TradeContext
-from trading.trade_helper import ktc_, ModelConstant, alert_exception, last_n_trade_day
+from trading.trade_helper import ktc_, alert_exception, last_n_trade_day, kca_, kst_
 
 
-def thread_buy_after_drop(trade_context, **param):
+def thread_model(trade_context, model, **param):
     try:
-        obj = BuyAfterDrop(trade_context, param)
+        obj = ThreadModel(trade_context, model, param)
         obj.run_loop()
-    except Exception as e:
-        mylog.fatal(to_log_str(e))
+    except Exception:
+        mylog.exception('Trade model exception')
         alert_exception(10)
 
 
-class BuyAfterDrop:
-    def __init__(self, trade_context: TradeContext, param_dict):
+class ThreadModel:
+    def __init__(self, trade_context: TradeContext, model_class, param_dict):
+        trade_context.thread_local.name = model_class.__name__
         self.trade_context = trade_context
-        trade_context.thread_local.name = ktc_.idm_buy_after_drop
+
+        self.model = model_class(trade_context, param_dict)
         self.self_queue = trade_context.get_current_thread_queue()
 
-        self.drop_days = param_dict[ModelConstant.bsm_drop_days]
+        self.model = model_class(param_dict)  # type: model_buy_after_drop
 
-        self.etf_day_data = None
-
+    # Initiate the model
     def prepare(self):
-        self.etf_day_data = update_etf_histories()
-        self.trade_context.add_monitored_stock([etf_with_amount])
+        context = self.model.init_model()
+        self.trade_context.on_init_model(context)
 
     def run_loop(self):
         self.prepare()
         while True:
-            with suppress(Empty):
-                msg = self.self_queue.get()
-                self.dispatch_msg(msg)
+            msg = self.self_queue.get()
+            self.dispatch_msg(msg)
 
     # noinspection PyUnusedLocal
     def on_realtime_stock_info(self, sender, param, msg_dt):
-        stocks_to_buy = self.query_buy_stocks(self.etf_day_data, msg_dt)
+        if self.stocks_to_buy is None:
+            stocks_to_buy = self.query_buy_stocks(self.etf_day_data, msg_dt)
+
         for stock in stocks_to_buy:
-            buy_param = {}
+            result = self.trade_context.buy_stock(stock, param[kst_.open], 100, kca_.fixed_price)
 
     def dispatch_msg(self, msg: CommMessage):
         jqd(f'BuyAfterDrop: Receive Message: {msg}')
@@ -87,8 +87,10 @@ class BuyAfterDrop:
                 mylog.info(f'Buy stock fail with exception {to_log_str(inst)}')
         return buy_stocks
 
+
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()

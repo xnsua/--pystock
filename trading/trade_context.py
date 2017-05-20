@@ -21,23 +21,24 @@ class TradeContext:
     def update_queue_dict(self, queue_dict):
         self.queue_dict.update(queue_dict)
 
-    def post_msg(self, dest, operation, param):
+    def post_msg(self, dest, operation, param1, param2=None):
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
-        msg = CommMessage(self.thread_local.name, operation, param,
+        msg = CommMessage(self.thread_local.name, operation, param1, param2,
                           result_queue=None, msg_time=self.dtm.now())
         dest_queue.put(msg)
 
+    # toch
     def post_msg_to_all_model(self, operation, param):
         for k, v in self.queue_dict.items():
             if k != ktc_.id_trade_manager and k != ktc_.id_data_server:
                 self.post_msg(k, operation, param)
 
-    def send_msg(self, dest, operation, param):
+    def send_msg(self, dest, operation, param1, param2=None):
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
         with self.queue_cabinet.use_one() as result_queue:
-            msg = CommMessage(self.thread_local.name, operation, param,
+            msg = CommMessage(self.thread_local.name, operation, param1, param2,
                               result_queue=result_queue, msg_time=self.dtm.now())
             dest_queue.put(msg)
             result = result_queue.get()
@@ -48,7 +49,7 @@ class TradeContext:
         return self.queue_dict[self.thread_local.name]
 
     def push_realtime_info(self, dest, stocks):
-        self.post_msg(dest, ktc_.msg_push_realtime_stocks, stocks)
+        self.post_msg(dest, ktc_.msg_realtime_push, stocks)
 
     def add_monitored_stock(self, stocks):
         self.send_msg(ktc_.id_data_server, ktc_.msg_set_monitored_stock, stocks)

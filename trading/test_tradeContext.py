@@ -16,8 +16,7 @@ class TestTradeContext(TestCase):
         self.data_server_queue = queue.Queue()
         self.model_buy_after_drop = queue.Queue()
         queue_dict = {_tcc.id_trade_manager: self.trade_manager_queue,
-                      _tcc.id_data_server: self.data_server_queue,
-                      _tcc.idm_buy_after_drop: self.model_buy_after_drop}
+                      _tcc.id_data_server: self.data_server_queue}
         self.dtm_manager = DateTimeManager(dt_from_time(9, 30, 0), 2)
 
         self.trade_context = TradeContext(queue_dict, self.dtm_manager)

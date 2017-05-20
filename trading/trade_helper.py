@@ -3,7 +3,6 @@ import datetime as dt
 
 import pandas as pd
 
-from common import plPath
 from common.helper import loop_for_seconds, play_wav
 from config_module import myconfig
 
@@ -13,9 +12,8 @@ class TradeCommunicationConstant:
     id_trade_manager = 'id_trade_manager'
 
     msg_set_monitored_stock = 'msg_set_monitor_stock'
-    msg_push_realtime_stocks = 'msg_push_realtime_stocks'
+    msg_realtime_push = 'msg_push_realtime_stocks'
     msg_wait_result_queue = 'msg_wait_result_queue'
-
 
     msg_quit_loop = 'msg_quit_loop'
     msg_exception_occur = 'msg_exception_occur'
@@ -26,7 +24,7 @@ class TradeCommunicationConstant:
 
     msg_before_trading = 'msg_before_trading'
     msg_after_trading = 'msg_after_trading'
-
+    msg_bid_over = 'msg_is_bid_over'
 
 
 class ModelConstant:
@@ -86,7 +84,6 @@ class ClientHttpAccessConstant:
     cancel_entrust = 'cancel_entrust'
     query = 'query'
     buy_or_sell = 'buy_or_sell'
-    fixed_price = 'fixed_price'
     query_account_info = 'query_account_info'
 
     myshare = "myshare"
@@ -96,6 +93,7 @@ class ClientHttpAccessConstant:
     hisfinentrust = "hisfinentrust"
     moneymovement = "moneymovement"
     deliveryentrust = "deliveryentrust"
+
     fixed_price = 'fixed_price'
     market_price_and_cancel = 'market_price_and_cancel'
     market_price_and_fixed = 'market_price_and_fixed'
@@ -105,6 +103,7 @@ class PushInterval:
     day = 'day'
     minute = 'minute'
     second = 'second'
+
 
 kca_ = ClientHttpAccessConstant
 ktc_ = TradeCommunicationConstant
@@ -125,7 +124,8 @@ class TradeDay:
         self.date_map = self.build_date_map()
 
     def read_df(self):
-        path = plPath(__file__).parent / 'trade_day.csv'
+        # path = plPath(__file__).parent / 'trade_day.csv'
+        path = myconfig.project_root / 'stock_basic/trade_day.csv'
         return pd.read_csv(str(path), index_col='index')
 
     def build_date_map(self):

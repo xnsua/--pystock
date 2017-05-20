@@ -1,112 +1,136 @@
 import queue
+from collections import namedtuple
 
 import pandas
 
 from common.datetime_manager import DateTimeManager
 from common.helper import to_log_str
 from common.log_helper import mylog, jqd
-from data_server.stock_querier.sina_api import get_realtime_stock_info
+from data_server.stock_querier import sina_api
+from stock_basic.stock_helper import etf_with_amount
 from trading.comm_message import CommMessage
 from trading.trade_context import TradeContext
-from trading.trade_helper import ktc_, alert_exception, ksti_
-from trading.trade_utility import is_in_expanded_stage
+from trading.trade_helper import ktc_, ksti_
 
 
-def thread_data_server_loop(trade_context, **kwargs):
-    try:
-        data_server = DataServer(trade_context, kwargs)
-        trade_context.thread_local.name = ktc_.id_data_server
-        data_server.run_loop()
-    except Exception:
-        mylog.exception()
-        alert_exception(10)
+# def thread_data_server_loop(trade_context, **kwargs):
+#     try:
+#         data_server = DataServer(trade_context, kwargs)
+#         trade_context.thread_local.name = ktc_.id_data_server
+#         data_server.run_loop()
+#     except Exception:
+#         mylog.exception()
+#         alert_exception(10)
 
 
 # noinspection PyUnusedLocal
 class DataServer:
-    dp_push_realtime_interval = 'dp_push_realtime_interval'
-
-    def __init__(self, trade_context: TradeContext, param_dict):
+    def __init__(self, trade_context: TradeContext, push_time_interval=None):
         self.trade_context = trade_context
-        self.trade_context.thread_local.name = ktc_.id_data_server
 
         self.tls = self.trade_context.thread_local
         self.dtm = self.trade_context.dtm  # type: DateTimeManager
         self.self_queue = self.trade_context.get_current_thread_queue()  # type:queue.Queue
 
-        self.param_dict = param_dict
+        self.push_time_interval = push_time_interval
 
-        self.monitored_stock_map = {}
-        self.df_realtime_stock_info = None  # type: pandas.DataFrame
+        self._monitored_stock_map = {}
+        self._df_realtime_stock_info = None  # type: pandas.DataFrame
 
-        self.msg_function_dict = {ktc_.msg_set_monitored_stock: self.add_monitored_stock,
-                                  ktc_.msg_quit_loop: self.quit_loop}
-        self.trade_stage_pushed = {ktc_.msg_before_trading: None, ktc_.msg_after_trading: None}
-        self.quit = False
+        self.msg_sent = {ktc_.msg_before_trading: None,
+                         ktc_.msg_after_trading: None,
+                         ktc_.msg_bid_over: None}
+
+        self._quit = False
+
+        self._msg_function_dict = {ktc_.msg_set_monitored_stock: self.add_monitored_stock,
+                                   ktc_.msg_quit_loop: self.quit_loop}
+
+    def init_thread_param(self):
+        self.tls.name = ktc_.id_data_server
+
+    def __call__(self, *args, **kwargs):
+        self.trade_context.thread_local.name = ktc_.id_data_server
+        self.run_loop()
 
     def add_monitored_stock(self, sender, param, msg_dt):
-        self.monitored_stock_map[sender] = param
+        self._monitored_stock_map[sender] = param
 
     # noinspection PyUnusedLocal
     def quit_loop(self, sender, param, msg_dt):
-        self.quit = True
-        jqd('self.quit\n', self.quit, self.dtm.now())
+        self._quit = True
+        jqd('self.quit\n', self._quit, self.dtm.now())
 
     def update_realtime_stock_info(self):
         stock_list = []
-        for k, v in self.monitored_stock_map.items():
+        for k, v in self._monitored_stock_map.items():
             stock_list.extend(v)
 
         if not stock_list:
             return None
-        self.df_realtime_stock_info = get_realtime_stock_info(stock_list)
-        return self.df_realtime_stock_info
+        self._df_realtime_stock_info = sina_api.get_realtime_stock_info(stock_list)
+        return self._df_realtime_stock_info
 
     def run_loop(self):
+        self.init_thread_param()
+
         mylog.info('Running data server loop')
-        interval = self.param_dict[self.dp_push_realtime_interval]
         self.dtm.set_timer()
         while 1:
             try:
                 # Handle all message first
                 while 1:
-                    real_timeout = interval.total_seconds() / self.dtm.speed
+                    real_timeout = self.push_time_interval.total_seconds() / self.dtm.speed
                     msg = self.self_queue.get(timeout=real_timeout)
                     self.dispatch_msg(msg)
 
             except queue.Empty:
-                if self.quit:
+                if self._quit:
                     break
-                self.push_realtime_stock_info()
+                self.push_all()
 
-    def handle_stage_event(self):
+    def _is_bid_over(self):
+        nt_result = namedtuple('bid_over_result', ['is_bid_over', 'first_bid_over'])
+        if self.dtm.today() == self.msg_sent[ktc_.msg_bid_over]:
+            return nt_result(True, False)
+        dfs = sina_api.get_realtime_stock_info(etf_with_amount)
+        open_prices = dfs.open
+        is_bid_over = all(open_prices)
 
-        if self.dtm.time() < ksti_.trade1_time[0]:
-            if self.trade_stage_pushed[self.k_before_trading] != self.dtm.today():
-                self.trade_stage_pushed[self.k_before_trading] = self.dtm.today()
-                self.trade_context.post_msg_to_all_model(ktc_.)
+        if is_bid_over:
+            self.msg_sent[ktc_.msg_bid_over] = self.dtm.today()
 
-    def in_expand_trade_time(self):
+        return nt_result(is_bid_over, True)
 
-        td1 = self.param_dict[ktc_.trade1_timedelta]
-        td2 = self.param_dict[ktc_.trade2_timedelta]
-        in_stage1 = is_in_expanded_stage(self.dtm.time(), ksti_.trade1, *td1)
-        in_stage2 = is_in_expanded_stage(self.dtm.time(), ksti_.trade2, *td2)
-        if not in_stage1 and not in_stage2:
-            return False
-        return True
+    def push_all(self):
 
-    def push_realtime_stock_info(self):
-        # jqd('PPP begin', self.dtm.now())
-        if self.in_expand_trade_time() and self.monitored_stock_map:
-            df_stock_info = self.update_realtime_stock_info()
-            for sender, list_stock in self.monitored_stock_map.items():
-                df = df_stock_info[df_stock_info.index.isin(list_stock)]
-                if len(df.index) == len(list_stock):
-                    self.trade_context.push_realtime_info(sender, df)
-                else:
-                    mylog.warn('Cannot find push data')
-                    # jqd('PPP End', self.dtm.now())
+        if self.dtm.time() < ksti_.bid_over_time[0]:
+            return
+
+        bid_over_result = self._is_bid_over()
+        if not bid_over_result.is_bid_over:
+            return
+
+        monitored_stock_info_dict = self.query_monitored_stock_info()
+        for sender, df in monitored_stock_info_dict.items():
+            if bid_over_result.first_bid_over:
+                self.trade_context.post_msg(sender, ktc_.msg_bid_over, df)
+            else:
+                self.trade_context.push_realtime_info(sender, df)
+
+    def query_monitored_stock_info(self):
+        realtime_stock_info_dict = {}
+        df_stock_info = self.update_realtime_stock_info()
+        for sender, list_stock in self._monitored_stock_map.items():
+            df = df_stock_info[df_stock_info.index.isin(list_stock)]
+            if len(df.index) == len(list_stock):
+                realtime_stock_info_dict[sender] = df
+                # self.trade_context.push_realtime_info(sender, df)
+            else:
+                mylog.warn(f'Cannot find push data for sender {sender}')
+
+        return realtime_stock_info_dict
+
     def handle_msg(self):
         try:
             msg = self.self_queue.get(block=False)
@@ -118,7 +142,7 @@ class DataServer:
     def dispatch_msg(self, msg: CommMessage):
         sender = msg.sender
         operation = msg.operation
-        param = msg.param
+        param = msg.param1
         msg_dt = msg.msg_dt
         try:
             func = self.find_func_by_operation(operation)
@@ -129,7 +153,7 @@ class DataServer:
             mylog.error(to_log_str(e))
 
     def find_func_by_operation(self, operation):
-        return self.msg_function_dict[operation]
+        return self._msg_function_dict[operation]
 
 
 def main():

@@ -32,6 +32,7 @@
       <w>myshare</w>
       <w>ndays</w>
       <w>ndrop</w>
+      <w>oper</w>
       <w>pchg</w>
       <w>realtime</w>
       <w>retrier</w>
@@ -43,6 +44,7 @@
       <w>substr</w>
       <w>topen</w>
       <w>vaturnover</w>
+      <w>visitserve</w>
       <w>voturnover</w>
       <w>wget</w>
     </words>

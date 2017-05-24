@@ -9,7 +9,7 @@ import pandas
 from common.datetime_manager import DateTimeManager
 from common.log_helper import jqd, mylog
 from data_manager.data_server_main import DataServer
-from stock_utility.client_access import visit_client_server, is_client_server_running
+from stock_utility.client_access import _visit_client_server, is_client_server_running
 from trading.base_structure.trade_constants import ktc_, kca_
 from trading.base_structure.trade_message import TradeMessage
 from trading.model_runner import ModelRunnerThread
@@ -88,7 +88,7 @@ class TradeManager:
         if is_client_server_running():
             params = {kca_.operation: kca_.query_account_info,
                       kca_.account_info_type: kca_.all}
-            success, resp_text = visit_client_server(params)
+            success, resp_text = _visit_client_server(params)
             account_info = jsonpickle.loads(resp_text)
             self.trade_context.set_account_info(account_info)
 
@@ -111,7 +111,7 @@ class TradeManager:
             self.dispatch_msgs(msg)
 
     def on_msg_buy_or_sell_or_cancel_stock(self, msg):
-        success, resp_text = visit_client_server(msg.param1, timeout=3)
+        success, resp_text = _visit_client_server(msg.param1, timeout=3)
         if success:
             result = jsonpickle.loads(resp_text)
             # If called sync
@@ -123,7 +123,7 @@ class TradeManager:
             mylog.warn('Visit client server failed with param', msg.param1, msg.param2)
 
     def on_msg_query_account_info(self, msg):
-        success, resp_text = visit_client_server(msg.param2)
+        success, resp_text = _visit_client_server(msg.param2)
         # if success:
         #     result = jsonpickle.loads(resp_text)
         #     if msg.res

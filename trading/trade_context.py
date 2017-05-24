@@ -4,7 +4,7 @@ import threading
 
 from common.helper import ObjectCabinet
 from ip.st import AccountInfo
-from stock_utility.client_access import fire_order
+from stock_utility.client_access import fire_operation
 from trading.base_structure.trade_constants import ktc_
 from trading.base_structure.trade_message import TradeMessage
 
@@ -54,7 +54,7 @@ class TradeContext:
         self.post_msg(dest, ktc_.msg_realtime_push, stocks)
 
     def fire_order(self, order):
-        fire_order(order)
+        fire_operation(order)
 
     def quit_all(self):
         for key in self.queue_dict:

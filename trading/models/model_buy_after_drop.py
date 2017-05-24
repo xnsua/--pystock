@@ -1,7 +1,9 @@
+import datetime
 from statistics import mean
 
 from common.log_helper import mylog, jqd
 from common.scipy_helper import pdDF
+from data_manager.stock_history_day_data_manager import DayBar
 from stock_utility.stock_data_constants import etf_with_amount
 from stock_utility.trade_day import last_n_trade_day
 from trading.models.model_base import AbstractModel
@@ -11,23 +13,42 @@ logger = mylog
 
 
 class ModelBuyAfterDrop(AbstractModel):
+    @classmethod
+    def name(cls):
+        return '__MODEL_BAD'
+
     def __init__(self, trade_context: TradeContext):
         super().__init__()
         self.context = trade_context
+        self.etf_code_range = etf_with_amount
+        self.etf_dict = None
+        self.etf_to_buy = None
+        self.
 
     def log(self, msg):
         jqd(f'{self.context.thread_local.name}:: {msg}')
 
     def init_model(self):
         self.log('Init model')
-        self.context.add_monitored_stock(etf_with_amount)
+        self.context.add_monitored_stock(self.etf_to_buy)
+        self.etf_dict = read_df_dict(self.etf_code_range)
+        self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())
 
-    def on_bid_over(self):
-        self.log('On bid over')
+    def on_bid_over(self, df: pdDF):
+        assert all(df.open)
+
+        for etf in self.etf_to_buy:
+            open_price = df.open[etf]
+            # buy_result = self.context.buy_stock(etf, open_price, 100, EntrustType.FIXED_PRICE)
+            # if buy_result.succ
+
+    def handle_bar(self, df: pdDF):
+        self.log('Handle bar')
+        del df
         pass
 
-    def handle_bar(self):
-        self.log('Handle bar')
+    def on_account_info(self, type_, content):
+        self.log(f'On account info: {type_}, {content}')
         pass
 
 
@@ -47,12 +68,19 @@ def is_buy(df: pdDF, now):
     return False
 
 
-def query_buy_stocks(self, df_dict, now):
+def query_stock_to_buy(df_dict, now):
     buy_stocks = []
     for stock_code in etf_with_amount:
         try:
-            if self.is_buy(df_dict[stock_code], now):
+            if is_buy(df_dict[stock_code], now):
                 buy_stocks.append(stock_code)
-        except Exception as inst:
-            mylog.exception(inst)
+        except Exception:
+            mylog.exception('Query stock to buy')
     return buy_stocks
+
+
+def read_df_dict(etfs):
+    etf_dict = {}
+    for etf in etfs:
+        etf_dict[etf] = DayBar.read_etf_day_data(etf)
+    return etf_dict

@@ -2,8 +2,11 @@ import re
 import time
 
 from common.helper import dt_now
+from common.log_helper import jqd
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
+from stock_utility.stock_codes_format import stock_to_sina_symbol, \
+    symbol_to_stock_code
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
@@ -22,7 +25,7 @@ def get_realtime_stock_info(stock_list):
         stock_codes = []
         attrs = []
         for v in fiter:
-            stock_codes.append(v[1])
+            stock_codes.append(symbol_to_stock_code(v[1]))
             content = v[2].split(',')
             content = content[0:6]
             content.append(content.pop(0))
@@ -32,8 +35,9 @@ def get_realtime_stock_info(stock_list):
         df['name'] = df['name'].astype(str)
         return df
 
-    liststr = ','.join(stock_list)
+    liststr = ','.join(map(stock_to_sina_symbol, stock_list))
     url = 'http://hq.sinajs.cn/list=' + liststr
+    jqd(url)
     resp = firefox_quick_get_url(url)
     if resp.status_code == 200:
         return extract_result(resp.text)

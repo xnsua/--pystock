@@ -1,9 +1,9 @@
+import datetime
 import queue
 from collections import namedtuple
 
 import pandas
 
-from common.datetime_manager import DateTimeManager
 from common.log_helper import mylog, jqd
 from data_manager.stock_querier import sina_api
 from stock_utility.stock_data_constants import etf_with_amount
@@ -29,7 +29,6 @@ class DataServer:
         self.trade_context.thread_local.name = ktc_.id_data_server
 
         self.tls = self.trade_context.thread_local
-        self.dtm = self.trade_context.dtm  # type: DateTimeManager
         self.self_queue = self.trade_context.get_current_thread_queue()  # type:queue.Queue
 
         self.push_time_interval = push_time_interval
@@ -47,8 +46,8 @@ class DataServer:
             try:
                 # Handle all message first
                 while 1:
-                    real_timedelta = self.dtm.to_real_timedelta(self.push_time_interval)
-                    msg = self.self_queue.get(timeout=real_timedelta.total_seconds())
+                    msg = self.self_queue.get(timeout=self.push_time_interval.total_seconds())
+                    self.log(f'ReceiveMessage: {msg}')
                     if msg.operation == ktc_.msg_quit_loop:
                         return
                     self.dispatch_msg(msg)
@@ -58,8 +57,9 @@ class DataServer:
 
     def push_all(self):
         self.log('Try push')
-        if self.dtm.time() < ksti_.bid_over_time[0] \
-                or self.dtm.time() > ksti_.trade2_time[1]:
+        bid_over_time_later = ksti_.bid_over_time[0].replace(second=20)
+        if datetime.datetime.now().time() < bid_over_time_later \
+                or datetime.datetime.now().time() > ksti_.trade2_time[1]:
             return
 
         bid_over_result = self._is_bid_over()
@@ -91,14 +91,14 @@ class DataServer:
 
     def _is_bid_over(self):
         nt_result = namedtuple('bid_over_result', ['is_bid_over', 'first_bid_over'])
-        if self.dtm.today() == self._msg_sent[ktc_.msg_bid_over]:
+        if datetime.date.today() == self._msg_sent[ktc_.msg_bid_over]:
             return nt_result(True, False)
         dfs = sina_api.get_realtime_stock_info(etf_with_amount)
         open_prices = dfs.open
         is_bid_over = all(open_prices)
 
         if is_bid_over:
-            self._msg_sent[ktc_.msg_bid_over] = self.dtm.today()
+            self._msg_sent[ktc_.msg_bid_over] = datetime.date.today()
 
         return nt_result(is_bid_over, True)
 
@@ -110,7 +110,7 @@ class DataServer:
             if len(df.index) == len(list_stock):
                 realtime_stock_info_dict[sender] = df
             else:
-                mylog.warn(f'Cannot find push data for sender {sender}')
+                mylog.warn(f'Cannot find push data for Model: {sender}')
 
         return realtime_stock_info_dict
 
@@ -123,7 +123,6 @@ class DataServer:
             return False
 
     def dispatch_msg(self, msg: TradeMessage):
-        self.log(f'Dispatch msg: {msg}')
         if msg.operation == ktc_.msg_set_monitored_stock:
             msg.put_result(self.on_add_monitored_stock(msg))
         else:

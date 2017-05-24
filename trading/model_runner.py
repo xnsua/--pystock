@@ -8,7 +8,7 @@ from trading.trade_context import TradeContext
 class ModelRunnerThread:
     def __init__(self, trade_context: TradeContext, model: AbstractModel):
         assert not hasattr(trade_context.thread_local, 'name')
-        trade_context.thread_local.name = type(model).__name__
+        trade_context.thread_local.name = model.name()
 
         self.trade_context = trade_context
         self.model = model
@@ -24,10 +24,13 @@ class ModelRunnerThread:
 
         while True:
             msg = self.self_queue.get()  # type: TradeMessage
-            self.log(str(msg))
+            self.log(f'ReceiveMessage: {msg}')
             if msg.operation == ktc_.msg_bid_over:
                 self.model.on_bid_over(msg.param1)
             elif msg.operation == ktc_.msg_realtime_push:
                 self.model.handle_bar(msg.param1)
+            elif msg.operation == ktc_.msg_push_account_info:
+                self.model.on_account_info(msg.param1, msg.param2)
             elif msg.operation == ktc_.msg_quit_loop:
                 break
+

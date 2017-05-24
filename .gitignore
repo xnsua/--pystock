@@ -41,3 +41,4 @@ log/
 # virtualenv
 # Spyder project settings
 # Rope project settings
+session_cache_one_day.sqlite

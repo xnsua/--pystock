@@ -1,16 +1,15 @@
 import datetime
 import pathlib as pl
+import shelve
 
 import pandas as pd
 import tushare as ts
 
 from common.helper import ndays_later, ndays_ago
-from common.my_old.cache_database import cache_db
+from common.log_helper import mylog
 from common.scipy_helper import pdDF
-from common.simple_retry import SimpleRetry
 from config_module import myconfig
-from data_manager.stock_querier import w163_api
-from stock_utility.stock_data_constants import stock_start_day
+from stock_utility.stock_data_constants import stock_start_day, etf_with_amount
 from stock_utility.trade_day import is_trade_day
 
 
@@ -36,7 +35,7 @@ class DayBar:
         try:
             df_read = pd.read_csv(filename, index_col='date')
             last_date = datetime.datetime.strptime(df_read.index.values[-1:][0],
-                                             '%Y-%m-%d').date()
+                                                   '%Y-%m-%d').date()
         except FileNotFoundError:
             df_read = pdDF()
             last_date = ndays_ago(1, stock_start_day)
@@ -78,14 +77,30 @@ class DayBar:
         return df_read
 
 
-def query_etf_info(etf_code):
-    key = 'key_etf_' + etf_code
-    val = cache_db.query_dict(key, ndays_ago(7))
-    if val: return val
+def update_day_bar_etf_amount():
+    print('--------------  Updating day bar of etf amount  ---------------------')
+    try:
+        for etf in etf_with_amount:
+            DayBar.update_etf_day_data(etf)
+    except Exception:
+        mylog.exception('Update etf day data failed')
+        return False
 
-    retrier = SimpleRetry(max_retry_times=2, wait_base_time=3)
-    info = retrier(w163_api.wget_etf_info)(etf_code)
-    cache_db.update(key, str(info))
-    return info
 
-# </editor-fold>
+def _need_update_day_bar(last_update, now):
+    base_time = datetime.datetime(1990, 1, 1, 17, 0, 0)
+    delta1 = last_update - base_time
+    delta2 = now - base_time
+    return delta2.days > delta1.days
+
+
+def try_update_day_bar():
+    db = shelve.open('day_bar_config')
+    key = 'day_bar_history_datetime'
+    if key in db and not _need_update_day_bar(db[key], datetime.datetime.now()):
+        return
+    update_day_bar_etf_amount()
+    db[key] = datetime.datetime.now()
+
+
+try_update_day_bar()

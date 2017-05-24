@@ -1,17 +1,18 @@
 from pathlib import Path
-
 class Config:
-    project_root = Path(__file__).parent
+    def __init__(self):
+        self.project_root = Path(__file__).parent
 
-    stock_data_dir = project_root.parent / 'py_stock_data'
+        self.stock_data_dir = self.project_root.parent / 'py_stock_data'
 
-    etf_day_data_dir = stock_data_dir / 'day/etf_data'
-    stock_day_data__dir = stock_data_dir / 'day'
+        self.etf_day_data_dir = self.stock_data_dir / 'day/etf_data'
+        self.stock_day_data__dir = self.stock_data_dir / 'day'
+
+        self.shelve_path = self.project_root / 'shelve'  # type: Path
+        self.shelve_path.mkdir(parents=True, exist_ok=True)
 
 
 myconfig = Config()
 
 if __name__ == '__main__':
-    print(myconfig.project_root)
-    print(myconfig.stock_data_dir)
     pass

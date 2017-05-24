@@ -1,9 +1,11 @@
 import datetime
 
+from ip.constants import ClientHttpAccessConstant
+
 
 class TradeCommunicationConstant:
-    id_data_server = 'id_data_server'
-    id_trade_manager = 'id_trade_manager'
+    id_data_server = 'DATA_SERVER'
+    id_trade_manager = 'TRAD_MANAGE'
 
     msg_set_monitored_stock = 'msg_set_monitor_stock'
     msg_realtime_push = 'msg_push_realtime_stocks'
@@ -19,6 +21,7 @@ class TradeCommunicationConstant:
     msg_before_trading = 'msg_before_trading'
     msg_after_trading = 'msg_after_trading'
     msg_bid_over = 'msg_is_bid_over'
+    msg_push_account_info = 'msg_push_account_info'
 
 
 class ModelConstant:
@@ -63,34 +66,6 @@ class StockTermConstant:
     low = 'low'
     high = 'high'
     scale = 'scale'
-
-
-class ClientHttpAccessConstant:
-    operation = 'operation'
-    stock_code = 'stock_code'
-    price = 'price'
-    amount = 'amount'
-    entrust_type = 'entrust_type'
-    entrust_id = 'entrust_id'
-    account_info_type = 'account_info_type'
-    buy = 'buy'
-    sell = 'sell'
-    cancel_entrust = 'cancel_entrust'
-    query = 'query'
-    buy_or_sell = 'buy_or_sell'
-    query_account_info = 'query_account_info'
-
-    myshare = "myshare"
-    dayentrust = "dayentrust"
-    dayfinentrust = "dayfinentrust"
-    hisentrust = "hisentrust"
-    hisfinentrust = "hisfinentrust"
-    moneymovement = "moneymovement"
-    deliveryentrust = "deliveryentrust"
-
-    fixed_price = 'fixed_price'
-    market_price_and_cancel = 'market_price_and_cancel'
-    market_price_and_fixed = 'market_price_and_fixed'
 
 
 class PushInterval:

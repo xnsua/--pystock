@@ -1,4 +1,5 @@
-from common.helper import loop_for_seconds, play_wav
+from common.audio.wav import play_wav
+from common.helper import loop_for_seconds
 from config_module import myconfig
 
 

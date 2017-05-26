@@ -10,8 +10,8 @@ class TradeCommunicationConstant:
     msg_set_monitored_stock = 'msg_set_monitor_stock'
     msg_realtime_push = 'msg_push_realtime_stocks'
     msg_wait_result_queue = 'msg_wait_result_queue'
+    msg_client_operation = 'msg_client_operation'
 
-    msg_quit_loop = 'msg_quit_loop'
     msg_exception_occur = 'msg_exception_occur'
     msg_buy_stock = 'msg_buy_stock'
     msg_sell_stock = 'msg_sell_stock'
@@ -23,14 +23,14 @@ class TradeCommunicationConstant:
     msg_bid_over = 'msg_is_bid_over'
     msg_push_account_info = 'msg_push_account_info'
 
+    msg_quit_loop = 'msg_quit_loop'
+
 
 class ModelConstant:
     bsm_drop_days = 'drop_days'
 
 
 class StockTimeConstant:
-    not_trade_day = 'not_trade_day'
-    stage_entered = 'stage_entered'
 
     before_bid = 'before_day_trade'
     bid_stage1 = 'bid_stage1'

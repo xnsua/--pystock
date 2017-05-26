@@ -1,4 +1,4 @@
-from common.log_helper import jqd
+from project_helper.phelper import jqd
 from trading.base_structure.trade_constants import ktc_
 from trading.base_structure.trade_message import TradeMessage
 from trading.models.model_base import AbstractModel

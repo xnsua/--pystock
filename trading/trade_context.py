@@ -1,10 +1,9 @@
-import copy
 import queue
 import threading
 
 from common.helper import ObjectCabinet
-from ip.st import AccountInfo
 from stock_utility.client_access import fire_operation
+from trading.account_manager import AccountManager
 from trading.base_structure.trade_constants import ktc_
 from trading.base_structure.trade_message import TradeMessage
 
@@ -16,16 +15,8 @@ class TradeContext:
         self.queue_cabinet = ObjectCabinet(queue.Queue, None)
         self.thread_local = threading.local()
         self.thread_local.name = None
-        self.__account_info = None  # type: AccountInfo
-        self.__account_info_lock = threading.Lock()
 
-    def get_account_info_copy(self):
-        with self.__account_info_lock:
-            return copy.deepcopy(self.__account_info)
-
-    def set_account_info(self, account_info):
-        with self.__account_info_lock:
-            self.__account_info = account_info
+        self.account_manager = AccountManager()
 
     def post_msg(self, dest, operation, param1, param2=None):
         assert self.thread_local.name

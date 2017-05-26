@@ -1,9 +1,9 @@
 import datetime
 from statistics import mean
 
-from common.log_helper import mylog, jqd
 from common.scipy_helper import pdDF
-from data_manager.stock_history_day_data_manager import DayBar
+from data_manager.stock_day_bar_manager import DayBar
+from project_helper.phelper import mylog, jqd
 from stock_utility.stock_data_constants import etf_with_amount
 from stock_utility.trade_day import last_n_trade_day
 from trading.models.model_base import AbstractModel
@@ -23,7 +23,6 @@ class ModelBuyAfterDrop(AbstractModel):
         self.etf_code_range = etf_with_amount
         self.etf_dict = None
         self.etf_to_buy = None
-        self.
 
     def log(self, msg):
         jqd(f'{self.context.thread_local.name}:: {msg}')
@@ -39,6 +38,7 @@ class ModelBuyAfterDrop(AbstractModel):
 
         for etf in self.etf_to_buy:
             open_price = df.open[etf]
+            pass
             # buy_result = self.context.buy_stock(etf, open_price, 100, EntrustType.FIXED_PRICE)
             # if buy_result.succ
 

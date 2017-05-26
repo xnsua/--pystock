@@ -1,15 +1,15 @@
 import datetime
 import queue
 import threading
-from typing import Dict
+from typing import Dict, Tuple
 
-import jsonpickle
 import pandas
 
-from common.datetime_manager import DateTimeManager
-from common.log_helper import jqd, mylog
 from data_manager.data_server_main import DataServer
-from stock_utility.client_access import _visit_client_server, is_client_server_running
+from ip.st import OperQuery
+from project_helper.phelper import mylog, jqd
+from stock_utility.client_access import is_client_server_running, \
+    fire_operation
 from trading.base_structure.trade_constants import ktc_, kca_
 from trading.base_structure.trade_message import TradeMessage
 from trading.model_runner import ModelRunnerThread
@@ -20,16 +20,13 @@ pandas.options.display.max_rows = 10
 
 
 def begin_trade():
-    trade = TradeManager(
-        trade_models=[ModelBuyAfterDrop],
-        datetime_manager=DateTimeManager()
-    )
+    trade = TradeManager(trade_models=[ModelBuyAfterDrop])
     trade.start_threads()
     trade.handle_msgs()
 
 
 class TradeManager:
-    def __init__(self, trade_models=None, datetime_manager=None):
+    def __init__(self, trade_models=None):
 
         # Queue member
         self.self_queue = queue.Queue()
@@ -41,13 +38,18 @@ class TradeManager:
         # Trade context
         self.trade_context = self.init_trade_context()
         self.init_trade_context()
+        self.account_manager = self.trade_context.account_manager
 
         self.threads = {}  # type: Dict[threading.Thread, str]
 
         self.need_update_entrust_status = False
 
-    def log(self, msg):
-        jqd(f'{ktc_.id_trade_manager}:: {msg}')
+    def log(self, msg, level=None):
+        text = f'{ktc_.id_trade_manager}:: {msg}'
+        if not level:
+            jqd(text)
+        else:
+            level(text)
 
     def start_threads(self):
         self.init_trade_context()
@@ -86,14 +88,25 @@ class TradeManager:
 
     def query_initial_account_info(self):
         if is_client_server_running():
-            params = {kca_.operation: kca_.query_account_info,
-                      kca_.account_info_type: kca_.all}
-            success, resp_text = _visit_client_server(params)
-            account_info = jsonpickle.loads(resp_text)
-            self.trade_context.set_account_info(account_info)
+            oper = OperQuery(kca_.all)
+            success, rs_oper = fire_operation(oper)  # type: Tuple[bool, OperQuery]
+
+            if success and rs_oper.result.success:
+                self.trade_context.account_manager \
+                    .set_init_account_info(rs_oper.result.data)
+            else:
+                raise Exception('Query account info failed')
+
+        else:
+            raise Exception('Cannot connect to client server')
 
     def run_loop(self):
-        self.query_initial_account_info()
+        try:
+            self.query_initial_account_info()
+        except Exception:
+            mylog.exception('Query initial account info failed')
+            self.trade_context.quit_all()
+
         self.handle_msgs()
 
     def handle_msgs(self):
@@ -110,28 +123,13 @@ class TradeManager:
                 return
             self.dispatch_msgs(msg)
 
-    def on_msg_buy_or_sell_or_cancel_stock(self, msg):
-        success, resp_text = _visit_client_server(msg.param1, timeout=3)
-        if success:
-            result = jsonpickle.loads(resp_text)
-            # If called sync
-            if msg.result_queue:
-                msg.result_queue.put(result)
-            else:
-                self.trade_context.push_account_info(msg.param1, result)
-        else:
-            mylog.warn('Visit client server failed with param', msg.param1, msg.param2)
-
-    def on_msg_query_account_info(self, msg):
-        success, resp_text = _visit_client_server(msg.param2)
-        # if success:
-        #     result = jsonpickle.loads(resp_text)
-        #     if msg.res
+    def on_msg_client_operation(self, msg: TradeMessage):
+        msg_result = fire_operation(msg.param1)
+        self.account_manager.on_operation_result(msg_result)
+        msg.try_put_result(msg_result)
 
     def dispatch_msgs(self, msg: TradeMessage):
-        msg_map = {ktc_.msg_buy_stock: self.on_msg_buy_or_sell_or_cancel_stock,
-                   ktc_.msg_sell_stock: self.on_msg_buy_or_sell_or_cancel_stock,
-                   ktc_.msg_cancel_entrust: self.on_msg_buy_or_sell_or_cancel_stock}
+        msg_map = {ktc_.msg_client_operation: self.on_msg_client_operation}
 
         try:
             func = msg_map[msg.operation]
@@ -146,10 +144,7 @@ def main():
 
 
 def test_begin_trade():
-    trade = TradeManager(
-        trade_models=[ModelBuyAfterDrop],
-        datetime_manager=DateTimeManager()
-    )
+    trade = TradeManager(trade_models=[ModelBuyAfterDrop])
     trade_context = trade.trade_context
 
     def post_msg():

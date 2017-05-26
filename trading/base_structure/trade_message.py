@@ -12,13 +12,13 @@ class TradeMessage:
     def __repr__(self):
         return f'CommMessage{{{self.sender}, {self.operation}, *{str(self.param1)[0:50]}*, *{str(self.param2)[0:50]}*}}'
 
-    def put_result(self, result):
+    def try_put_result(self, result):
         if self.result_queue:
             self.result_queue.put(result)
 
 
 def main():
-    print(TradeMessage('aa', 'dff', 'dfd', 'd1111111111111111f', 'df', 'fdfd'))
+    pass
 
 
 if __name__ == '__main__':

@@ -1,35 +1,26 @@
-def assign_value_with_name(cls):
-    for k in dir(cls):
-        if not k.startswith('_'):
-            setattr(cls, k, k)
-
-
 class ClientHttpAccessConstant:
-    operation = None
-    stock_code = None
-    price = None
-    amount = None
-    entrust_type = None
-    entrust_id = None
-    account_info_type = None
-    buy = None
-    sell = None
-    cancel_entrust = None
-    query = None
-    buy_or_sell = None
-    query_account_info = None
-    query_day_entrust = None
+    operation = 'operation'
+    stock_code = 'stock_code'
+    price = 'price'
+    amount = 'amount'
+    entrust_type = 'entrust_type'
+    entrust_id = 'entrust_id'
+    account_info_type = 'account_info_type'
+    buy = 'buy'
+    sell = 'sell'
+    cancel_entrust = 'cancel_entrust'
+    query = 'query'
+    buy_or_sell = 'buy_or_sell'
+    query_account_info = 'query_account_info'
+    query_day_entrust = 'query_day_entrust'
+    all = 'all'
+    myshare = 'myshare'
+    dayentrust = 'dayentrust'
+    dayfinentrust = 'dayfinentrust'
+    hisentrust = 'hisentrust'
+    hisfinentrust = 'hisfinentrust'
+    moneymovement = 'moneymovement'
+    deliveryentrust = 'deliveryentrust'
 
-    all = None
-    myshare = None
-    dayentrust = None
-    dayfinentrust = None
-    hisentrust = None
-    hisfinentrust = None
-    moneymovement = None
-    deliveryentrust = None
-
-
-assign_value_with_name(ClientHttpAccessConstant)
 
 kca_ = ClientHttpAccessConstant

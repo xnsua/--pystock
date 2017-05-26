@@ -4,8 +4,8 @@ from collections import namedtuple
 
 import pandas
 
-from common.log_helper import mylog, jqd
 from data_manager.stock_querier import sina_api
+from project_helper.phelper import mylog, jqd
 from stock_utility.stock_data_constants import etf_with_amount
 from trading.base_structure.trade_constants import ktc_, ksti_
 from trading.base_structure.trade_message import TradeMessage
@@ -124,7 +124,7 @@ class DataServer:
 
     def dispatch_msg(self, msg: TradeMessage):
         if msg.operation == ktc_.msg_set_monitored_stock:
-            msg.put_result(self.on_add_monitored_stock(msg))
+            msg.try_put_result(self.on_add_monitored_stock(msg))
         else:
             mylog.error(f'Can not dispatch msg {msg}')
 

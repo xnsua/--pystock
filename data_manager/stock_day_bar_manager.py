@@ -1,15 +1,15 @@
 import datetime
 import pathlib as pl
-import shelve
 
 import pandas as pd
 import tushare as ts
 
 from common.helper import ndays_later, ndays_ago
-from common.log_helper import mylog
 from common.scipy_helper import pdDF
 from config_module import myconfig
+from project_helper.phelper import mylog
 from stock_utility.stock_data_constants import stock_start_day, etf_with_amount
+from stock_utility.stock_shelve import myshelve, ShelveKey
 from stock_utility.trade_day import is_trade_day
 
 
@@ -95,12 +95,12 @@ def _need_update_day_bar(last_update, now):
 
 
 def try_update_day_bar():
-    db = shelve.open('day_bar_config')
-    key = 'day_bar_history_datetime'
-    if key in db and not _need_update_day_bar(db[key], datetime.datetime.now()):
+    key = ShelveKey.day_bar_history_datetime
+    if key in myshelve and not _need_update_day_bar(myshelve[key],
+                                                    datetime.datetime.now()):
         return
     update_day_bar_etf_amount()
-    db[key] = datetime.datetime.now()
+    myshelve[key] = datetime.datetime.now()
 
 
 try_update_day_bar()

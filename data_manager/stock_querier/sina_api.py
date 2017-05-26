@@ -2,11 +2,11 @@ import re
 import time
 
 from common.helper import dt_now
-from common.log_helper import jqd
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
 from ip.stock_codes_format import stock_to_sina_symbol, \
     symbol_to_stock_code
+from project_helper.phelper import jqd
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 

@@ -7,7 +7,7 @@ import pandas
 from data_manager.stock_querier import sina_api
 from project_helper.phelper import mylog, jqd
 from stock_utility.stock_data_constants import etf_with_amount
-from trading.base_structure.trade_constants import ktc_, ksti_
+from trading.base_structure.trade_constants import ktc_, trade_bid_end_time, trade_end_time
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
 
@@ -57,9 +57,8 @@ class DataServer:
 
     def push_all(self):
         self.log('Try push')
-        bid_over_time_later = ksti_.bid_over_time[0].replace(second=20)
-        if datetime.datetime.now().time() < bid_over_time_later \
-                or datetime.datetime.now().time() > ksti_.trade2_time[1]:
+        if datetime.datetime.now().time() < trade_bid_end_time + datetime.timedelta(seconds=10) \
+                or datetime.datetime.now().time() > trade_end_time:
             return
 
         bid_over_result = self._is_bid_over()

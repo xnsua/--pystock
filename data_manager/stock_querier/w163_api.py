@@ -7,14 +7,14 @@ import requests
 
 # The 163 website add 0 to the stock_code to imply SH stock_utility
 # Add the 1 to the stock_code to imply the SZ stock_utility
+import trading.base_structure.trade_constants
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_get_url
-from stock_utility import stock_data_constants
 from trading.base_structure.trade_constants import StockTermConstant
 
 
 def download_stock_history(stock_code, save_path,
-                           start_date=stock_data_constants.stock_start_day,
+                           start_date=trading.base_structure.trade_constants.stock_start_day,
                            end_date=dt.date.today()):
     # noinspection PyTypeChecker
     df = wget_stock_history(stock_code, start_date, end_date)

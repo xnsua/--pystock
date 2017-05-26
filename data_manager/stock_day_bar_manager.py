@@ -8,9 +8,10 @@ from common.helper import ndays_later, ndays_ago
 from common.scipy_helper import pdDF
 from config_module import myconfig
 from project_helper.phelper import mylog
-from stock_utility.stock_data_constants import stock_start_day, etf_with_amount
+from stock_utility.stock_data_constants import etf_with_amount
 from stock_utility.stock_shelve import myshelve, ShelveKey
 from stock_utility.trade_day import is_trade_day
+from trading.base_structure.trade_constants import stock_start_day
 
 
 class DayBar:

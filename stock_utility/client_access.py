@@ -30,10 +30,6 @@ def _visit_client_server(url_args, headers, timeout=5):
 
 
 def fire_operation(oper):
-    """
-
-    :rtype: object
-    """
     order_ps = jsonpickle.dumps(oper)
     order_ps = order_ps.strip()
     return _visit_client_server(

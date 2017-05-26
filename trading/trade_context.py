@@ -2,7 +2,6 @@ import queue
 import threading
 
 from common.helper import ObjectCabinet
-from stock_utility.client_access import fire_operation
 from trading.account_manager import AccountManager
 from trading.base_structure.trade_constants import ktc_
 from trading.base_structure.trade_message import TradeMessage
@@ -43,9 +42,6 @@ class TradeContext:
 
     def push_realtime_info(self, dest, stocks):
         self.post_msg(dest, ktc_.msg_realtime_push, stocks)
-
-    def fire_order(self, order):
-        fire_operation(order)
 
     def quit_all(self):
         for key in self.queue_dict:

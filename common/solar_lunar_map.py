@@ -32,7 +32,6 @@ def load_map():
     return solar_lunar_map
 
 
-
 def main():
     global solar_lunar_map
     solar_lunar_map = load_map()

@@ -2,14 +2,12 @@ import datetime
 from statistics import mean
 
 from common.scipy_helper import pdDF
+from common_stock.stock_data_constants import etf_with_amount
+from common_stock.trade_day import last_n_trade_day
 from data_manager.stock_day_bar_manager import DayBar
-from project_helper.phelper import mylog, jqd
-from stock_utility.stock_data_constants import etf_with_amount
-from stock_utility.trade_day import last_n_trade_day
+from project_helper.logbook_logger import jqd, mylog
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
-
-logger = mylog
 
 
 class ModelBuyAfterDrop(AbstractModel):
@@ -28,27 +26,21 @@ class ModelBuyAfterDrop(AbstractModel):
         jqd(f'{self.context.thread_local.name}:: {msg}')
 
     def init_model(self):
-        self.log('Init model')
-        self.context.add_monitored_stock(self.etf_to_buy)
+        mylog.debug('Init model')
+        self.context.add_push_stock(self.etf_to_buy)
         self.etf_dict = read_df_dict(self.etf_code_range)
         self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())
 
     def on_bid_over(self, df: pdDF):
         assert all(df.open)
 
-        for etf in self.etf_to_buy:
-            open_price = df.open[etf]
-            pass
-            # buy_result = self.context.buy_stock(etf, open_price, 100, EntrustType.FIXED_PRICE)
-            # if buy_result.succ
-
     def handle_bar(self, df: pdDF):
-        self.log('Handle bar')
+        mylog.debug('Handle bar')
         del df
         pass
 
     def on_account_info(self, type_, content):
-        self.log(f'On account info: {type_}, {content}')
+        mylog.debug(f'On account info: {type_}, {content}')
         pass
 
 

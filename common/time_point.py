@@ -1,6 +1,6 @@
 import datetime
 
-import sortedcontainers
+import sortedcontainers as sortedcontainers
 
 from common.helper import dt_today
 

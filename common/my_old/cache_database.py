@@ -5,8 +5,6 @@ import sqlite3
 import time
 from contextlib import suppress
 
-from config_module import myconfig
-
 
 # noinspection PyUnusedLocal
 class CacheDatabase:
@@ -77,11 +75,8 @@ class CacheDatabase:
         self.db_conn.close()
 
 
-cache_db = CacheDatabase(myconfig.project_root / 'cache.db')
-
-
 def test_quoted_string():
-    path = myconfig.project_root / 'test_cache_db.db'
+    path = 'test_cache_db.db'
     with suppress(FileNotFoundError):
         os.remove(path)
     db = CacheDatabase(path)
@@ -95,8 +90,10 @@ def test_quoted_string():
     db.close()
     with suppress(FileNotFoundError):
         os.remove(path)
+
+
 def test_cache_database():
-    path = myconfig.project_root / 'test_cache_db.db'
+    path = 'test_cache_db.db'
     with suppress(FileNotFoundError):
         os.remove(path)
     db = CacheDatabase(path)

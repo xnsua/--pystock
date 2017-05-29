@@ -11,7 +11,7 @@ class MockDateTime(_std_datetime):
     datetime_manager = None  # type: DateTimeManager
 
     @classmethod
-    def now(cls):
+    def now(cls, tz=None):
         return cls.datetime_manager.now()
 
 
@@ -55,6 +55,7 @@ class DateTimeManager:
         sec2 = sec1 * self.speed
         timedelta2 = dt.timedelta(seconds=sec2)
         now = self.start_dt + timedelta2
+        # noinspection PyTypeChecker
         return datetime_to_mock_datetime(now)
 
     def today(self):

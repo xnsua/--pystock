@@ -1,8 +1,10 @@
 import jsonpickle
 
+from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
 from ip.constants import ClientHttpAccessConstant
-from project_helper.phelper import jqd
+from ip.st import ClientOperBuy, EntrustType
+from project_helper.logbook_logger import mylog
 
 jsonpickle.load_backend('simplejson')
 jsonpickle.set_encoder_options('simplejson', sort_keys=True, ensure_ascii=False)
@@ -22,18 +24,18 @@ def _visit_client_server(url_args, headers, timeout=5):
             tmp = '&'
         append_str += tmp + str(k) + '=' + str(url_args[k])
     url = stock_server_operation_address + append_str
-    jqd('VISITSERVER: ', url)
+    mylog.info(url)
     resp = firefox_quick_get_url(url, headers, timeout=timeout)
     if resp.status_code == 200:
-        return True, jsonpickle.loads(resp.text)
-    return False, resp.text
+        return jsonpickle.loads(resp.text)
+    message_box_error(f"Serve status_code:", resp.status_code, 'resp.text:', resp.text)
 
 
 def fire_operation(oper):
-    order_ps = jsonpickle.dumps(oper)
-    order_ps = order_ps.strip()
+    order_str = jsonpickle.dumps(oper)
+    order_str = order_str.strip()
     return _visit_client_server(
-        {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_ps})
+        {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str})
 
 
 def is_client_server_running():
@@ -42,14 +44,7 @@ def is_client_server_running():
     return resp.status_code == 200
 
 
-def main():
-    val = is_client_server_running()
-    print(val)
-    return
-    # order = EntrustBuy('510900', 1.1, 100, EntrustType.FIXED_PRICE)
-    # success, obj = fire_operation(order)
-    # print(success, obj)
-
-
-if __name__ == '__main__':
-    main()
+def test_operation():
+    buy = ClientOperBuy('SH.510900', 1.2, 100, EntrustType.FIXED_PRICE)
+    result = fire_operation(buy)
+    print(result)

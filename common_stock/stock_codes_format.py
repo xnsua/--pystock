@@ -18,10 +18,10 @@ def symbol_to_stock_code(code):
     val = re.search('\d+', code)[0]
     return val
 
-
 def stock_to_tdxserver_symbol(code):
     code = symbol_to_stock_code(code)
     symbol = _code_to_symbol(code)
     symbol = symbol.replace('sh', 'SH.')
     symbol = symbol.replace('sz', 'SZ.')
     return symbol
+

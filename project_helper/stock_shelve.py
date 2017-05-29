@@ -1,6 +1,7 @@
+import atexit
 import shelve
 
-from config_module import myconfig
+from project_helper.config_module import myconfig
 
 
 # Easy to use by unittest, buy less locality
@@ -10,3 +11,5 @@ class ShelveKey:
 
 
 myshelve = shelve.open(str(myconfig.shelve_path / 'shelve_db'))
+
+atexit.register(lambda: myshelve.close())

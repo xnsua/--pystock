@@ -1,7 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="cqhme">
     <words>
+      <w>amlog</w>
+      <w>asctime</w>
+      <w>attrs</w>
       <w>buyrecord</w>
+      <w>cmlog</w>
       <w>datalen</w>
       <w>daterange</w>
       <w>dayentrust</w>
@@ -22,15 +26,19 @@
       <w>isbuy</w>
       <w>ksti</w>
       <w>lclose</w>
+      <w>levelname</w>
       <w>mavailable</w>
       <w>mdrawable</w>
       <w>mfree</w>
       <w>mfrozen</w>
       <w>midnoon</w>
       <w>moneymovement</w>
+      <w>msecs</w>
       <w>mtotal</w>
+      <w>myconfig</w>
       <w>mylog</w>
       <w>myshare</w>
+      <w>myshelve</w>
       <w>ndays</w>
       <w>ndrop</w>
       <w>oper</w>
@@ -39,15 +47,20 @@
       <w>retrier</w>
       <w>rval</w>
       <w>save_pat</w>
+      <w>sina</w>
       <w>sqlite</w>
       <w>start_dat</w>
       <w>subdata</w>
       <w>substr</w>
+      <w>tdxserver</w>
+      <w>threadid</w>
+      <w>tmlog</w>
       <w>topen</w>
       <w>vaturnover</w>
       <w>visitserve</w>
       <w>voturnover</w>
       <w>wget</w>
+      <w>yclose</w>
     </words>
   </dictionary>
 </component>

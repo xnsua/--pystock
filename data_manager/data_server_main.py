@@ -4,9 +4,9 @@ from collections import namedtuple
 
 import pandas
 
+from common_stock.stock_data_constants import etf_with_amount
 from data_manager.stock_querier import sina_api
-from project_helper.phelper import mylog, jqd
-from stock_utility.stock_data_constants import etf_with_amount
+from project_helper.logbook_logger import mylog
 from trading.base_structure.trade_constants import ktc_, trade_bid_end_time, trade_end_time
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
@@ -18,7 +18,7 @@ from trading.trade_context import TradeContext
 #         trade_context.thread_local.name = ktc_.id_data_server
 #         data_manager.run_loop()
 #     except Exception:
-#         mylog.exception()
+#         ds_log.exception()
 #         alert_exception(10)
 
 
@@ -29,7 +29,7 @@ class DataServer:
         self.trade_context.thread_local.name = ktc_.id_data_server
 
         self.tls = self.trade_context.thread_local
-        self.self_queue = self.trade_context.get_current_thread_queue()  # type:queue.Queue
+        self.self_queue = self.trade_context.current_thread_queue()  # type:queue.Queue
 
         self.push_time_interval = push_time_interval
 
@@ -41,13 +41,13 @@ class DataServer:
                           ktc_.msg_bid_over: None}
 
     def run_loop(self):
-        self.log('Running data server loop')
+        mylog.debug('Running data server loop')
         while 1:
             try:
                 # Handle all message first
                 while 1:
                     msg = self.self_queue.get(timeout=self.push_time_interval.total_seconds())
-                    self.log(f'ReceiveMessage: {msg}')
+                    mylog.debug(f'ReceiveMessage: {msg}')
                     if msg.operation == ktc_.msg_quit_loop:
                         return
                     self.dispatch_msg(msg)
@@ -56,8 +56,9 @@ class DataServer:
                 self.push_all()
 
     def push_all(self):
-        self.log('Try push')
-        if datetime.datetime.now().time() < trade_bid_end_time + datetime.timedelta(seconds=10) \
+        mylog.debug('Try push')
+        # noinspection PyTypeChecker
+        if datetime.datetime.now().time() < (trade_bid_end_time + datetime.timedelta(seconds=10)) \
                 or datetime.datetime.now().time() > trade_end_time:
             return
 
@@ -72,11 +73,8 @@ class DataServer:
             else:
                 self.trade_context.push_realtime_info(sender, df)
 
-    def log(self, msg):
-        jqd(f'{self.trade_context.thread_local.name}:: {msg}')
-
     def on_add_monitored_stock(self, msg: TradeMessage):
-        self._monitored_stock_map[msg.sender] = msg.param1
+        self._monitored_stock_map[msg.sender] = msg.result
 
     def update_realtime_stock_info(self):
         stock_list = []

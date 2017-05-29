@@ -5,8 +5,8 @@ import pandas as pd
 import pyquery
 import requests
 
-# The 163 website add 0 to the stock_code to imply SH stock_utility
-# Add the 1 to the stock_code to imply the SZ stock_utility
+# The 163 website add 0 to the stock_code to imply SH common_stock
+# Add the 1 to the stock_code to imply the SZ common_stock
 import trading.base_structure.trade_constants
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_get_url

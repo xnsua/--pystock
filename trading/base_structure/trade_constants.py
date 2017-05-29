@@ -1,6 +1,22 @@
 import datetime
 
+from common.base_functions import object_with_repr
+from common.scipy_helper import pdDF
 from ip.constants import ClientHttpAccessConstant
+
+
+class MsgPushStocks(object_with_repr):
+    def __init__(self, stocks):
+        self.stocks = stocks  # type: pdDF
+
+
+class MsgAddPushStocks(object_with_repr):
+    def __init__(self, stocks):
+        self.stocks = stocks
+
+
+class MsgQuitLoop(object_with_repr):
+    pass
 
 
 class TradeCommunicationConstant:

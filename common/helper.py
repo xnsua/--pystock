@@ -1,11 +1,13 @@
 import datetime as datetime
 import os
-import queue
 import re
+import sys
 import traceback
 
-
 # <editor-fold desc="FileAndDir">
+import psutil as psutil
+
+
 def is_file_outdated(path, span):
     if not os.path.exists(path):
         return True
@@ -133,37 +135,22 @@ def type_info(val):
 # </editor-fold>
 
 # <editor-fold desc="Data Structure">
-class ObjectCabinet:
-    def __init__(self, generator, clear_func):
-        self.queue = queue.Queue()
-        self.generator = generator
-        self.clear_func = clear_func
-
-    def fetch_one(self):
-        try:
-            fetch_result = self.queue.get(block=False)
-            return fetch_result
-        except queue.Empty:
-            return self.generator()
-
-    def put_one(self, obj):
-        if self.clear_func:
-            self.clear_func(obj)
-        self.queue.put(obj)
-
-    def use_one(self):
-        class Context:
-            def __init__(self, cabinet):
-                self.cabinet = cabinet
-                self.current_obj = None
-
-            def __enter__(self):
-                self.current_obj = self.cabinet.fetch_one()
-                return self.current_obj
-
-            def __exit__(self, exc_type, exc_val, exc_tb):
-                self.cabinet.put_one(self.current_obj)
-
-        return Context(self)
-
 # </editor-fold>
+
+# noinspection PyBroadException
+def restart_program():
+    """Restarts the current program, with file objects and descriptors
+       cleanup
+    """
+    try:
+        p = psutil.Process(os.getpid())
+        for handler in p.open_files() + p.connections():
+            try:
+                os.close(handler.fd)
+            except Exception:
+                print('error')
+    except Exception:
+        pass
+
+    python = sys.executable
+    os.execl(python, python, *sys.argv)

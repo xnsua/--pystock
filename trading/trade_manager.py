@@ -6,12 +6,12 @@ from typing import Dict, Tuple
 import pandas
 
 from data_manager.data_server_main import DataServer
-from ip.st import OperQuery
-from project_helper.phelper import mylog, jqd
-from stock_utility.client_access import is_client_server_running, \
-    fire_operation
-from trading.base_structure.trade_constants import ktc_, kca_
+from ip.st import ClientOperQuery, ClientOperBase
+from project_helper.logbook_logger import mylog
+from trading.base_structure.trade_constants import ktc_, kca_, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
+from trading.client_access import is_client_server_running, \
+    fire_operation
 from trading.model_runner import ModelRunnerThread
 from trading.models.model_buy_after_drop import ModelBuyAfterDrop
 from trading.trade_context import TradeContext
@@ -43,13 +43,6 @@ class TradeManager:
         self.threads = {}  # type: Dict[threading.Thread, str]
 
         self.need_update_entrust_status = False
-
-    def log(self, msg, level=None):
-        text = f'{ktc_.id_trade_manager}:: {msg}'
-        if not level:
-            jqd(text)
-        else:
-            level(text)
 
     def start_threads(self):
         self.init_trade_context()
@@ -88,15 +81,13 @@ class TradeManager:
 
     def query_initial_account_info(self):
         if is_client_server_running():
-            oper = OperQuery(kca_.all)
-            success, rs_oper = fire_operation(oper)  # type: Tuple[bool, OperQuery]
+            oper = ClientOperQuery(kca_.all)
+            success, rs_oper = fire_operation(oper)  # type: Tuple[bool, ClientOperQuery]
 
             if success and rs_oper.result.success:
-                self.trade_context.account_manager \
-                    .set_init_account_info(rs_oper.result.data)
+                self.account_manager.set_account_info(rs_oper.result.data)
             else:
                 raise Exception('Query account info failed')
-
         else:
             raise Exception('Cannot connect to client server')
 
@@ -104,7 +95,7 @@ class TradeManager:
         try:
             self.query_initial_account_info()
         except Exception:
-            mylog.exception('Query initial account info failed')
+            mylog.exception('Query initial account info failed, Quiting .......')
             self.trade_context.quit_all()
 
         self.handle_msgs()
@@ -112,38 +103,36 @@ class TradeManager:
     def handle_msgs(self):
         while 1:
             try:
-                msg = self.self_queue.get(timeout=3)
+                msg = self.self_queue.get(timeout=2)
             except queue.Empty:
                 continue
-            self.log(f'ReceiveMessage: {msg}')
-            if msg.operation == ktc_.msg_quit_loop:
+            mylog.info(f'Message Received: {msg}')
+            if isinstance(msg.operation == MsgQuitLoop):
                 for thread, name in self.threads.items():
-                    self.log(f'Wait for thread {name} to exit')
+                    mylog.info(f'Wait for thread {name} to exit')
                     thread.join()
                 return
             self.dispatch_msgs(msg)
 
-    def on_msg_client_operation(self, msg: TradeMessage):
-        msg_result = fire_operation(msg.param1)
-        self.account_manager.on_operation_result(msg_result)
-        msg.try_put_result(msg_result)
-
     def dispatch_msgs(self, msg: TradeMessage):
-        msg_map = {ktc_.msg_client_operation: self.on_msg_client_operation}
+        if isinstance(msg.operation, ClientOperBase):
+            msg_result = fire_operation(msg.result)
+            msg.operation.result = msg_result
+            self.account_manager.on_operation_result(msg.operation)
+        else:
+            raise Exception(f'Unrecognized Message{msg}')
 
-        try:
-            func = msg_map[msg.operation]
-            func(msg)
-        except KeyError:
-            raise Exception(f'Unknown msg: {msg}')
+    def do_when_idle(self):
+        if self.account_manager.need_push:
+            self.trade_context.post_msg(ktc_.id_trade_manager, ClientOperQuery(kca_.all))
 
 
 def main():
     # begin_trade()
-    test_begin_trade()
+    tes_begin_trade()
 
 
-def test_begin_trade():
+def tes_begin_trade():
     trade = TradeManager(trade_models=[ModelBuyAfterDrop])
     trade_context = trade.trade_context
 
@@ -159,5 +148,5 @@ def test_begin_trade():
 
 
 if __name__ == '__main__':
-    test_begin_trade()
+    tes_begin_trade()
     # main()

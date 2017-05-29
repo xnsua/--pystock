@@ -1,7 +1,7 @@
 from pathlib import Path
 class Config:
     def __init__(self):
-        self.project_root = Path(__file__).parent
+        self.project_root = Path(__file__).parent.parent
 
         self.stock_data_dir = self.project_root.parent / 'py_stock_data'
 

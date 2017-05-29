@@ -2,6 +2,7 @@ import datetime as dt
 
 _memory_cache = {}
 
+
 def cache(cache_time_delta):
     def cache_decorator(func):
         def func_wrapper(*args, **kwargs):

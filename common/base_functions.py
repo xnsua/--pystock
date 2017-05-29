@@ -1,19 +1,17 @@
-class UtilObjectBase(object):
-    def __eq__(self, other) -> bool:
-        if type(self) == type(other):
-            return self.__dict__ == other.__dict__
-        return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
+class ObjectWithRepr(object):
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
-        return self.__dict__.__str__()
+        return self._indent_repr()
 
-    def __hash__(self):
-        # This is valid only for non-nested dict.
-        # Frozenset is use to remove the order of items in dict.
-        return hash(frozenset(self.__dict__.items()))
+    def _indent_repr(self):
+        strs = [str(key) + ':' + str(value) for key, value in self.__dict__.items()]
+        text = '\n'.join(strs)
+        return type(self).__name__ + '{\n' + text + '}'
+
+    def _repr(self):
+        return type(self).__name__ + str(self.__dict__)
+
+    def _str(self):
+        return str(self.__dict__)

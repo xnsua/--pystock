@@ -2,7 +2,7 @@ import datetime as dt
 
 import pandas as pd
 
-from config_module import myconfig
+from project_helper.config_module import myconfig
 
 
 class TradeDay:
@@ -12,7 +12,7 @@ class TradeDay:
 
     def read_df(self):
         # path = plPath(__file__).parent / 'trade_day.csv'
-        path = myconfig.project_root / 'stock_utility/trade_day.csv'
+        path = myconfig.project_root / 'common_stock/trade_day.csv'
         return pd.read_csv(str(path), index_col='index')
 
     def build_date_map(self):

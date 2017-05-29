@@ -4,27 +4,20 @@ import time
 from common.helper import dt_now
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
-from ip.stock_codes_format import stock_to_sina_symbol, \
+from common_stock.stock_codes_format import stock_to_sina_symbol, \
     symbol_to_stock_code
-from project_helper.phelper import jqd
+from project_helper.logbook_logger import jqd
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
 
-# def get_real_time_price(stocklist):
-#     stockprices = get_realtime_stock_info(stocklist)
-#     stockprices = list(stockprices.price)
-#     return stockprices
-
 
 def get_realtime_stock_info(stock_list):
-    def extract_result(contentlist: str):
-        fiter = re.finditer(r'var hq_str_(..\d{6})="(.*)";', contentlist)
-        # print(contentlistist)
-        # fiter = re.finditer(r'var', contentlist)
+    def extract_result(content_list: str):
+        find_results = re.finditer(r'var hq_str_(..\d{6})="(.*)";', content_list)
         stock_codes = []
         attrs = []
-        for v in fiter:
+        for v in find_results:
             stock_codes.append(symbol_to_stock_code(v[1]))
             content = v[2].split(',')
             content = content[0:6]
@@ -35,8 +28,8 @@ def get_realtime_stock_info(stock_list):
         df['name'] = df['name'].astype(str)
         return df
 
-    liststr = ','.join(map(stock_to_sina_symbol, stock_list))
-    url = 'http://hq.sinajs.cn/list=' + liststr
+    list_str = ','.join(map(stock_to_sina_symbol, stock_list))
+    url = 'http://hq.sinajs.cn/list=' + list_str
     jqd(url)
     resp = firefox_quick_get_url(url)
     if resp.status_code == 200:

@@ -9,6 +9,7 @@ session_cache_one_day = requests_cache.CachedSession(
 
 session_nocache = requests.session()
 
+
 def firefox_get_url(session, url, headers=None, timeout=5):
     if headers is None:
         headers = {}

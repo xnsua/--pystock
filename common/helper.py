@@ -5,7 +5,7 @@ import sys
 import traceback
 
 # <editor-fold desc="FileAndDir">
-import psutil as psutil
+import psutil
 
 
 def is_file_outdated(path, span):

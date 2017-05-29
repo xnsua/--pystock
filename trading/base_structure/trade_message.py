@@ -2,14 +2,14 @@ from queue import Queue
 
 
 class TradeMessage:
-    def __init__(self, sender, operation, result, result_queue):
+    def __init__(self, sender, operation, result_queue):
         self.sender = sender
         self.operation = operation
-        self.result = result
+        self.result = None
         self.result_queue = result_queue  # type: Queue
 
     def __repr__(self):
-        return f'CommMessage{{{self.sender}, {self.operation}, *{str(self.result)[0:50]}*, *{str(self.param2)[0:50]}*}}'
+        return f'CommMessage{{{self.sender}, {self.operation}, *{str(self.result)[0:50]}*'
 
     def try_put_result(self, result):
         if self.result_queue:

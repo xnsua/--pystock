@@ -107,7 +107,7 @@ class TradeManager:
             except queue.Empty:
                 continue
             mylog.info(f'Message Received: {msg}')
-            if isinstance(msg.operation == MsgQuitLoop):
+            if isinstance(msg.operation, MsgQuitLoop):
                 for thread, name in self.threads.items():
                     mylog.info(f'Wait for thread {name} to exit')
                     thread.join()

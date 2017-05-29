@@ -3,7 +3,8 @@ import threading
 
 from common.data_structures.object_cabinet import ObjectCabinet
 from trading.account_manager import AccountManager
-from trading.base_structure.trade_constants import ktc_, MsgAddPushStocks, MsgPushStocks
+from trading.base_structure.trade_constants import ktc_, MsgAddPushStocks, MsgPushStocks, \
+    MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 
 
@@ -46,7 +47,7 @@ class TradeContext:
 
     def quit_all(self):
         for key in self.queue_dict:
-            self.post_msg(key, ktc_.msg_quit_loop, None, None)
+            self.post_msg(key, MsgQuitLoop)
 
     def _is_model_queue(self, queue_name):
         return queue_name != ktc_.id_data_server and queue_name != ktc_.id_trade_manager

@@ -1,6 +1,5 @@
 import datetime
 
-from common.base_functions import object_with_repr
 from common.scipy_helper import pdDF
 from ip.constants import ClientHttpAccessConstant
 
@@ -39,7 +38,6 @@ class TradeCommunicationConstant:
     msg_bid_over = 'msg_is_bid_over'
     msg_push_account_info = 'msg_push_account_info'
 
-    msg_quit_loop = 'msg_quit_loop'
 
 
 class ModelConstant:

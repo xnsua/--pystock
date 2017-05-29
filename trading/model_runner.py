@@ -26,8 +26,3 @@ class ModelRunnerThread:
                 self.model.on_bid_over(msg.result)
             elif msg.operation == ktc_.msg_realtime_push:
                 self.model.handle_bar(msg.result)
-            elif msg.operation == ktc_.msg_push_account_info:
-                self.model.on_account_info(msg.result, msg.param2)
-            elif msg.operation == ktc_.msg_quit_loop:
-                break
-

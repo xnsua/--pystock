@@ -7,7 +7,8 @@ import pandas
 from common_stock.stock_data_constants import etf_with_amount
 from data_manager.stock_querier import sina_api
 from project_helper.logbook_logger import mylog
-from trading.base_structure.trade_constants import ktc_, trade_bid_end_time, trade_end_time
+from trading.base_structure.trade_constants import ktc_, trade_bid_end_time, trade_end_time, \
+    MsgPushStocks
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
 
@@ -69,7 +70,7 @@ class DataServer:
         monitored_stock_info_dict = self.query_monitored_stock_info()
         for sender, df in monitored_stock_info_dict.items():
             if bid_over_result.first_bid_over:
-                self.trade_context.post_msg(sender, ktc_.msg_bid_over, df)
+                self.trade_context.post_msg(sender, MsgPushStocks(df))
             else:
                 self.trade_context.push_realtime_info(sender, df)
 

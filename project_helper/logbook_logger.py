@@ -51,6 +51,7 @@ def stdout_formatter(record, handler):
     return log
 
 
+# noinspection PyUnusedLocal
 def file_formatter(record, handler):
     dt = record.time.strftime('%y%m%d %H:%M:%S.%f')
     filename = pathlib.Path(record.filename).stem

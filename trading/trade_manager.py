@@ -1,14 +1,14 @@
 import datetime
 import queue
 import threading
-from typing import Dict, Tuple
+from typing import Dict
 
 import pandas
 
 from data_manager.data_server_main import DataServer
 from ip.st import ClientOperQuery, ClientOperBase
 from project_helper.logbook_logger import mylog
-from trading.base_structure.trade_constants import ktc_, kca_, MsgQuitLoop
+from trading.base_structure.trade_constants import TradeId, kca_, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.client_access import is_client_server_running, \
     fire_operation
@@ -27,7 +27,6 @@ def begin_trade():
 
 class TradeManager:
     def __init__(self, trade_models=None):
-
         # Queue member
         self.self_queue = queue.Queue()
         self.data_server_queue = queue.Queue()
@@ -42,8 +41,6 @@ class TradeManager:
 
         self.threads = {}  # type: Dict[threading.Thread, str]
 
-        self.need_update_entrust_status = False
-
     def start_threads(self):
         self.init_trade_context()
 
@@ -54,7 +51,7 @@ class TradeManager:
 
         data_server_thread = threading.Thread(target=thread_data_server)
         data_server_thread.start()
-        self.threads[data_server_thread] = ktc_.id_data_server
+        self.threads[data_server_thread] = TradeId.data_server
 
         for model_class in self.trade_models:
             def thread_fun():
@@ -71,34 +68,32 @@ class TradeManager:
         for model_cls in self.trade_models:
             model_queue_dict[model_cls.name()] = queue.Queue()
 
-        queue_dict = {ktc_.id_trade_manager: self.self_queue,
-                      ktc_.id_data_server: self.data_server_queue,
+        queue_dict = {TradeId.trade_manager: self.self_queue,
+                      TradeId.data_server: self.data_server_queue,
                       **model_queue_dict}
 
         trade_context = TradeContext(queue_dict)
-        trade_context.thread_local.name = ktc_.id_trade_manager
+        trade_context.thread_local.name = TradeId.trade_manager
         return trade_context
 
-    def query_initial_account_info(self):
+    def query_account_info(self):
         if is_client_server_running():
-            oper = ClientOperQuery(kca_.all)
-            success, rs_oper = fire_operation(oper)  # type: Tuple[bool, ClientOperQuery]
-
-            if success and rs_oper.result.success:
-                self.account_manager.set_account_info(rs_oper.result.data)
-            else:
-                raise Exception('Query account info failed')
+            query = ClientOperQuery(kca_.all)
+            result = fire_operation(query)
+            self.account_manager.set_account_info(result)
         else:
             raise Exception('Cannot connect to client server')
 
     def run_loop(self):
+        mylog.info('Trade manager running .....')
         try:
-            self.query_initial_account_info()
+            self.query_account_info()
         except Exception:
             mylog.exception('Query initial account info failed, Quiting .......')
             self.trade_context.quit_all()
 
         self.handle_msgs()
+        mylog.info('Quit the program.')
 
     def handle_msgs(self):
         while 1:
@@ -106,7 +101,7 @@ class TradeManager:
                 msg = self.self_queue.get(timeout=2)
             except queue.Empty:
                 continue
-            mylog.info(f'Message Received: {msg}')
+            mylog.info(f'ReceiveMessage {msg}')
             if isinstance(msg.operation, MsgQuitLoop):
                 for thread, name in self.threads.items():
                     mylog.info(f'Wait for thread {name} to exit')
@@ -116,15 +111,15 @@ class TradeManager:
 
     def dispatch_msgs(self, msg: TradeMessage):
         if isinstance(msg.operation, ClientOperBase):
-            msg_result = fire_operation(msg.result)
+            msg_result = fire_operation(msg.operation)
             msg.operation.result = msg_result
             self.account_manager.on_operation_result(msg.operation)
         else:
-            raise Exception(f'Unrecognized Message{msg}')
+            raise Exception(f'Unrecognized Message: {msg}')
 
     def do_when_idle(self):
         if self.account_manager.need_push:
-            self.trade_context.post_msg(ktc_.id_trade_manager, ClientOperQuery(kca_.all))
+            self.trade_context.post_msg(TradeId.trade_manager, ClientOperQuery(kca_.all))
 
 
 def main():

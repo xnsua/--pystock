@@ -4,7 +4,7 @@ import pathlib as pl
 import pandas as pd
 import tushare as ts
 
-from common.helper import ndays_later, ndays_ago
+from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
 from common_stock.stock_data_constants import etf_with_amount
 from common_stock.trade_day import is_trade_day
@@ -39,12 +39,12 @@ class DayBar:
                                                    '%Y-%m-%d').date()
         except FileNotFoundError:
             df_read = pdDF()
-            last_date = ndays_ago(1, stock_start_day)
+            last_date = ndays_ago_from(stock_start_day, 1)
 
         # Skip the non_trade_day
-        query_start_date = ndays_later(1, last_date)
+        query_start_date = ndays_later_from(last_date, 1)
         while not is_trade_day(query_start_date):
-            query_start_date = ndays_later(1, query_start_date)
+            query_start_date = ndays_later_from(query_start_date, 1)
 
         now = datetime.datetime.now()
         if now.date() < query_start_date:

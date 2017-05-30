@@ -9,7 +9,7 @@ class TradeMessage:
         self.result_queue = result_queue  # type: Queue
 
     def __repr__(self):
-        return f'CommMessage{{{self.sender}, {self.operation}, *{str(self.result)[0:50]}*'
+        return f'{TradeMessage.__name__}{{{self.sender}, {self.operation}, *{str(self.result)[0:50]}*}}'
 
     def try_put_result(self, result):
         if self.result_queue:
@@ -19,4 +19,4 @@ class TradeMessage:
 
 
 def test():
-    pass
+    print(repr(TradeMessage(1, 1, 1)))

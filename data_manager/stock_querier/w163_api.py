@@ -10,7 +10,7 @@ import requests
 import trading.base_structure.trade_constants
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_get_url
-from trading.base_structure.trade_constants import StockTermConstant
+from trading.base_structure.trade_constants import StockTerm
 
 
 def download_stock_history(stock_code, save_path,
@@ -49,7 +49,7 @@ def wget_etf_info(etf_code):
         net_assert = float(net_assert.replace('亿', '')) * 10000 * 10000
     else:
         raise Exception(f'Query etf info for {etf_code} failed, text is {text}')
-    return {StockTermConstant.scale: net_assert}
+    return {StockTerm.scale: net_assert}
 
 
 def main():

@@ -7,6 +7,7 @@ from project_helper.logbook_logger import mylog
 
 
 class AccountManager:
+    # imp Check all function use the lock
     def __init__(self):
         self._account_info = None  # type: AccountInfo
         self._lock = threading.RLock()

@@ -34,19 +34,22 @@ def get_file_create_time(path):
 
 
 # <editor-fold desc="Time">
-def time_exec(func):
-    start = datetime.datetime.now()
-    func()
-    print(datetime.datetime.now() - start)
+
+def ndays_later(n):
+    return datetime.date.today() + datetime.timedelta(days=n)
 
 
-def ndays_later(n, old_date=None):
+def ndays_ago(n):
+    return datetime.date.today() - datetime.timedelta(days=n)
+
+
+def ndays_later_from(old_date, n):
     if not old_date:
         old_date = datetime.date.today()
     return old_date + datetime.timedelta(days=n)
 
 
-def ndays_ago(n, old_date=None):
+def ndays_ago_from(old_date, n):
     if not old_date:
         old_date = datetime.date.today()
     return old_date - datetime.timedelta(days=n)
@@ -64,13 +67,20 @@ def dt_today():
 def dt_now():
     return datetime.datetime.now()
 
-
 def dt_now_time():
     return datetime.datetime.now().time()
 
 
 def dt_from_time(a, b, c):
     return datetime.datetime.combine(dt_today(), datetime.time(a, b, c))
+
+
+def dt_day_delta(n):
+    return datetime.timedelta(days=n)
+
+
+def dt_seconds_delta(n):
+    return datetime.timedelta(seconds=n)
 
 
 def to_seconds_str(o) -> str:
@@ -132,9 +142,6 @@ def type_info(val):
         return info
 
 
-# </editor-fold>
-
-# <editor-fold desc="Data Structure">
 # </editor-fold>
 
 # noinspection PyBroadException

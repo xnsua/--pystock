@@ -1,9 +1,12 @@
+from typing import List
+
 import jsonpickle
 
 from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
-from ip.constants import ClientHttpAccessConstant
-from ip.st import ClientOperBuy, EntrustType
+from ip.constants import ClientHttpAccessConstant, kca_
+from ip.st import ClientOperBuy, EntrustType, BuyResult, SellResult, ClientOperSell, \
+    ClientOperQuery, AccountInfo, QueryResult, ShareItem, EntrustItem
 from project_helper.logbook_logger import mylog
 
 jsonpickle.load_backend('simplejson')
@@ -44,7 +47,47 @@ def is_client_server_running():
     return resp.status_code == 200
 
 
-def test_operation():
+def test_operation_buy():
     buy = ClientOperBuy('SH.510900', 1.2, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(buy)
     print(result)
+    assert isinstance(result, BuyResult)
+
+
+def test_operation_sell():
+    sell = ClientOperSell('SH.510900', 1.2, 100, EntrustType.FIXED_PRICE)
+    result = fire_operation(sell)
+    assert isinstance(result, SellResult)
+
+
+def test_operation_query_all():
+    query = ClientOperQuery(kca_.all)
+    result = fire_operation(query)
+    print(result)
+    assert isinstance(result, QueryResult)
+    assert isinstance(result.data, AccountInfo)
+
+
+def test_operation_query_myshare():
+    query = ClientOperQuery(kca_.myshare)
+    result = fire_operation(query)
+    print(result)
+    assert isinstance(result, QueryResult)
+    assert isinstance(result.data, List)
+    if len(result.data):
+        assert isinstance(result.data[0], ShareItem)
+
+
+def test_operation_query_dayentrust():
+    query = ClientOperQuery(kca_.dayentrust)
+    result = fire_operation(query)
+    print(result)
+    assert isinstance(result, QueryResult)
+    assert isinstance(result.data, List)
+    if len(result.data):
+        assert isinstance(result.data[0], EntrustItem)
+
+
+def test_cancel_order():
+    # toch
+    pass

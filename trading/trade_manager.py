@@ -5,6 +5,8 @@ from typing import Dict
 
 import pandas
 
+from common.datetime_manager import DateTimeManager
+from common.helper import dt_from_time
 from data_manager.data_server_main import DataServer
 from ip.st import ClientOperQuery, ClientOperBase
 from project_helper.logbook_logger import mylog
@@ -89,7 +91,7 @@ class TradeManager:
         try:
             self.query_account_info()
         except Exception:
-            mylog.exception('Query initial account info failed, Quiting .......')
+            mylog.exception('Query account info failed')
             self.trade_context.quit_all()
 
         self.handle_msgs()
@@ -143,5 +145,5 @@ def tes_begin_trade():
 
 
 if __name__ == '__main__':
-    tes_begin_trade()
-    # main()
+    with DateTimeManager(dt_from_time(9, 26, 0)):
+        tes_begin_trade()

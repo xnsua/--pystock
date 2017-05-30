@@ -17,8 +17,8 @@ class MsgPushStocks(ObjectWithIndentRepr):
 
 
 class MsgAddPushStocks(ObjectWithIndentRepr):
-    def __init__(self, stocks):
-        self.stocks = stocks  # type: List
+    def __init__(self, stock_list):
+        self.stock_list = stock_list  # type: List
 
 
 class MsgBidOver(ObjectWithIndentRepr):

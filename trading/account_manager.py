@@ -45,3 +45,13 @@ class AccountManager:
                     if val.entrust_id == entrust_id]
             if item: mylog.info(f'Can not find entrust for id:{entrust_id}')
             return item[0]
+
+    @property
+    def entrust_items(self):
+        with self._lock:
+            return self._account_info.entrust_items
+
+    @property
+    def share_items(self):
+        with self._lock:
+            return self.share_items

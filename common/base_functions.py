@@ -29,3 +29,7 @@ def test():
             self.b = 'hello'
 
     print(repr(Foo()))
+
+
+def jqtt():
+    1 / 0

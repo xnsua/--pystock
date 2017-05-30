@@ -2,6 +2,7 @@ import datetime as dt
 
 import pandas as pd
 
+from common.helper import dt_today
 from project_helper.config_module import myconfig
 
 
@@ -41,3 +42,7 @@ class TradeDay:
 _trade_day = TradeDay()
 is_trade_day = _trade_day.is_trade_day
 last_n_trade_day = _trade_day.last_n_trade_day
+
+
+def test():
+    print(last_n_trade_day(dt_today(), 3))

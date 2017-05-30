@@ -61,7 +61,8 @@ class DataServer:
                 self.trade_context.post_msg(sender, MsgPushStocks(df))
 
     def on_add_push_stock(self, msg: TradeMessage):
-        self._monitored_stock_map[msg.sender] = msg.result
+        assert isinstance(msg.operation, MsgAddPushStocks)
+        self._monitored_stock_map[msg.sender] = msg.operation.stock_list
 
     def update_realtime_stock_info(self):
         stock_list = []

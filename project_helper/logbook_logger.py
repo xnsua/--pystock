@@ -24,7 +24,7 @@ class MyLogger(logbook.Logger):
 
 
 # noinspection PyUnusedLocal
-def stdout_formatter(record, handler):
+def stdout_formatter(record: LogRecord, handler):
     dt = record.time.strftime('%H:%M:%S.%f')[:-3]
     filename = pathlib.Path(record.filename).stem
     log = "{dt} {level:5.5} {module:12.12}: {msg}".format(
@@ -33,12 +33,15 @@ def stdout_formatter(record, handler):
         msg=record.message,
         module=filename
     )
+    except_str = record.formatted_exception
+    if except_str:
+        return log + '\n' + except_str
     return log
 
 
 # noinspection PyUnusedLocal
 def file_formatter(record, handler):
-    dt = record.time.strftime('%y%m%d %H:%M:%S.%f')
+    dt = record.time.strftime('%y-%m-%d %H:%M:%S.%f')
     filename = pathlib.Path(record.filename).stem
     log = "[{threadid:5x}] {dt} {level:5.5} {module:15.15}: {msg}".format(
         dt=dt,
@@ -47,6 +50,9 @@ def file_formatter(record, handler):
         module=filename,
         threadid=record.thread
     )
+    except_str = record.formatted_exception
+    if except_str:
+        return log + '\n' + except_str
     return log
 
 
@@ -84,3 +90,7 @@ s_time = datetime.datetime.now()
 atexit.register(lambda: _file_handler_with_debug.pop_application())
 atexit.register(lambda: _file_handler.pop_application())
 atexit.register(lambda: stdout_handler.pop_application())
+
+
+def test():
+    mylog.info('Hello')

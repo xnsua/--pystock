@@ -20,6 +20,3 @@ class AbstractModel(metaclass=abc.ABCMeta):
     def handle_bar(self, df: pdDF):
         pass
 
-    @abc.abstractmethod
-    def on_account_info(self, type_, content):
-        pass

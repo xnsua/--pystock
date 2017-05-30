@@ -5,7 +5,7 @@ from common.scipy_helper import pdDF
 from common_stock.stock_data_constants import etf_with_amount
 from common_stock.trade_day import last_n_trade_day
 from data_manager.stock_day_bar_manager import DayBar
-from project_helper.logbook_logger import jqd, mylog
+from project_helper.logbook_logger import mylog
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
@@ -18,29 +18,37 @@ class ModelBuyAfterDrop(AbstractModel):
     def __init__(self, trade_context: TradeContext):
         super().__init__()
         self.context = trade_context
+        self.account_manager = trade_context.account_manager
         self.etf_code_range = etf_with_amount
         self.etf_dict = None
         self.etf_to_buy = None
 
-    def log(self, msg):
-        jqd(f'{self.context.thread_local.name}:: {msg}')
+    def log_account_info(self):
+        try:
+            log_str = f'AccountInfo:\n ' \
+                      f'Available: {self.account_manager.available}\n' \
+                      f'ShareCount: {len(self.account_manager.share_items)}\n' \
+                      f'EntrustCount: {len(self.account_manager.entrust_items)}'
+            mylog.info(log_str)
+        except:
+            mylog.info('*** There is not account info')
 
     def init_model(self):
+        self.log_account_info()
         mylog.debug('Init model')
+        self.etf_to_buy = ['510900']
         self.context.add_push_stock(self.etf_to_buy)
         self.etf_dict = read_df_dict(self.etf_code_range)
         self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())
 
     def on_bid_over(self, df: pdDF):
+        self.log_account_info()
+        mylog.info('On bid over\n' + str(df))
         assert all(df.open)
 
     def handle_bar(self, df: pdDF):
-        mylog.debug('Handle bar')
+        mylog.info('On handle bar\n' + str(df))
         del df
-        pass
-
-    def on_account_info(self, type_, content):
-        mylog.debug(f'On account info: {type_}, {content}')
         pass
 
 

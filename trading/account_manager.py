@@ -2,8 +2,7 @@ import threading
 
 from common.alert import message_box_error, message_box_error_if
 from ip.st import AccountInfo, ClientOperBase, QueryResult, BuyResult, SellResult, \
-    CancelEntrustResult
-from project_helper.logbook_logger import mylog
+    CancelEntrustResult, EntrustStatus
 
 
 class AccountManager:
@@ -20,7 +19,10 @@ class AccountManager:
     def _on_oper_query(self, result_data):
         if isinstance(result_data, AccountInfo):
             self._account_info = result_data
-            self.need_push = False
+            pending_entrusts = [val for val in self.entrust_items
+                                if val.entrust_status in [EntrustStatus.pending]]
+
+            self.need_push = True if pending_entrusts else False
         message_box_error('Invalid result', repr(result_data))
 
     def on_operation_result(self, oper_with_result: ClientOperBase):
@@ -38,13 +40,6 @@ class AccountManager:
     def available(self):
         with self._lock:
             return self._account_info.available
-
-    def get_entrust_item(self, entrust_id):
-        with self._lock:
-            item = [val for val in self._account_info.entrust_items
-                    if val.entrust_id == entrust_id]
-            if item: mylog.info(f'Can not find entrust for id:{entrust_id}')
-            return item[0]
 
     @property
     def entrust_items(self):

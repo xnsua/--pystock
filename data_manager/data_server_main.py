@@ -7,8 +7,8 @@ from common.helper import dt_now_time
 from common_stock.stock_data_constants import etf_with_amount
 from data_manager.stock_querier import sina_api
 from project_helper.logbook_logger import mylog
-from trading.base_structure.trade_constants import TradeId, trade_bid_end_time, trade_end_time, \
-    MsgPushStocks, MsgAddPushStocks, MsgBidOver, MsgQuitLoop
+from trading.base_structure.trade_constants import TradeId, trade_bid_end_time, trade2_end_time, \
+    MsgPushStocks, MsgAddPushStocks, MsgBidOver, MsgQuitLoop, trade1_end_time, trade2_begin_time
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
 
@@ -44,10 +44,20 @@ class DataServer:
             except queue.Empty:
                 self.push_all()
 
+    @staticmethod
+    def _is_in_push_time(nowtime):
+        if nowtime < trade_bid_end_time or nowtime > trade2_end_time:
+            return False
+        if trade1_end_time < nowtime < trade2_begin_time:
+            return False
+        return True
+
     def push_all(self):
-        mylog.info('Try push ...')
-        if dt_now_time() < trade_bid_end_time or dt_now_time() > trade_end_time:
+        if not self._is_in_push_time(dt_now_time()):
+            mylog.info('NOT in push time ...')
             return
+        else:
+            mylog.info('Try push ...')
 
         bid_over_result = self._is_bid_over()
         if not bid_over_result.has_bid_over:
@@ -117,6 +127,29 @@ class DataServer:
             msg.try_put_result(self.on_add_push_stock(msg))
         else:
             mylog.error(f'Can not dispatch msg {msg}')
+
+
+# noinspection PyProtectedMember
+def test_is_in_push_time():
+    assert not DataServer._is_in_push_time(datetime.time(9, 24, 0))
+    assert DataServer._is_in_push_time(datetime.time(9, 25, 0))
+    assert DataServer._is_in_push_time(datetime.time(9, 25, 1))
+
+    assert DataServer._is_in_push_time(datetime.time(9, 29, 0))
+    assert DataServer._is_in_push_time(datetime.time(9, 30, 0))
+    assert DataServer._is_in_push_time(datetime.time(9, 30, 1))
+
+    assert DataServer._is_in_push_time(datetime.time(11, 29, 0))
+    assert DataServer._is_in_push_time(datetime.time(11, 30, 0))
+    assert not DataServer._is_in_push_time(datetime.time(11, 30, 1))
+
+    assert not DataServer._is_in_push_time(datetime.time(12, 59, 0))
+    assert DataServer._is_in_push_time(datetime.time(13, 0, 0))
+    assert DataServer._is_in_push_time(datetime.time(13, 0, 1))
+
+    assert DataServer._is_in_push_time(datetime.time(14, 59, 0))
+    assert DataServer._is_in_push_time(datetime.time(15, 0, 0))
+    assert not DataServer._is_in_push_time(datetime.time(15, 0, 1))
 
 
 def main():

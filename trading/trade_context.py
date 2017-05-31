@@ -33,6 +33,9 @@ class TradeContext:
             msg.result = result
         return result
 
+    def send_oper(self, operation):
+        return self.send_msg(TradeId.trade_manager, operation)
+
     @property
     def current_thread_queue(self):
         assert self.thread_local.name

@@ -2,7 +2,7 @@ import datetime
 
 import sortedcontainers as sortedcontainers
 
-from common.helper import dt_today
+from common.helper import dt_today, dt_from_time
 
 
 class TimePoints:
@@ -11,7 +11,7 @@ class TimePoints:
         self.time_points_used = {}
         pass
 
-    def hit(self, vdatetime):
+    def hit_once(self, vdatetime):
         vtime = vdatetime.time()
         index = self.time_points.bisect_right(vtime)
         index = index - 1
@@ -33,9 +33,6 @@ def test_time_point():
                      datetime.time(1, 2, 1): 't2',
                      datetime.time(1, 3, 1): 't3',
                      })
-    assert 't1' == tp.hit(
-        datetime.datetime.combine(dt_today(), datetime.time(1, 1, 2)))
-    assert not tp.hit(
-        datetime.datetime.combine(dt_today(), datetime.time(1, 1, 2)))
-    assert 't3' == tp.hit(
-        datetime.datetime.combine(dt_today(), datetime.time(1, 3, 2)))
+    assert 't1' == tp.hit_once(dt_from_time(1, 1, 2))
+    assert not tp.hit_once(dt_from_time(1, 1, 2))
+    assert 't3' == tp.hit_once(dt_from_time(1, 3, 2))

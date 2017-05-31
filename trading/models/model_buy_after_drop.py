@@ -1,10 +1,12 @@
 import datetime
 from statistics import mean
 
+from common.helper import dt_now_time
 from common.scipy_helper import pdDF
 from common_stock.stock_data_constants import etf_with_amount
 from common_stock.trade_day import last_n_trade_day
 from data_manager.stock_day_bar_manager import DayBar
+from ip.st import ClientOperBuy, EntrustType
 from project_helper.logbook_logger import mylog
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
@@ -22,6 +24,9 @@ class ModelBuyAfterDrop(AbstractModel):
         self.etf_code_range = etf_with_amount
         self.etf_dict = None
         self.etf_to_buy = None
+        # todo Add buy logic with time
+        self.buy_time_point = [datetime.time(9, 0, 0), datetime.time(9, 0, 0),
+                               datetime.time(9, 0, 0), datetime.time(9, 0, 0), ]
 
     def log_account_info(self):
         try:
@@ -48,6 +53,12 @@ class ModelBuyAfterDrop(AbstractModel):
 
     def handle_bar(self, df: pdDF):
         mylog.info('On handle bar\n' + str(df))
+        nowtime = dt_now_time()
+        old_len = len(self.buy_time_point)
+        self.buy_time_point = [val for val in self.buy_time_point if nowtime > val]
+        if len(self.buy_time_point) > old_len:
+            buy_oper = ClientOperBuy('510900', 1.3, 100, EntrustType.FIXED_PRICE)
+            self.context.send_oper(buy_oper)
         del df
         pass
 

@@ -62,12 +62,14 @@ kca_ = ClientHttpAccessConstant
 stock_start_day = datetime.date(1990, 12, 19)
 stock_start_datetime = datetime.datetime(1990, 12, 19)
 
-trade_bid_time = datetime.time(9, 15, 0)
+trade_bid_start_time = datetime.time(9, 15, 0)
 trade_bid_end_time = datetime.time(9, 25, 0)
-trade1_time = datetime.time(9, 30, 0)
-trade_break_time = datetime.time(11, 30, 0)
-trade2_time = datetime.time(13, 0, 0)
-trade_end_time = datetime.time(15, 0, 0)
+
+trade1_begin_time = datetime.time(9, 30, 0)
+trade1_end_time = datetime.time(11, 30, 0)
+
+trade2_begin_time = datetime.time(13, 0, 0)
+trade2_end_time = datetime.time(15, 0, 0)
 
 
 def test():

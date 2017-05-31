@@ -5,8 +5,6 @@ from typing import Dict
 
 import pandas
 
-from common.datetime_manager import DateTimeManager
-from common.helper import dt_from_time
 from data_manager.data_server_main import DataServer
 from ip.st import ClientOperQuery, ClientOperBase
 from project_helper.logbook_logger import mylog
@@ -102,6 +100,7 @@ class TradeManager:
             try:
                 msg = self.self_queue.get(timeout=2)
             except queue.Empty:
+                self.do_when_idle()
                 continue
             mylog.info(f'ReceiveMessage {msg}')
             if isinstance(msg.operation, MsgQuitLoop):
@@ -145,5 +144,8 @@ def tes_begin_trade():
 
 
 if __name__ == '__main__':
-    with DateTimeManager(dt_from_time(9, 26, 0)):
-        tes_begin_trade()
+    # with DateTimeManager(dt_from_time(9, 26, 0)):
+    tes_begin_trade()
+
+
+    # fixme: auto refresh when there is buy or sell order.

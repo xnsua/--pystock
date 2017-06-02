@@ -36,17 +36,15 @@ class TradeManager:
 
         # Trade context
         self.trade_context = self.init_trade_context()
-        self.init_trade_context()
         self.account_manager = self.trade_context.account_manager
 
         self.threads = {}  # type: Dict[threading.Thread, str]
 
     def start_threads(self):
-        self.init_trade_context()
 
         def thread_data_server():
             data_server = DataServer(self.trade_context,
-                                     push_time_interval=datetime.timedelta(seconds=1))
+                                     push_time_interval=datetime.timedelta(seconds=3))
             data_server.run_loop()
 
         data_server_thread = threading.Thread(target=thread_data_server)
@@ -78,9 +76,10 @@ class TradeManager:
 
     def query_account_info(self):
         if is_client_server_running():
-            query = ClientOperQuery(kca_.all)
+            query = ClientOperQuery(kca_.account_info)
             result = fire_operation(query)
-            self.account_manager.set_account_info(result)
+            query.result = result
+            self.account_manager.on_operation_result(query)
         else:
             raise Exception('Cannot connect to client server')
 
@@ -91,6 +90,8 @@ class TradeManager:
         except Exception:
             mylog.exception('Query account info failed')
             self.trade_context.quit_all()
+
+        self.start_threads()
 
         self.handle_msgs()
         mylog.info('Quit the program.')
@@ -114,13 +115,14 @@ class TradeManager:
         if isinstance(msg.operation, ClientOperBase):
             msg_result = fire_operation(msg.operation)
             msg.operation.result = msg_result
+            msg.try_put_result(msg_result)
             self.account_manager.on_operation_result(msg.operation)
         else:
             raise Exception(f'Unrecognized Message: {msg}')
 
     def do_when_idle(self):
-        if self.account_manager.need_push:
-            self.trade_context.post_msg(TradeId.trade_manager, ClientOperQuery(kca_.all))
+        if self.account_manager.need_client_push:
+            self.trade_context.post_msg(TradeId.trade_manager, ClientOperQuery(kca_.account_info))
 
 
 def main():
@@ -132,14 +134,15 @@ def tes_begin_trade():
     trade = TradeManager(trade_models=[ModelBuyAfterDrop])
     trade_context = trade.trade_context
 
+    # noinspection PyUnusedLocal
     def post_msg():
         import time
         time.sleep(3)
         trade_context.thread_local.name = 'TestThread'
         trade_context.quit_all()
 
-    threading.Thread(target=post_msg).start()
-    trade.start_threads()
+    # threading.Thread(target=post_msg).start()
+    # trade.start_threads()
     trade.run_loop()
 
 

@@ -67,6 +67,7 @@ def dt_today():
 def dt_now():
     return datetime.datetime.now()
 
+
 def dt_now_time():
     return datetime.datetime.now().time()
 

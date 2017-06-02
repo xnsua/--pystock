@@ -21,10 +21,6 @@ class MsgAddPushStocks(ObjectWithIndentRepr):
         self.stock_list = stock_list  # type: List
 
 
-class MsgBidOver(ObjectWithIndentRepr):
-    def __init__(self, stocks):
-        self.stocks = stocks
-
 
 class MsgQuitLoop(ObjectWithRepr):
     pass

@@ -6,8 +6,8 @@ class ObjectWithIndentRepr(object):
         return self._indent_repr()
 
     def _indent_repr(self):
-        strs = ['    ' + str(key) + ':' + str(value) for key, value in self.__dict__.items()]
-        text = '\n'.join(strs)
+        texts = ['    ' + str(key) + ':' + str(value) for key, value in self.__dict__.items()]
+        text = '\n'.join(texts)
         return type(self).__name__ + '{\n' + text + '}'
 
 
@@ -31,5 +31,3 @@ def test():
     print(repr(Foo()))
 
 
-def jqtt():
-    1 / 0

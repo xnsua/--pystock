@@ -3,7 +3,10 @@ import datetime
 import pathlib
 import sys
 
-import logbook
+try:
+    import logbook
+except:
+    import log_helper
 # noinspection PyUnresolvedReferences
 from logbook.base import LogRecord
 from logbook.handlers import StreamHandler

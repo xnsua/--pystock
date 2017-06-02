@@ -6,7 +6,7 @@ import pandas
 from common.helper import dt_now_time
 from common_stock.stock_data_constants import etf_with_amount
 from data_manager.stock_querier import sina_api
-from project_helper.logbook_logger import mylog
+from project_helper.logbook_logger import mylog, jqd
 from trading.base_structure.trade_constants import TradeId, trade_bid_end_time, trade2_end_time, \
     MsgPushStocks, MsgAddPushStocks, MsgBidOver, MsgQuitLoop, trade1_end_time, trade2_begin_time
 from trading.base_structure.trade_message import TradeMessage
@@ -54,16 +54,17 @@ class DataServer:
 
     def push_all(self):
         if not self._is_in_push_time(dt_now_time()):
-            mylog.info('NOT in push time ...')
+            mylog.info('***** NOT ***** in push time ...')
             return
         else:
-            mylog.info('Try push ...')
+            mylog.info(' ********  Try push *********')
 
         bid_over_result = self._is_bid_over()
+        jqd('bid_over_result:::\n', bid_over_result.__dict__)
         if not bid_over_result.has_bid_over:
             return
 
-        monitored_stock_info_dict = self.query_monitored_stock_info()
+        monitored_stock_info_dict = self.query_push_stock_info()
         for sender, df in monitored_stock_info_dict.items():
             if bid_over_result.first_bid_over:
                 self.trade_context.post_msg(sender, MsgBidOver(df))
@@ -81,7 +82,10 @@ class DataServer:
 
         if not stock_list:
             return None
-        self._df_realtime_stock_info = sina_api.get_realtime_stock_info(stock_list)
+        try:
+            self._df_realtime_stock_info = sina_api.get_realtime_stock_info(stock_list)
+        except:
+            mylog.warn(f'Can not query realtime info from sina api')
         return self._df_realtime_stock_info
 
     def _is_bid_over(self):
@@ -102,7 +106,7 @@ class DataServer:
         else:
             return BidResult(False, False)
 
-    def query_monitored_stock_info(self):
+    def query_push_stock_info(self):
         realtime_stock_info_dict = {}
         df_stock_info = self.update_realtime_stock_info()
         for sender, list_stock in self._monitored_stock_map.items():

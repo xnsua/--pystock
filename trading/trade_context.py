@@ -2,6 +2,7 @@ import queue
 import threading
 
 from common.data_structures.object_cabinet import ObjectCabinet
+from project_helper.logbook_logger import mylog
 from trading.account_manager import AccountManager
 from trading.base_structure.trade_constants import TradeId, MsgAddPushStocks, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
@@ -21,6 +22,8 @@ class TradeContext:
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
         msg = TradeMessage(self.thread_local.name, operation, result_queue=None)
+        mylog.notice(dest_queue)
+        mylog.notice(operation)
         dest_queue.put(msg)
 
     def send_msg(self, dest, operation):

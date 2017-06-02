@@ -6,7 +6,8 @@ from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
 from ip.constants import ClientHttpAccessConstant, kca_
 from ip.st import ClientOperBuy, EntrustType, BuyResult, SellResult, ClientOperSell, \
-    ClientOperQuery, AccountInfo, QueryResult, ShareItem, EntrustItem
+    ClientOperQuery, AccountInfo, QueryResult, ShareItem, EntrustItem, ClientOperCancel, \
+    EntrustWay, ErrorResult
 from project_helper.logbook_logger import mylog
 
 jsonpickle.load_backend('simplejson')
@@ -37,8 +38,12 @@ def _visit_client_server(url_args, headers, timeout=5):
 def fire_operation(oper):
     order_str = jsonpickle.dumps(oper)
     order_str = order_str.strip()
-    return _visit_client_server(
+    result = _visit_client_server(
         {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str})
+    if isinstance(result, ErrorResult):
+        message_box_error(f'Visit client error: {result}')
+    else:
+        return result
 
 
 def is_client_server_running():
@@ -54,14 +59,22 @@ def test_operation_buy():
     assert isinstance(result, BuyResult)
 
 
+def test_operation_buy_market_price():
+    buy = ClientOperBuy('SH.510900', 0, 100, EntrustType.MARKET_PRICE_AND_CANCEL)
+    result = fire_operation(buy)
+    print(result)
+    assert isinstance(result, BuyResult)
+
+
 def test_operation_sell():
     sell = ClientOperSell('SH.510900', 1.2, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(sell)
+    print(result)
     assert isinstance(result, SellResult)
 
 
 def test_operation_query_all():
-    query = ClientOperQuery(kca_.all)
+    query = ClientOperQuery(kca_.account_info)
     result = fire_operation(query)
     print(result)
     assert isinstance(result, QueryResult)
@@ -89,5 +102,6 @@ def test_operation_query_dayentrust():
 
 
 def test_cancel_order():
-    # toch
-    pass
+    canceller = ClientOperCancel('O1706021110090094021', 'SH.510900', EntrustWay.way_buy)
+    result = fire_operation(canceller)
+    print(result)

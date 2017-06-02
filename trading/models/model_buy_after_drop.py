@@ -1,13 +1,12 @@
 import datetime
 from statistics import mean
 
-from common.helper import dt_now_time
 from common.scipy_helper import pdDF
 from common_stock.stock_data_constants import etf_with_amount
 from common_stock.trade_day import last_n_trade_day
 from data_manager.stock_day_bar_manager import DayBar
-from ip.st import ClientOperBuy, EntrustType
-from project_helper.logbook_logger import mylog
+from ip.st import ClientOperBuy, EntrustType, ClientOperCancel, EntrustWay
+from project_helper.logbook_logger import mylog, jqd
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
@@ -24,24 +23,27 @@ class ModelBuyAfterDrop(AbstractModel):
         self.etf_code_range = etf_with_amount
         self.etf_dict = None
         self.etf_to_buy = None
-        # todo Add buy logic with time
-        self.buy_time_point = [datetime.time(9, 0, 0), datetime.time(9, 0, 0),
-                               datetime.time(9, 0, 0), datetime.time(9, 0, 0), ]
+
+        self._push_times = 1
+        self._oper_dict = {
+            2: ClientOperBuy('SH.510900', 1.19, 100, EntrustType.FIXED_PRICE)
+        }
 
     def log_account_info(self):
         try:
-            log_str = f'AccountInfo:\n ' \
-                      f'Available: {self.account_manager.available}\n' \
-                      f'ShareCount: {len(self.account_manager.share_items)}\n' \
-                      f'EntrustCount: {len(self.account_manager.entrust_items)}'
+            log_str = f'ACCOUNTINFO: ' \
+                      f'Available: {self.account_manager.available}  ' \
+                      f'ShareCount: {len(self.account_manager.share_items)}  ' \
+                      f'EntrustCount: {len(self.account_manager.entrust_items)}  '
             mylog.info(log_str)
-        except:
-            mylog.info('*** There is not account info')
+        except Exception as e:
+            mylog.info(
+                f'*** There is NO account info {self.account_manager._account_info}, Exception: {e}')
 
     def init_model(self):
         self.log_account_info()
         mylog.debug('Init model')
-        self.etf_to_buy = ['510900']
+        self.etf_to_buy = ['510900', '510050']
         self.context.add_push_stock(self.etf_to_buy)
         self.etf_dict = read_df_dict(self.etf_code_range)
         self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())
@@ -52,15 +54,24 @@ class ModelBuyAfterDrop(AbstractModel):
         assert all(df.open)
 
     def handle_bar(self, df: pdDF):
+        self._push_times += 1
         mylog.info('On handle bar\n' + str(df))
-        nowtime = dt_now_time()
-        old_len = len(self.buy_time_point)
-        self.buy_time_point = [val for val in self.buy_time_point if nowtime > val]
-        if len(self.buy_time_point) > old_len:
-            buy_oper = ClientOperBuy('510900', 1.3, 100, EntrustType.FIXED_PRICE)
-            self.context.send_oper(buy_oper)
-        del df
-        pass
+        oper = self._oper_dict.get(self._push_times, None)
+        if oper:
+            mylog.info(f'Send operation {oper}')
+            self.context.send_oper(oper)
+            mylog.info(f'Operation result', oper.result)
+            assert oper.result.success
+            # noinspection PyAttributeOutsideInit
+            self.entrust_id = oper.result.entrust_id
+            jqd('self.entrust_id:::\n', self.entrust_id)
+        else:
+            if hasattr(self, 'entrust_id'):
+                result = self.context.send_oper(
+                    ClientOperCancel(self.entrust_id, 'SH.510900', EntrustWay.way_buy))
+                mylog.notice(result.__dict__)
+                del self.entrust_id
+
 
 
 def is_buy(df: pdDF, now):

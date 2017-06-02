@@ -1,5 +1,5 @@
 from common.alert import message_box_error
-from project_helper.logbook_logger import mylog
+from project_helper.logbook_logger import mylog, jqd
 from trading.base_structure.trade_constants import MsgPushStocks, MsgQuitLoop, MsgBidOver
 from trading.base_structure.trade_message import TradeMessage
 from trading.models.model_base import AbstractModel
@@ -21,6 +21,7 @@ class ModelRunnerThread:
         mylog.debug(f'Model: {self.model.name()} ........')
 
         while True:
+            jqd('self.self_queue:::\n', self.self_queue)
             msg = self.self_queue.get()  # type: TradeMessage
             mylog.info(f'ReceiveMessage: {msg}')
             if isinstance(msg.operation, MsgBidOver):

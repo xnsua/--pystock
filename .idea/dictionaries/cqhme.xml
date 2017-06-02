@@ -43,6 +43,7 @@
       <w>ndrop</w>
       <w>nowtime</w>
       <w>oper</w>
+      <w>opers</w>
       <w>pchg</w>
       <w>realtime</w>
       <w>retrier</w>
@@ -57,6 +58,7 @@
       <w>tdxserver</w>
       <w>threadid</w>
       <w>tmlog</w>
+      <w>toch</w>
       <w>topen</w>
       <w>vaturnover</w>
       <w>visitserve</w>

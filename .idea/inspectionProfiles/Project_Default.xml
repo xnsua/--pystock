@@ -17,6 +17,7 @@
         <list>
           <option value="pathlib.PurePath.mkdir" />
           <option value="pathlib.PurePath.read_text" />
+          <option value="log_helper" />
         </list>
       </option>
     </inspection_tool>

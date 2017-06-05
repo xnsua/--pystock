@@ -31,7 +31,7 @@ class ModelBuyAfterDrop(AbstractModel):
 
     def log_account_info(self):
         try:
-            log_str = f'ACCOUNTINFO: ' \
+            log_str = f'ACCOUNT_INFO: ' \
                       f'Available: {self.account_manager.available}  ' \
                       f'ShareCount: {len(self.account_manager.share_items)}  ' \
                       f'EntrustCount: {len(self.account_manager.entrust_items)}  '
@@ -55,6 +55,9 @@ class ModelBuyAfterDrop(AbstractModel):
         assert all(df.open)
 
     def handle_bar(self, df: pdDF):
+        #        open    yclose  price  high   low   name
+        # 510900  1.152   1.145  1.151  1.157  1.149  H股ETF
+        # 510050  2.490   2.490  2.472  2.494  2.466  50ETF
         self._push_times += 1
         mylog.info('On handle bar --------')
         oper = self._oper_dict.get(self._push_times, None)

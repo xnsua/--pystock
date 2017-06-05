@@ -24,10 +24,14 @@
       <w>hisentrust</w>
       <w>hisfinentrust</w>
       <w>infos</w>
+      <w>interop</w>
       <w>isbuy</w>
       <w>ksti</w>
       <w>lclose</w>
       <w>levelname</w>
+      <w>linq</w>
+      <w>luarsolarconverter</w>
+      <w>lunisolar</w>
       <w>mavailable</w>
       <w>mdrawable</w>
       <w>mfree</w>
@@ -52,6 +56,7 @@
       <w>rval</w>
       <w>save_pat</w>
       <w>sina</w>
+      <w>solor</w>
       <w>sqlite</w>
       <w>start_dat</w>
       <w>subdata</w>

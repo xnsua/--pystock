@@ -30,23 +30,38 @@ class AccountManager:
             message_box_error('Result data type not account info', repr(result_data))
 
     def _calc_need_push(self):
+        # fixme me. Remove checkitem that is finished.
+        # fixme Add unit test
         buy_item_code = [item.result.entrust_id for item in self._buy_oper
                          if item.result.success]
         sell_item_code = [item.result.entrust_id for item in self._sell_oper
                           if item.result.success]
         check_items = [item for item in self._account_info.entrust_items
                        if item.entrust_id in [*buy_item_code, *sell_item_code]]
+        entrust_items_codes = [item.entrust_id for item in self._account_info.entrust_items]
+        mylog.warn(
+            f'BuyItemCode:{buy_item_code}, SellItemCode:{sell_item_code}, entrustItemCode:{entrust_items_codes}')
         # The result is not refreshed
         if len(check_items) != (len(buy_item_code) + len(sell_item_code)):
-            mylog.notice(f'CheckItem len {len(check_items)} '
+            # toch
+            mylog.error(f'CheckItem len {len(check_items)} '
                          f'do not equal {len(buy_item_code)} + {len(sell_item_code)}')
             return True
         else:
+            mylog.notice(f'CheckItem len is the same')
             # The result is refreshed, find the unfinished item
-            unfinished_item = [item for item in check_items
-                               if item.entrust_status in [EntrustStatus.no_commit,
-                                                          EntrustStatus.partial_finished]]
-            if not len(unfinished_item):
+            unfinished_check_item = [item for item in check_items
+                                     if item.entrust_status in [EntrustStatus.no_commit,
+                                                                EntrustStatus.partial_finished]]
+            unfinished_item = [item for item in self._account_info.entrust_items if
+                               item.entrust_status in [
+                                   EntrustStatus.no_commit, EntrustStatus.partial_finished]]
+            untracted_items = [item for item in unfinished_item if
+                               item not in unfinished_check_item]
+
+            if untracted_items:
+                mylog.warn(f'Untracted items length:: {len(untracted_items)}')
+            if not unfinished_check_item:
                 self._buy_oper.clear()
                 self._sell_oper.clear()
 
@@ -57,18 +72,21 @@ class AccountManager:
             # mylog.info(f'On operation result: {oper_with_result}')
             if isinstance(oper_with_result, ClientOperQuery):
                 self._on_oper_query(oper_with_result)
-
+                self._need_push = self._calc_need_push()
             elif isinstance(oper_with_result, ClientOperBuy):
                 self._buy_oper.append(oper_with_result)
+                self._need_push = True
 
             elif isinstance(oper_with_result, ClientOperSell):
                 self._sell_oper.append(oper_with_result)
+                self._need_push = True
 
             elif isinstance(oper_with_result, ClientOperCancel):
-                pass
+                self._need_push = True
+
             else:
                 message_box_error('Invalid oper with result', oper_with_result)
-            self._need_push = self._calc_need_push()
+
             mylog.notice(
                 'Need client push....' if self._need_push else '** NOT ** need client push ...')
 

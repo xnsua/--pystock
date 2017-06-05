@@ -3,9 +3,9 @@ from statistics import mean
 
 from common.scipy_helper import pdDF
 from common_stock.stock_data_constants import etf_with_amount
+from common_stock.stock_day_bar_manager import DayBar
 from common_stock.trade_day import last_n_trade_day
-from data_manager.stock_day_bar_manager import DayBar
-from ip.st import ClientOperBuy, EntrustType, ClientOperCancel, EntrustWay
+from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell
 from project_helper.logbook_logger import mylog, jqd
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
@@ -24,9 +24,9 @@ class ModelBuyAfterDrop(AbstractModel):
         self.etf_dict = None
         self.etf_to_buy = None
 
-        self._push_times = 1
+        self._push_times = 0
         self._oper_dict = {
-            2: ClientOperBuy('SH.510900', 1.19, 100, EntrustType.FIXED_PRICE)
+            1: ClientOperSell('SH.510900', 1.23, 100, EntrustType.FIXED_PRICE)
         }
 
     def log_account_info(self):
@@ -37,6 +37,7 @@ class ModelBuyAfterDrop(AbstractModel):
                       f'EntrustCount: {len(self.account_manager.entrust_items)}  '
             mylog.info(log_str)
         except Exception as e:
+            # noinspection PyProtectedMember
             mylog.info(
                 f'*** There is NO account info {self.account_manager._account_info}, Exception: {e}')
 
@@ -55,7 +56,7 @@ class ModelBuyAfterDrop(AbstractModel):
 
     def handle_bar(self, df: pdDF):
         self._push_times += 1
-        mylog.info('On handle bar\n' + str(df))
+        mylog.info('On handle bar --------')
         oper = self._oper_dict.get(self._push_times, None)
         if oper:
             mylog.info(f'Send operation {oper}')
@@ -64,12 +65,12 @@ class ModelBuyAfterDrop(AbstractModel):
             assert oper.result.success
             # noinspection PyAttributeOutsideInit
             self.entrust_id = oper.result.entrust_id
-            jqd('self.entrust_id:::\n', self.entrust_id)
+            jqd('self.entrust_id:::', self.entrust_id)
         else:
             if hasattr(self, 'entrust_id'):
                 result = self.context.send_oper(
-                    ClientOperCancel(self.entrust_id, 'SH.510900', EntrustWay.way_buy))
-                mylog.notice(result.__dict__)
+                    ClientOperCancel(self.entrust_id, 'SH.510900', EntrustWay.way_sell))
+                mylog.warn(f'Cancel result {result.__dict__}')
                 del self.entrust_id
 
 

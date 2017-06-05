@@ -76,6 +76,9 @@ def dt_from_time(a, b, c):
     return datetime.datetime.combine(dt_today(), datetime.time(a, b, c))
 
 
+def dt_combine(date, time):
+    return datetime.datetime.combine(date, time)
+
 def dt_day_delta(n):
     return datetime.timedelta(days=n)
 

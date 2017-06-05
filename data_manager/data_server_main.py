@@ -5,8 +5,8 @@ import pandas
 
 from common.helper import dt_now_time
 from common_stock.stock_data_constants import etf_with_amount
-from data_manager.stock_querier import sina_api
-from project_helper.logbook_logger import mylog, jqd
+from common_stock.stock_querier import sina_api
+from project_helper.logbook_logger import mylog
 from trading.base_structure.trade_constants import TradeId, trade_bid_end_time, trade2_end_time, \
     MsgPushStocks, MsgAddPushStocks, MsgBidOver, MsgQuitLoop, trade1_end_time, trade2_begin_time
 from trading.base_structure.trade_message import TradeMessage
@@ -60,7 +60,6 @@ class DataServer:
             mylog.info(' ********  Try push *********')
 
         bid_over_result = self._is_bid_over()
-        jqd('bid_over_result:::\n', bid_over_result.__dict__)
         if not bid_over_result.has_bid_over:
             return
 

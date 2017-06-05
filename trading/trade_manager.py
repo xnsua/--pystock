@@ -44,7 +44,7 @@ class TradeManager:
 
         def thread_data_server():
             data_server = DataServer(self.trade_context,
-                                     push_time_interval=datetime.timedelta(seconds=3))
+                                     push_time_interval=datetime.timedelta(seconds=2))
             data_server.run_loop()
 
         data_server_thread = threading.Thread(target=thread_data_server)
@@ -99,6 +99,7 @@ class TradeManager:
     def handle_msgs(self):
         while 1:
             try:
+                # Haitong do not allow too fast operation
                 msg = self.self_queue.get(timeout=2)
             except queue.Empty:
                 self.do_when_idle()
@@ -150,5 +151,3 @@ if __name__ == '__main__':
     # with DateTimeManager(dt_from_time(9, 26, 0)):
     tes_begin_trade()
 
-
-    # fixme: auto refresh when there is buy or sell order.

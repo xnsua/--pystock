@@ -6,6 +6,7 @@ class Config:
         self.stock_data_dir = self.project_root.parent / 'py_stock_data'
 
         self.etf_day_data_dir = self.stock_data_dir / 'day/etf_data'
+        self.index_day_data_dir = self.stock_data_dir / 'day/index_data'
         self.stock_day_data__dir = self.stock_data_dir / 'day'
 
         self.shelve_path = self.project_root / 'shelve'  # type: Path

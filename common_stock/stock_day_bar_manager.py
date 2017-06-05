@@ -2,15 +2,18 @@ import datetime
 import pathlib as pl
 
 import pandas as pd
+import requests
+import tushare
 import tushare as ts
 
-from common.helper import ndays_later_from, ndays_ago_from
+from common.helper import ndays_later_from, ndays_ago_from, dt_day_delta
+from common.persistent_cache import PersistentCache
 from common.scipy_helper import pdDF
+from common.timing import time_this
 from common_stock.stock_data_constants import etf_with_amount
 from common_stock.trade_day import is_trade_day
 from project_helper.config_module import myconfig
 from project_helper.logbook_logger import mylog
-from project_helper.stock_shelve import myshelve, ShelveKey
 from trading.base_structure.trade_constants import stock_start_day
 
 
@@ -24,6 +27,14 @@ class DayBar:
         return filename
 
     @staticmethod
+    def _index_code_to_csv_filepath(index):
+        index = index.replace('SH.', '')
+        index = index.replace('SZ.', '')
+        path = myconfig.index_day_data_dir
+        filename = pl.Path(path) / (index + '.csv')
+        return filename
+
+    @staticmethod
     def _stock_code_to_csv_filepath(stock_code):
         stock_code = stock_code.replace('SH.', '')
         stock_code = stock_code.replace('SZ.', '')
@@ -32,7 +43,7 @@ class DayBar:
         return filename
 
     @staticmethod
-    def _update_k_data(stock_code: str, filename):
+    def _update_k_data(stock_code: str, filename, index=False):
         try:
             df_read = pd.read_csv(filename, index_col='date')
             last_date = datetime.datetime.strptime(df_read.index.values[-1:][0],
@@ -51,7 +62,8 @@ class DayBar:
             return df_read
         if now.date() == query_start_date and now.hour < 16:
             return df_read
-        df_update = ts.get_k_data(stock_code, start=str(query_start_date))
+        print(f'Updating using web for {stock_code}')
+        df_update = ts.get_k_data(stock_code, start=str(query_start_date), index=index)
         df_update.set_index('date', inplace=True)
         df_concat = pd.concat([df_read, df_update],
                               ignore_index=False)  # type: pdDF
@@ -64,6 +76,12 @@ class DayBar:
         return cls._update_k_data(stock_code, filename)
 
     @classmethod
+    def update_index_data(cls, index):
+        filename = cls._etf_code_to_csv_filepath(index)
+        return cls._update_k_data(index, filename, index=True)
+
+    @classmethod
+    @time_this
     def update_stock_day_data(cls, stock_code):
         filename = cls._stock_code_to_csv_filepath(stock_code)
         return cls._update_k_data(stock_code, filename)
@@ -78,30 +96,56 @@ class DayBar:
         return df_read
 
 
-def update_day_bar_etf_amount():
-    print('--------------  Updating day bar of etf amount  ---------------------')
-    try:
-        for etf in etf_with_amount:
-            DayBar.update_etf_day_data(etf)
-    except Exception:
-        mylog.exception('Update etf day data failed')
-        return False
+class DayBarUpdater:
+    @classmethod
+    @PersistentCache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    def update_etfs_with_amount(cls):
+        try:
+            for code in etf_with_amount:
+                DayBar.update_etf_day_data(code)
+        except requests.exceptions.RequestException as e:
+            mylog.info(e)
+
+    @classmethod
+    @PersistentCache(cache_timedelta=dt_day_delta(100))
+    def update_sz50_component(cls):
+        df1 = tushare.get_sz50s()
+        code_dict = dict(zip(df1.code, df1.name))
+        return code_dict
+
+    @classmethod
+    @PersistentCache(cache_timedelta=dt_day_delta(100))
+    def update_hs300_component(cls):
+        df2 = tushare.get_hs300s()
+        code_dict = dict(zip(df2.code, df2.name))
+        return code_dict
+
+    @classmethod
+    @PersistentCache(cache_timedelta=dt_day_delta(100))
+    def update_zz500_component(cls):
+        df3 = tushare.get_zz500s()
+        code_dict = dict(zip(df3.code, df3.name))
+        return code_dict
+
+    @classmethod
+    @PersistentCache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    def update_800(cls):
+        d50 = cls.update_sz50_component()
+        d300 = cls.update_hs300_component()
+        d500 = cls.update_zz500_component()
+        d50.update(d300)
+        d50.update(d500)
+        for code in d50:
+            DayBar.update_stock_day_data(code)
+
+    @classmethod
+    @PersistentCache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    def update_all(cls):
+        cls.update_800()
+        cls.update_etfs_with_amount()
 
 
-def _need_update_day_bar(last_update, now):
-    base_time = datetime.datetime(1990, 1, 1, 17, 0, 0)
-    delta1 = last_update - base_time
-    delta2 = now - base_time
-    return delta2.days > delta1.days
-
-
-def try_update_day_bar():
-    key = ShelveKey.day_bar_history_datetime
-    if key in myshelve and not _need_update_day_bar(myshelve[key],
-                                                    datetime.datetime.now()):
-        return
-    update_day_bar_etf_amount()
-    myshelve[key] = datetime.datetime.now()
-
-
-try_update_day_bar()
+# PersistentCache.clear_cache()
+# PersistentCache.print_cache_data()
+val = DayBarUpdater.update_all()
+# DayBarUpdater.update_etfs_with_amount()

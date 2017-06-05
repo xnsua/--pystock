@@ -1,3 +1,3 @@
-import data_manager.stock_day_bar_manager
+import common_stock.stock_day_bar_manager
 
-shdd = data_manager.stock_day_bar_manager
+shdd = common_stock.stock_day_bar_manager

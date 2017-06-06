@@ -25,9 +25,9 @@ class _PersistentDescriptorBase:
         self._has_read = False
 
     def __get__(self, instance, owner):
-        print('get')
         if not self._has_read:
             self.value = self._db.get(self.identifier, None)
+            self._has_read = True
         return self.value
 
     def __set__(self, instance, value):

@@ -1,17 +1,24 @@
 import datetime
+import pathlib
 from statistics import mean
+from typing import List
 
+from common.persistent_descriptor import create_persistent_descriptor_class
 from common.scipy_helper import pdDF
 from common_stock.stock_data_constants import etf_with_amount
 from common_stock.stock_day_bar_manager import DayBar
 from common_stock.trade_day import last_n_trade_day
+from ip.st import EntrustItem
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell
 from project_helper.logbook_logger import mylog, jqd
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
+persistent_descriptor = create_persistent_descriptor_class(
+    str(pathlib.Path(pathlib.Path(__file__).parent) / 'model_buy_after_drop'))
 
 class ModelBuyAfterDrop(AbstractModel):
+    buy_entrust = persistent_descriptor('buy_entrust')  # type: List[EntrustItem]
     @classmethod
     def name(cls):
         return '__MODEL_BAD'
@@ -58,7 +65,9 @@ class ModelBuyAfterDrop(AbstractModel):
         #        open    yclose  price  high   low   name
         # 510900  1.152   1.145  1.151  1.157  1.149  H股ETF
         # 510050  2.490   2.490  2.472  2.494  2.466  50ETF
+
         self._push_times += 1
+        if self._push_times / 20 ==
         mylog.info('On handle bar --------')
         oper = self._oper_dict.get(self._push_times, None)
         if oper:
@@ -75,7 +84,6 @@ class ModelBuyAfterDrop(AbstractModel):
                     ClientOperCancel(self.entrust_id, 'SH.510900', EntrustWay.way_sell))
                 mylog.warn(f'Cancel result {result.__dict__}')
                 del self.entrust_id
-
 
 
 def is_buy(df: pdDF, now):

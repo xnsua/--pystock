@@ -7,7 +7,7 @@ import tushare
 import tushare as ts
 
 from common.helper import ndays_later_from, ndays_ago_from, dt_day_delta
-from common.persistent_cache import PersistentCache
+from common.persistent_cache import _PersistentCacheBase
 from common.scipy_helper import pdDF
 from common.timing import time_this
 from common_stock.stock_data_constants import etf_with_amount
@@ -98,7 +98,7 @@ class DayBar:
 
 class DayBarUpdater:
     @classmethod
-    @PersistentCache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    @_PersistentCacheBase(day_boundary=datetime.time(17, 0, 0), cache_days=1)
     def update_etfs_with_amount(cls):
         try:
             for code in etf_with_amount:
@@ -107,28 +107,28 @@ class DayBarUpdater:
             mylog.info(e)
 
     @classmethod
-    @PersistentCache(cache_timedelta=dt_day_delta(100))
+    @_PersistentCacheBase(cache_timedelta=dt_day_delta(100))
     def update_sz50_component(cls):
         df1 = tushare.get_sz50s()
         code_dict = dict(zip(df1.code, df1.name))
         return code_dict
 
     @classmethod
-    @PersistentCache(cache_timedelta=dt_day_delta(100))
+    @_PersistentCacheBase(cache_timedelta=dt_day_delta(100))
     def update_hs300_component(cls):
         df2 = tushare.get_hs300s()
         code_dict = dict(zip(df2.code, df2.name))
         return code_dict
 
     @classmethod
-    @PersistentCache(cache_timedelta=dt_day_delta(100))
+    @_PersistentCacheBase(cache_timedelta=dt_day_delta(100))
     def update_zz500_component(cls):
         df3 = tushare.get_zz500s()
         code_dict = dict(zip(df3.code, df3.name))
         return code_dict
 
     @classmethod
-    @PersistentCache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    @_PersistentCacheBase(day_boundary=datetime.time(17, 0, 0), cache_days=1)
     def update_800(cls):
         d50 = cls.update_sz50_component()
         d300 = cls.update_hs300_component()
@@ -139,7 +139,7 @@ class DayBarUpdater:
             DayBar.update_stock_day_data(code)
 
     @classmethod
-    @PersistentCache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    @_PersistentCacheBase(day_boundary=datetime.time(17, 0, 0), cache_days=1)
     def update_all(cls):
         cls.update_800()
         cls.update_etfs_with_amount()

@@ -38,13 +38,16 @@ class TradeManager:
         self.trade_context = self.init_trade_context()
         self.account_manager = self.trade_context.account_manager
 
+        self.data_push_time_interval = datetime.timedelta(seconds=2)
+        self.client_push_time_interval = datetime.timedelta(seconds=2)
+
         self.threads = {}  # type: Dict[threading.Thread, str]
 
     def start_threads(self):
 
         def thread_data_server():
             data_server = DataServer(self.trade_context,
-                                     push_time_interval=datetime.timedelta(seconds=2))
+                                     push_time_interval=self.data_push_time_interval)
             data_server.run_loop()
 
         data_server_thread = threading.Thread(target=thread_data_server)
@@ -100,7 +103,8 @@ class TradeManager:
         while 1:
             try:
                 # Haitong do not allow too fast operation
-                msg = self.self_queue.get(timeout=2)
+                interval = self.client_push_time_interval.total_seconds()
+                msg = self.self_queue.get(timeout=interval)
             except queue.Empty:
                 self.do_when_idle()
                 continue

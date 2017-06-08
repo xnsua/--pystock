@@ -63,6 +63,7 @@ class CacheDatabase:
         return result_dict
 
     def update(self, key, value):
+        key = key.replace("'", "''")
         value = str(value)
         value = value.replace("'", "''")
         time_str = str(dt.datetime.now())

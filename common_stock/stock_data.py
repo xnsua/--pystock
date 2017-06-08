@@ -1,3 +1,5 @@
+from common_stock.stock_querier import sina_api
+
 stock_in_etf50 = ['600000', '600016', '600028', '600029',
                   '600030', '600036', '600048', '600050',
                   '600100', '600104', '600109', '600111',
@@ -29,3 +31,5 @@ etf_t1 = ['sh510010', 'sh510020', 'sh510030', 'sh510050', 'sh510060',
 etf_with_amount = ['512000', '513100', '510360', '510510', '510330', '510180',
                    '510500', '510300', '510050', '510900', ]
 
+all_etf_sinacode_list = sina_api.get_etf_scode_list()
+all_etf_code_list = [val[2:] for val in all_etf_sinacode_list]

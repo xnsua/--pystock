@@ -6,9 +6,10 @@ from typing import Dict
 import pandas
 
 from data_manager.data_server_main import DataServer
+from ip.constants import ClientConstant
 from ip.st import ClientOperQuery, ClientOperBase
 from project_helper.logbook_logger import mylog
-from trading.base_structure.trade_constants import TradeId, kca_, MsgQuitLoop
+from trading.base_structure.trade_constants import TradeId, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.client_access import is_client_server_running, \
     fire_operation
@@ -79,7 +80,7 @@ class TradeManager:
 
     def query_account_info(self):
         if is_client_server_running():
-            query = ClientOperQuery(kca_.account_info)
+            query = ClientOperQuery(ClientConstant.account_info)
             result = fire_operation(query)
             query.result = result
             self.account_manager.on_operation_result(query)
@@ -127,7 +128,8 @@ class TradeManager:
 
     def do_when_idle(self):
         if self.account_manager.need_client_push:
-            self.trade_context.post_msg(TradeId.trade_manager, ClientOperQuery(kca_.account_info))
+            self.trade_context.post_msg(TradeId.trade_manager,
+                                        ClientOperQuery(ClientConstant.account_info))
 
 
 def main():

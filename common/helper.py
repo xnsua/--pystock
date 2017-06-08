@@ -1,11 +1,9 @@
 import datetime as datetime
 import os
 import re
-import sys
-import traceback
+
 
 # <editor-fold desc="FileAndDir">
-import psutil
 
 
 def is_file_outdated(path, span):
@@ -79,6 +77,7 @@ def dt_from_time(a, b, c):
 def dt_combine(date, time):
     return datetime.datetime.combine(date, time)
 
+
 def dt_day_delta(n):
     return datetime.timedelta(days=n)
 
@@ -115,14 +114,6 @@ def loop_for_seconds(func, seconds):
 # </editor-fold>
 
 # <editor-fold desc="Basic">
-def to_log_str(e):
-    if isinstance(e, Exception):
-        log_str = ''.join(traceback.format_tb(e.__traceback__))
-        log_str = log_str + str(e)
-        return f'Exception encountered: \n{log_str}'
-    raise Exception(f'Unsupported type {type(e)} value:{e}')
-
-
 def type_info(val):
     if type(val) == list:
         info = 'typeinfo:: list['
@@ -145,23 +136,4 @@ def type_info(val):
         info += '}'
         return info
 
-
 # </editor-fold>
-
-# noinspection PyBroadException
-def restart_program():
-    """Restarts the current program, with file objects and descriptors
-       cleanup
-    """
-    try:
-        p = psutil.Process(os.getpid())
-        for handler in p.open_files() + p.connections():
-            try:
-                os.close(handler.fd)
-            except Exception:
-                print('error')
-    except Exception:
-        pass
-
-    python = sys.executable
-    os.execl(python, python, *sys.argv)

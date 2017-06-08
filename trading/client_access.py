@@ -4,7 +4,7 @@ import jsonpickle
 
 from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
-from ip.constants import ClientHttpAccessConstant, kca_
+from ip.constants import ClientConstant
 from ip.st import ClientOperBuy, EntrustType, BuyResult, SellResult, ClientOperSell, \
     ClientOperQuery, AccountInfo, QueryResult, ShareItem, EntrustItem, ClientOperCancel, \
     EntrustWay, ErrorResult
@@ -13,7 +13,7 @@ from project_helper.logbook_logger import mylog
 jsonpickle.load_backend('simplejson')
 jsonpickle.set_encoder_options('simplejson', sort_keys=True, ensure_ascii=False)
 
-_c = ClientHttpAccessConstant
+_c = ClientConstant
 
 stock_server_address = 'http://127.0.0.1:8866'
 stock_server_operation_address = 'http://127.0.0.1:8866/operation'
@@ -75,7 +75,7 @@ def test_operation_sell():
 
 
 def test_operation_query_all():
-    query = ClientOperQuery(kca_.account_info)
+    query = ClientOperQuery(ClientConstant.account_info)
     result = fire_operation(query)
     print(result)
     assert isinstance(result, QueryResult)
@@ -83,7 +83,7 @@ def test_operation_query_all():
 
 
 def test_operation_query_myshare():
-    query = ClientOperQuery(kca_.myshare)
+    query = ClientOperQuery(ClientConstant.myshare)
     result = fire_operation(query)
     print(result)
     assert isinstance(result, QueryResult)
@@ -93,7 +93,7 @@ def test_operation_query_myshare():
 
 
 def test_operation_query_dayentrust():
-    query = ClientOperQuery(kca_.dayentrust)
+    query = ClientOperQuery(ClientConstant.dayentrust)
     result = fire_operation(query)
     # print(result)
     assert isinstance(result, QueryResult)

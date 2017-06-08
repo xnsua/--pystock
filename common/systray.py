@@ -242,7 +242,6 @@ if __name__ == '__main__':
     icons = itertools.cycle(glob.glob('*.ico'))
     hover_text = "WebCrawler"
 
-
     # noinspection PyPep8Naming,PyUnusedLocal
     def hello(sysTrayIcon):
         print('hello')
@@ -265,7 +264,6 @@ if __name__ == '__main__':
                                                  ('Switch Icon', next(icons), switch_icon),
                                                  ))
                     )
-
 
     # noinspection PyPep8Naming,PyUnusedLocal
     def bye(sysTrayIcon):

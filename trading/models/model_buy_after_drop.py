@@ -1,24 +1,40 @@
 import datetime
-import pathlib
+from random import choice
 from statistics import mean
-from typing import List
 
-from common.persistent_descriptor import create_persistent_descriptor_class
+from common.helper import dt_today, dt_now
+from common.key_value_db import KeyValueDb
 from common.scipy_helper import pdDF
-from common_stock.stock_data_constants import etf_with_amount
-from common_stock.stock_day_bar_manager import DayBar
+from common_stock.stock_data import etf_with_amount
 from common_stock.trade_day import last_n_trade_day
-from ip.st import EntrustItem
-from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell
-from project_helper.logbook_logger import mylog, jqd
+from data_manager.stock_day_bar_manager import DayBar
+from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
+from project_helper.logbook_logger import mylog
+from trading.client_access import fire_operation
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
-persistent_descriptor = create_persistent_descriptor_class(
-    str(pathlib.Path(pathlib.Path(__file__).parent) / 'model_buy_after_drop'))
+
+class BadData:
+    def __init__(self, path):
+        self.db = KeyValueDb(path)
+        self.opers = []
+        self.entrusts = []
+        self.key = str(dt_today())
+
+    def add_operation(self, oper):
+        self.opers.append((oper, dt_now()))
+        self.db[self.key] = (self.opers, self.entrusts)
+
+    def add_entrusts(self, entrust):
+        self.opers.append((entrust, dt_now()))
+        self.db[self.key] = (self.opers, self.entrusts)
+
+    def query_operation(self):
+        return [oper[0] for oper in self.opers]
+
 
 class ModelBuyAfterDrop(AbstractModel):
-    buy_entrust = persistent_descriptor('buy_entrust')  # type: List[EntrustItem]
     @classmethod
     def name(cls):
         return '__MODEL_BAD'
@@ -32,9 +48,8 @@ class ModelBuyAfterDrop(AbstractModel):
         self.etf_to_buy = None
 
         self._push_times = 0
-        self._oper_dict = {
-            1: ClientOperSell('SH.510900', 1.23, 100, EntrustType.FIXED_PRICE)
-        }
+
+        self.db = BadData('model_buy_after_drop.sqlite')
 
     def log_account_info(self):
         try:
@@ -65,25 +80,52 @@ class ModelBuyAfterDrop(AbstractModel):
         #        open    yclose  price  high   low   name
         # 510900  1.152   1.145  1.151  1.157  1.149  H股ETF
         # 510050  2.490   2.490  2.472  2.494  2.466  50ETF
+        mylog.info('On handle bar --------')
 
         self._push_times += 1
-        if self._push_times / 20 ==
-        mylog.info('On handle bar --------')
-        oper = self._oper_dict.get(self._push_times, None)
-        if oper:
-            mylog.info(f'Send operation {oper}')
-            self.context.send_oper(oper)
-            mylog.info(f'Operation result', oper.result)
-            assert oper.result.success
-            # noinspection PyAttributeOutsideInit
-            self.entrust_id = oper.result.entrust_id
-            jqd('self.entrust_id:::', self.entrust_id)
-        else:
-            if hasattr(self, 'entrust_id'):
-                result = self.context.send_oper(
-                    ClientOperCancel(self.entrust_id, 'SH.510900', EntrustWay.way_sell))
-                mylog.warn(f'Cancel result {result.__dict__}')
-                del self.entrust_id
+        if self._push_times / 20 != 1:
+            return
+        mylog.notice('On handle bar operation')
+        prices1 = [val / 1000 + df.price[0] for val in range(-5, 5)]
+        prices2 = [val / 1000 + df.price[1] for val in range(-5, 5)]
+        stock_price = [(df.index[0], prices1), (df.index[1], prices2)]
+
+        def select_price_code():
+            sp = choice(stock_price)
+            price = choice(sp[1])
+            return sp[0], price
+
+        def buy_stock():
+            mylog.notice('Begin buy operation .........')
+            stock_code, price = select_price_code()
+            oper_buy = ClientOperBuy(stock_code, price, 100, EntrustType.FIXED_PRICE)
+            fire_operation(oper_buy)
+            self.db.add_operation(oper_buy)
+
+        def sell_stock():
+            mylog.notice('Begin sell operation .........')
+            stock_code, price = select_price_code()
+            oper_sell = ClientOperSell(stock_code, price, 100, EntrustType.FIXED_PRICE)
+            fire_operation(oper_sell)
+            self.db.add_operation(oper_sell)
+
+        def cancel_operation():
+            mylog.notice('Begin cancel operation .........')
+            oper = choice(self.db.query_operation())
+            if isinstance(oper, ClientOperBuy) and oper.result.success:
+                cancel_oper = ClientOperCancel(oper.result.entrust_id, oper.stock_code,
+                                               EntrustWay.way_buy)
+            elif isinstance(oper, ClientOperSell) and oper.result.success:
+                cancel_oper = ClientOperCancel(oper.result.entrust_id, oper.stock_code,
+                                               EntrustWay.way_sell)
+            else:
+                return
+            fire_operation(cancel_oper)
+            self.db.add_operation(cancel_oper)
+
+        func_list = [buy_stock, sell_stock, cancel_operation]
+        func = choice(func_list)
+        func()
 
 
 def is_buy(df: pdDF, now):

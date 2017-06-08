@@ -30,6 +30,7 @@ def time_all_class_methods(cls):
             else:
                 return x
             x = self.oInstance.__getattribute__(s)
+            # noinspection PyPep8
             if type(x) == type(self.__init__):  # it is an instance method
                 return time_this(
                     x)  # this is equivalent of just decorating the method with time_this
@@ -43,7 +44,8 @@ def time_all_class_methods(cls):
 
 @time_all_class_methods
 class Foo(object):
-    def foo(self):
+    @staticmethod
+    def foo():
         print("entering a")
         import time
         time.sleep(3)

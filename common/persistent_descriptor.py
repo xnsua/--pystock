@@ -1,6 +1,7 @@
 import atexit
 import pathlib
-import shelve
+
+from common.key_value_db import KeyValueDb
 
 
 class _PersistentDescriptorBase:
@@ -14,7 +15,7 @@ class _PersistentDescriptorBase:
         cls._db_path = file_path
         pathlib.Path(pathlib.Path(file_path).parent).mkdir(parents=True, exist_ok=True)
 
-        cls._db = shelve.open(file_path)
+        cls._db = KeyValueDb(file_path)
         atexit.register(lambda: cls._db.close())
         cls._write_every_time = write_every_time
 

@@ -2,7 +2,7 @@ import threading
 from typing import List
 
 from common.alert import message_box_error
-from ip.constants import kca_
+from ip.constants import ClientConstant
 from ip.st import AccountInfo, ClientOperBase, QueryResult, BuyResult, SellResult, \
     EntrustStatus, ClientOperCancel, ClientOperQuery, EntrustItem, EntrustType
 from ip.st import ClientOperBuy
@@ -120,7 +120,7 @@ def test_cal_push():
     entrust_item1.entrust_id = 'buy_id1'
     entrust_item1.entrust_status = EntrustStatus.no_commit
     account_info.entrust_items = [entrust_item1]
-    client_oper_query_all = ClientOperQuery(info_type=kca_.account_info)
+    client_oper_query_all = ClientOperQuery(info_type=ClientConstant.account_info)
     client_oper_query_all.result = QueryResult(True, account_info)
     account_manager.on_operation_result(client_oper_query_all)
     assert account_manager.need_client_push

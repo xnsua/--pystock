@@ -1,9 +1,9 @@
 import datetime as dt
 
-import pandas as pd
+import tushare
 
 from common.helper import dt_today
-from project_helper.config_module import myconfig
+from common_stock.stock_config import stock_cache_one_month
 
 
 class TradeDay:
@@ -11,10 +11,12 @@ class TradeDay:
         self.df = self.read_df()
         self.date_map = self.build_date_map()
 
-    def read_df(self):
-        # path = plPath(__file__).parent / 'trade_day.csv'
-        path = myconfig.project_root / 'common_stock/trade_day.csv'
-        return pd.read_csv(str(path), index_col='index')
+    @staticmethod
+    @stock_cache_one_month
+    def read_df():
+        # path = pathlib.Path(__file__).parent / 'trade_day.csv'
+        # return pd.read_csv(str(path), index_col='index')
+        return tushare.trade_cal()
 
     def build_date_map(self):
         date_map = {}
@@ -45,4 +47,4 @@ last_n_trade_day = _trade_day.last_n_trade_day
 
 
 def test():
-    print(last_n_trade_day(dt_today(), 3))
+    print(last_n_trade_day(dt_today(), 5))

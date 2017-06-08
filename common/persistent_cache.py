@@ -2,12 +2,12 @@ import atexit
 import datetime
 import os
 import pathlib
-import shelve
 import time
 from unittest.case import TestCase
 
 from common.datetime_manager import DateTimeManager
 from common.helper import dt_now, dt_from_time, dt_combine
+from common.key_value_db import KeyValueDb
 
 
 class _PersistentCacheBase:
@@ -20,7 +20,8 @@ class _PersistentCacheBase:
         cls._db_path = file_path
         pathlib.Path(pathlib.Path(file_path).parent).mkdir(parents=True, exist_ok=True)
 
-        cls._db = shelve.open(file_path)
+        # cls._db = shelve.open(file_path)
+        cls._db = KeyValueDb(file_path)
         atexit.register(lambda: cls._db.close())
 
     def __init__(self, cache_timedelta=None, day_boundary: datetime.time = None, cache_days=None):
@@ -76,14 +77,16 @@ class TestFileCache(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        for path in pathlib.Path().glob('__test_cache__.*'):
+        for path in pathlib.Path().glob('__test_cache__*'):
             os.remove(path)
         TestFileCache.p_cache = create_persistent_cache('__test_cache__')
 
     @classmethod
     def tearDownClass(cls):
-        for path in pathlib.Path().glob('__test_cache__.*'):
+        TestFileCache.p_cache._db.close()
+        for path in pathlib.Path().glob('__test_cache__*'):
             os.remove(path)
+        pass
 
     def test_file_cache1(self):
         @TestFileCache.p_cache(cache_timedelta=datetime.timedelta(seconds=1))

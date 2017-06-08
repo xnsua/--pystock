@@ -4,11 +4,14 @@ import queue
 import pandas
 
 from common.helper import dt_now_time
-from common_stock.stock_data_constants import etf_with_amount
+from common.scipy_helper import pdDF
+from common_stock.common_stock_helper import trade_bid_end_time, trade1_end_time, \
+    trade2_begin_time, trade2_end_time
+from common_stock.stock_data import etf_with_amount
 from common_stock.stock_querier import sina_api
 from project_helper.logbook_logger import mylog
-from trading.base_structure.trade_constants import TradeId, trade_bid_end_time, trade2_end_time, \
-    MsgPushStocks, MsgAddPushStocks, MsgBidOver, MsgQuitLoop, trade1_end_time, trade2_begin_time
+from trading.base_structure.trade_constants import TradeId, MsgPushStocks, MsgAddPushStocks, \
+    MsgBidOver, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
 
@@ -74,13 +77,13 @@ class DataServer:
         assert isinstance(msg.operation, MsgAddPushStocks)
         self._monitored_stock_map[msg.sender] = msg.operation.stock_list
 
-    def update_realtime_stock_info(self):
+    def update_realtime_stock_info(self) -> pdDF:
         stock_list = []
         for k, v in self._monitored_stock_map.items():
             stock_list.extend(v)
 
         if not stock_list:
-            return None
+            return pdDF()
         try:
             self._df_realtime_stock_info = sina_api.get_realtime_stock_info(stock_list)
         except:

@@ -364,9 +364,9 @@ class EntrustItem(ObjectWithRepr):
 
             time_str = val[i_entrust_time]
             if len(time_str) < 6: time_str = '0' + time_str
-            time = datetime.time(
+            time_ = datetime.time(
                 *map(int, [time_str[i:i + 2] for i in range(0, len(time_str), 2)]))
-            s_item.entrust_dt = datetime.datetime.combine(datetime.date.today(), time)
+            s_item.entrust_dt = datetime.datetime.combine(datetime.date.today(), time_)
             s_item.cost_price = float_default_zero(val[i_cost_price])
             s_item.entrust_price = float_default_zero(val[i_entrust_price])
             s_item.entrust_status = EntrustStatus.from_string(val[i_entrust_status])

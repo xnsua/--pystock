@@ -3,7 +3,7 @@ import datetime as dt
 _memory_cache = {}
 
 
-def cache(cache_time_delta):
+def memory_cache(cache_time_delta):
     def cache_decorator(func):
         def func_wrapper(*args, **kwargs):
             cache_key = (func.__name__, args, frozenset(kwargs.items()))

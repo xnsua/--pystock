@@ -1,4 +1,4 @@
-class ClientHttpAccessConstant:
+class ClientConstant:
     account_info = 'account_info'
     myshare = 'myshare'
     dayentrust = 'dayentrust'
@@ -9,4 +9,3 @@ class ClientHttpAccessConstant:
     deliveryentrust = 'deliveryentrust'
 
 
-kca_ = ClientHttpAccessConstant

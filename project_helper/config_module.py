@@ -1,9 +1,7 @@
 from pathlib import Path
 
-from common.persistent_cache import create_persistent_cache
 
-
-class Config:
+class MyConfig:
     def __init__(self):
         self.project_root = Path(__file__).parent.parent
 
@@ -17,8 +15,8 @@ class Config:
         self.shelve_path = self.project_root / 'shelve'  # type: Path
         self.shelve_path.mkdir(parents=True, exist_ok=True)
 
-myconfig = Config()
-stock_cache = create_persistent_cache(myconfig.stock_cache_dir / 'cache')
+
+myconfig = MyConfig()
 
 if __name__ == '__main__':
     pass

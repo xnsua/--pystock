@@ -1,4 +1,3 @@
-import datetime
 import re
 
 from common.scipy_helper import pdDF
@@ -50,13 +49,12 @@ pd.set_option('precision', 5)
 
 
 def main():
-    s_time = datetime.datetime.now()
-    get_etf_scode_list()
-    print(datetime.datetime.now() - s_time)
-    # ret = get_realtime_stock_info('sh' + v for v in ['510900'])
-    # print(dt_now())
-    # print(ret.dtypes)
-    # print(ret.ix[0, 'price'])
+    # s_time = datetime.datetime.now()
+    # get_etf_scode_list()
+    # print(datetime.datetime.now() - s_time)
+    ret = get_realtime_stock_info('sh' + v for v in ['510900'])
+    print(ret.dtypes)
+    print(type(ret.price[0]))
 
 
 if __name__ == '__main__':

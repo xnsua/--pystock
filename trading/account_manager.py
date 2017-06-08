@@ -35,7 +35,7 @@ class AccountManager:
         buy_entrust_ids = {item.result.entrust_id for item in self._buy_oper}
         sell_entrust_ids = {item.result.entrust_id for item in self._sell_oper}
 
-        if (buy_entrust_ids | sell_entrust_ids) < entrusts_ids:
+        if (buy_entrust_ids | sell_entrust_ids) > entrusts_ids:
             mylog.error(f'Id missing in entrust items. buyids:{buy_entrust_ids}'
                         f'sellids: {sell_entrust_ids}, entrust_ids: {entrusts_ids}')
 
@@ -44,8 +44,8 @@ class AccountManager:
         unfinished_ids = {item.entrust_id for item in entrusts
                           if item.entrust_status in status_unfinished}
 
-        if not unfinished_ids < (buy_entrust_ids | sell_entrust_ids):
-            mylog.error(f'Untracted entrust')
+        if not unfinished_ids > (buy_entrust_ids | sell_entrust_ids):
+            mylog.warn(f'Untracted entrust')
 
         # Remove finished items from buy oper and sell oper
         self._buy_oper = [item for item in self._buy_oper if

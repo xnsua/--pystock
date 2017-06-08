@@ -3,14 +3,14 @@ import queue
 
 import pandas
 
-from common.helper import dt_now_time
 from common.scipy_helper import pdDF
 from common_stock.common_stock_helper import trade_bid_end_time, trade1_end_time, \
     trade2_begin_time, trade2_end_time
 from common_stock.stock_data import etf_with_amount
 from common_stock.stock_querier import sina_api
 from project_helper.logbook_logger import mylog
-from trading.base_structure.trade_constants import TradeId, MsgPushStocks, MsgAddPushStocks, \
+from trading.base_structure.trade_constants import TradeId, MsgPushRealTimePrice, \
+    MsgAddRealTimeStocks, \
     MsgBidOver, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
@@ -56,11 +56,12 @@ class DataServer:
         return True
 
     def push_all(self):
-        if not self._is_in_push_time(dt_now_time()):
-            mylog.info('***** NOT ***** in push time ...')
-            return
-        else:
-            mylog.info(' ********  Try push *********')
+        # toch
+        # if not self._is_in_push_time(dt_now_time()):
+        #     mylog.info('***** NOT ***** in push time ...')
+        #     return
+        # else:
+        #     mylog.info(' ********  Try push *********')
 
         bid_over_result = self._is_bid_over()
         if not bid_over_result.has_bid_over:
@@ -71,10 +72,10 @@ class DataServer:
             if bid_over_result.first_bid_over:
                 self.trade_context.post_msg(sender, MsgBidOver(df))
             else:
-                self.trade_context.post_msg(sender, MsgPushStocks(df))
+                self.trade_context.post_msg(sender, MsgPushRealTimePrice(df))
 
     def on_add_push_stock(self, msg: TradeMessage):
-        assert isinstance(msg.operation, MsgAddPushStocks)
+        assert isinstance(msg.operation, MsgAddRealTimeStocks)
         self._monitored_stock_map[msg.sender] = msg.operation.stock_list
 
     def update_realtime_stock_info(self) -> pdDF:
@@ -129,7 +130,7 @@ class DataServer:
             return False
 
     def dispatch_msg(self, msg: TradeMessage):
-        if isinstance(msg.operation, MsgAddPushStocks):
+        if isinstance(msg.operation, MsgAddRealTimeStocks):
             msg.try_put_result(self.on_add_push_stock(msg))
         else:
             mylog.error(f'Can not dispatch msg {msg}')

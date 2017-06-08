@@ -37,6 +37,7 @@ def _visit_client_server(url_args, headers, timeout=5):
 
 def fire_operation(oper):
     order_str = jsonpickle.dumps(oper)
+    mylog.warn(repr(oper))
     order_str = order_str.strip()
     result = _visit_client_server(
         {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str})

@@ -7,8 +7,9 @@ from typing import List
 from common.alert import message_box_error
 from common.base_functions import ObjectWithIndentRepr, ObjectWithRepr
 from common.numeric import float_default_zero
-
 # noinspection PyBroadException
+from common_stock.common_stock_helper import stock_code_to_tdxserver_code
+
 try:
     # noinspection PyUnresolvedReferences
     from log_helper import mylog
@@ -60,7 +61,7 @@ class ClientOperBuy(ClientOperBase):
     def __init__(self, stock_code: str, price: float, number: int,
                  entrust_type: EntrustType):
         super().__init__()
-        self.stock_code = stock_code
+        self.stock_code = stock_code_to_tdxserver_code(stock_code)
         self.price = price
         self.amount = number
         self.entrust_type = entrust_type
@@ -72,7 +73,7 @@ class ClientOperSell(ClientOperBase):
     def __init__(self, stock_code: str, price: float, number: int,
                  entrust_type: EntrustType):
         super().__init__()
-        self.stock_code = stock_code
+        self.stock_code = stock_code_to_tdxserver_code(stock_code)
         self.price = price
         self.amount = number
         self.entrust_type = entrust_type
@@ -84,7 +85,7 @@ class ClientOperCancel(ClientOperBase):
     def __init__(self, entrust_id, stock_code, way):
         super().__init__()
         self.entrust_id = entrust_id
-        self.stock_code = stock_code
+        self.stock_code = stock_code_to_tdxserver_code(stock_code)
         self.way = way
 
         self.result = None  # type:CancelEntrustResult

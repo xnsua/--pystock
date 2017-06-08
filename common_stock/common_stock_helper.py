@@ -38,7 +38,7 @@ def stock_symbol_to_pure_stock_code(code):
     return val
 
 
-def stock_to_tdxserver_symbol(code):
+def stock_code_to_tdxserver_code(code):
     code = stock_symbol_to_pure_stock_code(code)
     symbol = _code_to_symbol(code)
     symbol = symbol.replace('sh', 'SH.')

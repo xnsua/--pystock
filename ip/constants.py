@@ -7,5 +7,3 @@ class ClientConstant:
     hisfinentrust = 'hisfinentrust'
     moneymovement = 'moneymovement'
     deliveryentrust = 'deliveryentrust'
-
-

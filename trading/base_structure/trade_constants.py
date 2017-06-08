@@ -9,12 +9,12 @@ class MsgBidOver(ObjectWithIndentRepr):
         self.stocks = stocks  # type: pdDF
 
 
-class MsgPushStocks(ObjectWithIndentRepr):
+class MsgPushRealTimePrice(ObjectWithIndentRepr):
     def __init__(self, stocks):
         self.stocks = stocks  # type: pdDF
 
 
-class MsgAddPushStocks(ObjectWithIndentRepr):
+class MsgAddRealTimeStocks(ObjectWithIndentRepr):
     def __init__(self, stock_list):
         self.stock_list = stock_list  # type: List
 

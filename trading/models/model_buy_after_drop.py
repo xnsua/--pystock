@@ -1,4 +1,3 @@
-import datetime
 from random import choice
 from statistics import mean
 
@@ -10,7 +9,6 @@ from common_stock.trade_day import last_n_trade_day
 from data_manager.stock_day_bar_manager import DayBar
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
 from project_helper.logbook_logger import mylog
-from trading.client_access import fire_operation
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
@@ -69,7 +67,8 @@ class ModelBuyAfterDrop(AbstractModel):
         self.etf_to_buy = ['510900', '510050']
         self.context.add_push_stock(self.etf_to_buy)
         self.etf_dict = read_df_dict(self.etf_code_range)
-        self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())
+        # toch
+        # self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())
 
     def on_bid_over(self, df: pdDF):
         self.log_account_info()
@@ -83,8 +82,10 @@ class ModelBuyAfterDrop(AbstractModel):
         mylog.info('On handle bar --------')
 
         self._push_times += 1
-        if self._push_times / 20 != 1:
-            return
+        if self._push_times / 2 != 1:
+            # toch
+            pass
+            # return
         mylog.notice('On handle bar operation')
         prices1 = [val / 1000 + df.price[0] for val in range(-5, 5)]
         prices2 = [val / 1000 + df.price[1] for val in range(-5, 5)]
@@ -93,24 +94,28 @@ class ModelBuyAfterDrop(AbstractModel):
         def select_price_code():
             sp = choice(stock_price)
             price = choice(sp[1])
-            return sp[0], price
+            return sp[0], float(price)
 
         def buy_stock():
             mylog.notice('Begin buy operation .........')
             stock_code, price = select_price_code()
+            mylog.error(f'-----------{stock_code}, {price}')
             oper_buy = ClientOperBuy(stock_code, price, 100, EntrustType.FIXED_PRICE)
-            fire_operation(oper_buy)
+            self.context.send_oper(oper_buy)
             self.db.add_operation(oper_buy)
+            mylog.notice(f'Buy operation result \n {oper_buy.result}')
 
         def sell_stock():
             mylog.notice('Begin sell operation .........')
             stock_code, price = select_price_code()
             oper_sell = ClientOperSell(stock_code, price, 100, EntrustType.FIXED_PRICE)
-            fire_operation(oper_sell)
+            self.context.send_oper(oper_sell)
             self.db.add_operation(oper_sell)
+            mylog.notice(f'Sell operation result \n {oper_sell.result}')
 
         def cancel_operation():
             mylog.notice('Begin cancel operation .........')
+            if not self.db.query_operation(): return
             oper = choice(self.db.query_operation())
             if isinstance(oper, ClientOperBuy) and oper.result.success:
                 cancel_oper = ClientOperCancel(oper.result.entrust_id, oper.stock_code,
@@ -120,7 +125,8 @@ class ModelBuyAfterDrop(AbstractModel):
                                                EntrustWay.way_sell)
             else:
                 return
-            fire_operation(cancel_oper)
+            self.context.send_oper(cancel_oper)
+            mylog.notice(f'Cancel operation result {cancel_oper}')
             self.db.add_operation(cancel_oper)
 
         func_list = [buy_stock, sell_stock, cancel_operation]

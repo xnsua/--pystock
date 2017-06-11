@@ -1,6 +1,5 @@
+import json
 import re
-
-from pandas import json
 
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url

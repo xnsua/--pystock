@@ -28,8 +28,10 @@ etf_t1 = ['sh510010', 'sh510020', 'sh510030', 'sh510050', 'sh510060',
           'sh512220', 'sh512230', 'sh512300', 'sh512310', 'sh512330',
           'sh512340', 'sh512500', 'sh512510', 'sh512580', 'sh512600']
 
-etf_with_amount = ['512000', '513100', '510360', '510510', '510330', '510180',
-                   '510500', '510300', '510050', '510900', ]
+etf_with_amount = ['sh510900', 'sh510050', 'sh518880', 'sh511010', 'sh510300', 'sh510500',
+                   'sz159915', 'sz159919', 'sh510180', 'sz159902', 'sz159934', 'sz159901',
+                   'sh513050', 'sh510330', 'sh512660', 'sh510880', 'sz159920', 'sh512000',
+                   'sh513100', 'sh510360', 'sh510510']
 
-all_etf_sinacode_list = sina_api.get_etf_scode_list()
+all_etf_sinacode_list = sina_api.get_etf_sina_symbols()
 all_etf_code_list = [val[2:] for val in all_etf_sinacode_list]

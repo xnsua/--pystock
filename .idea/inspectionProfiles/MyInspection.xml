@@ -1,0 +1,44 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="MyInspection" />
+    <inspection_tool class="CheckDtdRefs" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="CheckTagEmptyBody" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CheckXmlFileWithXercesValidator" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="PyBroadExceptionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyMethodMayBeStaticInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8Inspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N801" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="pathlib.PurePath.mkdir" />
+          <option value="pathlib.PurePath.read_text" />
+          <option value="log_helper" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <scope name="Changed Files" level="TYPO" enabled="false">
+        <option name="processCode" value="true" />
+        <option name="processLiterals" value="true" />
+        <option name="processComments" value="true" />
+      </scope>
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="XmlDuplicatedId" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="XmlHighlighting" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="XmlInvalidId" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="XmlPathReference" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="XmlUnboundNsPrefix" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="XmlUnusedNamespaceDeclaration" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="XmlWrongRootElement" enabled="false" level="ERROR" enabled_by_default="false" />
+  </profile>
+</component>

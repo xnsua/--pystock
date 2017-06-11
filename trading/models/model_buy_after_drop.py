@@ -65,7 +65,7 @@ class ModelBuyAfterDrop(AbstractModel):
         self.log_account_info()
         mylog.debug('Init model')
         self.etf_to_buy = ['510900', '510050']
-        self.context.add_push_stock(self.etf_to_buy)
+        self.context.set_realtime_stocks(self.etf_to_buy)
         self.etf_dict = read_df_dict(self.etf_code_range)
         # toch
         # self.etf_to_buy = query_stock_to_buy(self.etf_dict, datetime.datetime.now())

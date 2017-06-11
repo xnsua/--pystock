@@ -14,11 +14,14 @@ class MsgPushRealTimePrice(ObjectWithIndentRepr):
         self.stocks = stocks  # type: pdDF
 
 
-class MsgAddRealTimeStocks(ObjectWithIndentRepr):
+class MsgSetRealTimeStocks(ObjectWithIndentRepr):
     def __init__(self, stock_list):
         self.stock_list = stock_list  # type: List
 
 
+class MsgRemoveRealTimeStocks(ObjectWithIndentRepr):
+    def __init__(self, stock_list):
+        self.stock_list = stock_list  # type: List
 
 class MsgQuitLoop(ObjectWithRepr):
     pass

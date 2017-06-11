@@ -23,11 +23,7 @@ trade2_begin_time = datetime.time(13, 0, 0)
 trade2_end_time = datetime.time(15, 0, 0)
 
 
-def pure_stock_code_to_symbol_code(code):
-    return _code_to_symbol(code)
-
-
-def pure_stock_code_to_sina_symbol_code(code):
+def pure_stock_code_to_sina_symbol(code):
     code = stock_symbol_to_pure_stock_code(code)
     return _code_to_symbol(code)
 

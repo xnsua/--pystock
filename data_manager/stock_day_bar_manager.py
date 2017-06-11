@@ -98,15 +98,6 @@ class DayBar:
 
 class DayBarUpdater:
     @classmethod
-    @stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
-    def update_etfs_with_amount(cls):
-        try:
-            for code in etf_with_amount:
-                DayBar.update_etf_day_data(code)
-        except requests.exceptions.RequestException as e:
-            mylog.info(e)
-
-    @classmethod
     @stock_cache(cache_timedelta=dt_day_delta(100))
     def update_sz50_component(cls):
         df1 = tushare.get_sz50s()
@@ -137,6 +128,15 @@ class DayBarUpdater:
         d50.update(d500)
         for code in d50:
             DayBar.update_stock_day_data(code)
+
+    @classmethod
+    @stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    def update_etfs_with_amount(cls):
+        try:
+            for code in etf_with_amount:
+                DayBar.update_etf_day_data(code)
+        except requests.exceptions.RequestException as e:
+            mylog.info(e)
 
     @classmethod
     @stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)

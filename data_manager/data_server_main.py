@@ -10,7 +10,7 @@ from common_stock.stock_data import etf_with_amount
 from common_stock.stock_querier import sina_api
 from project_helper.logbook_logger import mylog
 from trading.base_structure.trade_constants import TradeId, MsgPushRealTimePrice, \
-    MsgAddRealTimeStocks, \
+    MsgSetRealTimeStocks, \
     MsgBidOver, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.trade_context import TradeContext
@@ -74,8 +74,8 @@ class DataServer:
             else:
                 self.trade_context.post_msg(sender, MsgPushRealTimePrice(df))
 
-    def on_add_push_stock(self, msg: TradeMessage):
-        assert isinstance(msg.operation, MsgAddRealTimeStocks)
+    def on_set_realtime_stocks(self, msg: TradeMessage):
+        assert isinstance(msg.operation, MsgSetRealTimeStocks)
         self._monitored_stock_map[msg.sender] = msg.operation.stock_list
 
     def update_realtime_stock_info(self) -> pdDF:
@@ -130,8 +130,8 @@ class DataServer:
             return False
 
     def dispatch_msg(self, msg: TradeMessage):
-        if isinstance(msg.operation, MsgAddRealTimeStocks):
-            msg.try_put_result(self.on_add_push_stock(msg))
+        if isinstance(msg.operation, MsgSetRealTimeStocks):
+            msg.try_put_result(self.on_set_realtime_stocks(msg))
         else:
             mylog.error(f'Can not dispatch msg {msg}')
 

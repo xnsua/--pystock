@@ -4,7 +4,7 @@ import threading
 from common.data_structures.object_cabinet import ObjectCabinet
 from project_helper.logbook_logger import mylog
 from trading.account_manager import AccountManager
-from trading.base_structure.trade_constants import TradeId, MsgAddRealTimeStocks, MsgQuitLoop
+from trading.base_structure.trade_constants import TradeId, MsgSetRealTimeStocks, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 
 
@@ -44,8 +44,8 @@ class TradeContext:
         assert self.thread_local.name
         return self.queue_dict[self.thread_local.name]
 
-    def add_push_stock(self, stocks):
-        self.send_msg(TradeId.data_server, MsgAddRealTimeStocks(stocks))
+    def set_realtime_stocks(self, stocks):
+        self.send_msg(TradeId.data_server, MsgSetRealTimeStocks(stocks))
 
     def quit_all(self):
         for key in self.queue_dict:

@@ -19,7 +19,7 @@ stock_server_address = 'http://127.0.0.1:8866'
 stock_server_operation_address = 'http://127.0.0.1:8866/operation'
 
 
-def _visit_client_server(url_args, headers, timeout=5):
+def _visit_client_server(url_args, headers, timeout=10):
     append_str = ''
     for i, k in enumerate(url_args):
         if not i:
@@ -54,7 +54,7 @@ def is_client_server_running():
 
 
 def test_operation_buy():
-    buy = ClientOperBuy('SH.510900', 1.2, 100, EntrustType.FIXED_PRICE)
+    buy = ClientOperBuy('SH.510900', 1, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(buy)
     print(result)
     assert isinstance(result, BuyResult)
@@ -68,7 +68,7 @@ def test_operation_buy_market_price():
 
 
 def test_operation_sell():
-    sell = ClientOperSell('SH.510900', 1.2, 100, EntrustType.FIXED_PRICE)
+    sell = ClientOperSell('SH.510900', 2, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(sell)
     # print(result)
     assert isinstance(result, SellResult)

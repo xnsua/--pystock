@@ -109,6 +109,7 @@ class BuyResultError(enum.Enum):
     not_enough_money = 2
     not_proper_unit = 3
     not_in_price_range = 4
+    no_support_for_this_stock = 5
 
     @staticmethod
     def from_text(text):
@@ -126,6 +127,8 @@ class BuyResultError(enum.Enum):
             return BuyResultError.not_enough_money
         elif text.find('涨跌幅限制') != -1:
             return BuyResultError.not_in_price_range
+        elif text.find('不支持该证券交易') != -1:
+            return BuyResultError.no_support_for_this_stock
         else:
             message_box_error('BuyResultError', text)
 
@@ -174,6 +177,7 @@ class CancelEntrustError(enum.Enum):
     entrust_not_find = 0
     cancelling_not_allowed = 1
     already_canceled = 2
+    not_proper_time = 3
 
 
 class CancelEntrustResult(BasicResult):
@@ -269,12 +273,13 @@ class EntrustWay:
 
 
 class EntrustStatus:
-    no_commit = 'not_finished'
-    invalid = 'invalid'
-    finished = 'finished'
-    cancelled = 'cancelled'
-    partial_finished = 'partial_finished'
-    partial_cancelled = 'partial_cancelled'
+    no_commit = 'en_not_finished'
+    invalid = 'en_invalid'
+    finished = 'en_finished'
+    cancelled = 'en_cancelled'
+    partial_finished = 'en_partial_finished'
+    partial_cancelled = 'en_partial_cancelled'
+    waiting_for_cancel = 'en_waiting_for_cancel'
 
     @classmethod
     def from_string(cls, text):
@@ -300,6 +305,8 @@ class EntrustStatus:
             '废单': EntrustStatus.invalid,
             '场内废单': EntrustStatus.invalid,
             '系统废单': EntrustStatus.invalid,
+
+            '撤单已发': EntrustStatus.waiting_for_cancel
         }
         if text not in text_map:
             message_box_error(f'EntrustStatus: {text}')

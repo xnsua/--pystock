@@ -63,10 +63,12 @@ def get_etf_info_dict():
     # 11367471830, 'code': '511990', 'ticktime': '15:00:00'}, {
     return val
 
+
 def get_etf_sina_symbols():
     val = get_etf_info_dict()
     rval = [item['symbol'] for item in val]
     return rval
+
 
 import pandas as pd
 
@@ -76,7 +78,7 @@ pd.set_option('precision', 5)
 def main():
     # s_time = datetime.datetime.now()
     val = get_etf_info_dict()
-    val = sorted(val, key = lambda v: v['amount'])
+    val = sorted(val, key=lambda v: v['amount'])
     val = [(item['symbol'], item['name'], item['amount']) for item in val]
     val.reverse()
     print(val)

@@ -1,3 +1,5 @@
+import pandas
+
 from common.scipy_helper import pdDF
 from data_manager.stock_day_bar_manager import DayBar
 
@@ -55,7 +57,7 @@ class ModelBuyAfterDropTester:
         self.df = df
         self.df_money = pdDF(index=df.index, data=[1] * len(df.index), columns=['balance'])
 
-        self.account = EmuAccount()
+        self.accounts = pandas.Series(index=self.df.index)
 
     def run(self):
         openp = self.df.open
@@ -69,7 +71,7 @@ class ModelBuyAfterDropTester:
                     balance[i] = balance[i - 1]
                     break
             else:
-                balance[i] =
+                # balance[i] =
                 pass
 
 

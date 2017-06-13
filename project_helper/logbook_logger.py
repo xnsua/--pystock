@@ -83,7 +83,7 @@ def jqd(*args, **kwargs):
     sep = kwargs.get("sep", " ")
     end = kwargs.get("end", "")
 
-    message = sep.join(map(repr, args)) + end
+    message = sep.join(map(str, args)) + end
 
     mylog.info(message)
 

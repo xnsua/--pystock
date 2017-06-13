@@ -35,9 +35,9 @@ def _visit_client_server(url_args, headers, timeout=5):
             resp = firefox_quick_get_url(url, headers, timeout=timeout)
             if resp.status_code == 200:
                 return jsonpickle.loads(resp.text)
+            message_box_error(f"Serve status_code:", resp.status_code, 'resp.text:', resp.text)
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
             mylog.error('Timeout occur .............................')
-    message_box_error(f"Serve status_code:", resp.status_code, 'resp.text:', resp.text)
 
 
 def fire_operation(oper):

@@ -36,8 +36,8 @@ def _visit_client_server(url_args, headers, timeout=5):
             if resp.status_code == 200:
                 return jsonpickle.loads(resp.text)
             message_box_error(f"Serve status_code:", resp.status_code, 'resp.text:', resp.text)
-        except requests.exceptions.RequestException:
-            mylog.error('Timeout occur .............................')
+        except requests.exceptions.RequestException as e:
+            mylog.error(f'Request Exception: {e}')
 
 
 def fire_operation(oper):

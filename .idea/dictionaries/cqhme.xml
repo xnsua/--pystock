@@ -11,6 +11,7 @@
       <w>dayentrust</w>
       <w>dayfinentrust</w>
       <w>deliveryentrust</w>
+      <w>descs</w>
       <w>dest</w>
       <w>drdata</w>
       <w>dropcount</w>
@@ -72,6 +73,7 @@
       <w>visitserve</w>
       <w>voturnover</w>
       <w>wget</w>
+      <w>withdrawable</w>
       <w>yclose</w>
     </words>
   </dictionary>

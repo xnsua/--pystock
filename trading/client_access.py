@@ -1,6 +1,7 @@
 from typing import List
 
 import jsonpickle
+import requests
 
 from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
@@ -19,7 +20,7 @@ stock_server_address = 'http://127.0.0.1:8866'
 stock_server_operation_address = 'http://127.0.0.1:8866/operation'
 
 
-def _visit_client_server(url_args, headers, timeout=10):
+def _visit_client_server(url_args, headers, timeout=5):
     append_str = ''
     for i, k in enumerate(url_args):
         if not i:
@@ -29,15 +30,19 @@ def _visit_client_server(url_args, headers, timeout=10):
         append_str += tmp + str(k) + '=' + str(url_args[k])
     url = stock_server_operation_address + append_str
     mylog.info(url)
-    resp = firefox_quick_get_url(url, headers, timeout=timeout)
-    if resp.status_code == 200:
-        return jsonpickle.loads(resp.text)
+    while 1:
+        try:
+            resp = firefox_quick_get_url(url, headers, timeout=timeout)
+            if resp.status_code == 200:
+                return jsonpickle.loads(resp.text)
+        except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
+            mylog.error('Timeout occur .............................')
     message_box_error(f"Serve status_code:", resp.status_code, 'resp.text:', resp.text)
 
 
 def fire_operation(oper):
     order_str = jsonpickle.dumps(oper)
-    mylog.warn(repr(oper))
+    # mylog.warn(repr(oper))
     order_str = order_str.strip()
     result = _visit_client_server(
         {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str})

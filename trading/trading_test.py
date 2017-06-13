@@ -2,7 +2,7 @@ from trading.client_access import test_operation_sell, test_operation_query_daye
     test_operation_buy
 
 
-def test_operations():
+def do_operations():
     while 1:
         # is_client_server_running()
         # continue
@@ -20,4 +20,4 @@ def test_operations():
         # break
 
 
-test_operations()
+do_operations()

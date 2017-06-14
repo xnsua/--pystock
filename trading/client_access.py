@@ -61,8 +61,8 @@ def is_client_server_running():
 def test_operation_buy():
     buy = ClientOperBuy('SH.510900', 1, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(buy)
-    print(result)
-    assert isinstance(result, BuyResult)
+    # print(result)
+    assert isinstance(result, BuyResult), repr(result)
 
 
 def test_operation_buy_market_price():

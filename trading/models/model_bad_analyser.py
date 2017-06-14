@@ -64,10 +64,9 @@ class ModelBuyAfterDropTester:
         self.codes = [df.code[0] for df in self.dfs]
         self.longest_index = max([df.index for df in dfs], key=len)
         self.accounts = pandas.Series(index=self.longest_index)  # type: List[EmuAccount]
-        self.i_open = dfs[0].columns.get_loc['open']
-        self.i_close = dfs[0].columns.get_loc['close']
 
     def need_buy(self, df, date, drop_days):
+
         i_date = df.index.get_loc(date)
         if i_date > drop_days:
             for i in range(i_date - drop_days, i_date):

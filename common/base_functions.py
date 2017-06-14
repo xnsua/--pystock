@@ -28,6 +28,4 @@ def test():
             self.a = 1
             self.b = 'hello'
 
-    print(repr(Foo()))
-
-
+    print(f'{Foo()}')

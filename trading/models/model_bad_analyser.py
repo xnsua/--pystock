@@ -1,7 +1,6 @@
+import copy
 from itertools import islice
 from typing import List
-
-import pandas
 
 from common.scipy_helper import pdDF
 from data_manager.stock_day_bar_manager import DayBar
@@ -34,11 +33,13 @@ class EmuTrade:
 
 
 class EmuAccount:
-    def __init__(self):
-        self.balance = 0
+    emu_trade = EmuTrade()
+
+    def __init__(self, balance=0, total_assert=0):
+        self.balance = balance
         self.stocks = {}
-        self.emu_trade = EmuTrade()
-        self.total_assert = 0
+
+        self.total_assert = total_assert
 
     def buy_stock(self, code, price, amount):
         balance = self.emu_trade.buy_stock(price, amount, self.balance)
@@ -59,14 +60,14 @@ class ModelBuyAfterDropTester:
         assert len(dfs) and len(dfs[0])
 
         self.drop_days = 1
-        self.dfs = dfs
+        self.dfs = {df.code[0]: df for df in dfs}  # type:
 
         self.codes = [df.code[0] for df in self.dfs]
         self.longest_index = max([df.index for df in dfs], key=len)
-        self.accounts = pandas.Series(index=self.longest_index)  # type: List[EmuAccount]
+        self.accounts = [None] * self.longest_index  # type: List[EmuAccount]
+        # self.index_map = {i: index for i, index in enumerate(self.longest_index)}
 
     def need_buy(self, df, date, drop_days):
-
         i_date = df.index.get_loc(date)
         if i_date > drop_days:
             for i in range(i_date - drop_days, i_date):
@@ -74,35 +75,18 @@ class ModelBuyAfterDropTester:
                     return False
             else:
                 return True
+        else:
+            return False
 
     def run(self):
-        account = self.accounts
-        for date in islice(self.longest_index, 1):
+        self.accounts[0] = EmuAccount(balance=1, total_assert=1)
+        for i, date in islice(enumerate(self.longest_index), 1, None):
+            cur_account = copy.deepcopy(self.accounts[i - 1])
             for df in self.dfs:
                 is_buy = self.need_buy(df, date, self.drop_days)
                 if is_buy:
+                    cur_account.buy_all()
                     pass
-
-        acc = EmuAccount()
-        acc.balance = 1
-        acc.stocks = []
-        acc.total_assert = 1
-
-        stock_code = self.codes[0]
-        self.accounts[0] = acc
-
-        # for index, date in enumerate(dates):
-        #     if index < self.drop_days: continue
-        #
-        #     for i in range(index, index - self.drop_days, -1):
-        #         The equality
-        # if close[i] > close[i - 1]:
-        #     self.accounts[i] = self.accounts[i - 1]
-        #     break
-        # else:
-        #     acc = copy.deepcopy(self.accounts[i - 1])
-        #     acc.buy_all(self.)
-        #     pass
 
 
 def main():

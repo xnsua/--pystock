@@ -1,4 +1,4 @@
-jqs.py
+ztest/jqs.py
 log/
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
@@ -40,3 +40,22 @@ log/
 # Spyder project settings
 # Rope project settings
 session_cache_one_day.sqlite
+__pycache__/
+common/__file_cache__/
+common/__pycache__/
+common/data_structures/__pycache__/
+common/my_old/__pycache__/
+common_stock/__pycache__/common_stock_helper.cpython-36.pyc
+common_stock/__pycache__/stock_config.cpython-36.pyc
+common_stock/__pycache__/stock_data.cpython-36.pyc
+common_stock/data_shelve/
+common_stock/stock_cache_data/
+common_stock/stock_querier/__pycache__/
+data_manager/__pycache__/stock_day_bar_manager.cpython-36.pyc
+ip/__pycache__/
+project_helper/__pycache__/
+shelve/
+trading/__pycache__/
+trading/base_structure/__pycache__/
+trading/model_buy_after_drop.sqlite
+trading/models/__pycache__/

@@ -104,38 +104,30 @@ class BasicResult(ObjectWithIndentRepr):
 
 
 # class BuyResult(BasicResult):
-class BuyResultError(enum.Enum):
-    not_in_trade_time = 1
-    not_enough_money = 2
-    not_proper_unit = 3
-    not_in_price_range = 4
-    no_support_for_this_stock = 5
+# class BuyResultError(enum.Enum):
+class BuyResultError:
+    def __init__(self, text):
+        self.err_text = text
 
-    @staticmethod
-    def from_text(text):
-        if text.find('在非正常时间内') != -1:
-            return BuyResultError.not_in_trade_time
-        elif text.find('该时段不允许撤单') != -1:
-            return BuyResultError.not_in_trade_time
-        elif text.find('该时段不支持该操作') != -1:
-            return BuyResultError.not_in_trade_time
-        elif text.find('非整手') != -1:
-            return BuyResultError.not_proper_unit
-        elif text.find('委托数量超出每笔数量') != -1:
-            return BuyResultError.not_proper_unit
-        elif text.find('资金不足') != -1:
-            return BuyResultError.not_enough_money
-        elif text.find('涨跌幅限制') != -1:
-            return BuyResultError.not_in_price_range
-        elif text.find('不支持该证券交易') != -1:
-            return BuyResultError.no_support_for_this_stock
-        else:
-            message_box_error('BuyResultError', text)
+    def not_in_trade_time(self):
+        texts = ['在非正常时间内', '该时段不允许撤单', '该时段不允许撤单', '系统处于未开市状态']
+        return any(self.err_text.find(item) != -1 for item in texts)
+
+    def not_proper_unit(self):
+        return self.err_text.find('非整手') != -1 or self.err_text.find('委托数量超出每笔数量') != -1
+
+    def not_enough_money(self):
+        return self.err_text.find('资金不足') != -1
+
+    def not_in_price_range(self):
+        return self.err_text.find('涨跌幅限制') != -1
+
+    def no_support_for_this_stock(self):
+        return self.err_text.find('不支持该证券交易') != -1
 
 
 def test_buy_result_error():
-    assert BuyResultError.not_in_trade_time \
-           == BuyResultError.from_text('在非正常时间内')
+    assert BuyResultError('在非正常时间内').not_in_trade_time()
 
 
 class BuyResult(BasicResult):
@@ -145,25 +137,22 @@ class BuyResult(BasicResult):
         self.error = err
 
 
-class SellResultError(enum.Enum):
-    not_in_trade_time = 1
-    not_in_price_range = 2
-    not_enough_share = 3
+class SellResultError:
+    def __init__(self, text):
+        self.err_text = text
 
-    @staticmethod
-    def from_text(text):
-        if text.find('该时段不支持该操作') != -1:
-            return SellResultError.not_in_trade_time
-        elif text.find('在非正常时间内') != -1:
-            return SellResultError.not_in_trade_time
-        elif text.find('涨跌幅限制') != -1:
-            return SellResultError.not_in_price_range
-        elif text.find('客户股票不足') != -1:
-            return SellResultError.not_enough_share
-        elif text.find('持仓数量不足') != -1:
-            return SellResultError.not_enough_share
-        else:
-            message_box_error('SellResultError', text)
+    def not_in_trade_time(self):
+        texts = ['在非正常时间内', '该时段不支持该操作', '系统处于未开市状态']
+        return any(self.err_text.find(item) != -1 for item in texts)
+
+    def not_in_price_range(self):
+        return self.err_text.find('涨跌幅限制') != -1
+
+    def not_enough_stock(self):
+        return self.err_text.find('客户股票不足') != -1 or self.err_text.find('持仓数量不足') != -1
+
+    def no_support_for_this_stock(self):
+        return self.err_text.find('不支持该证券交易') != -1
 
 
 class SellResult(BasicResult):

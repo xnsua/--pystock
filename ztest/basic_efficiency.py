@@ -40,6 +40,7 @@ statement_list = [
     'a = open_.iat[0]',
     'a = open_[0]',
     'a = df.iat[0,0]',
+    'a = df.iloc[0,0]',
     'a = df.index.get_loc("2011-01-02")'
 ]
 

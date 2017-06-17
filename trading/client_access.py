@@ -45,7 +45,7 @@ def fire_operation(oper):
     # mylog.warn(repr(oper))
     order_str = order_str.strip()
     result = _visit_client_server(
-        {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str})
+        {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str}, timeout=10)
     if isinstance(result, ErrorResult):
         message_box_error(f'Visit client error: {result}')
     else:

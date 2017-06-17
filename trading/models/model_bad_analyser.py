@@ -3,6 +3,7 @@ from itertools import islice
 from typing import List
 
 from common.scipy_helper import pdDF
+from common_stock.trade_day import get_close_trade_date_range
 from data_manager.stock_day_bar_manager import DayBar
 
 
@@ -55,17 +56,33 @@ class EmuAccount:
         self.balance = 0
 
 
+def max_date_range(dfs):
+    start_dates = []
+    end_dates = []
+    for df in dfs:
+        if len(df.index) >= 2:
+            start_dates.append(df.index[0])
+            end_dates.append(df.index[1])
+    begin_date = min(start_dates)
+    end_date = max(end_dates)
+    return begin_date, end_date
+
 class ModelBuyAfterDropTester:
     def __init__(self, dfs: List[pdDF]):
         assert len(dfs) and len(dfs[0])
 
-        self.drop_days = 1
-        self.dfs = {df.code[0]: df for df in dfs}  # type:
+        self.i_open = 0
+        self.i_close = 1
+        self.df_map = {}
+        for df in dfs:
+            dfm = dict(zip(df.index, zip(df.open, df.close)))
+            self.df_map[df.code[0]] = dfm
+        self.l_daterange = get_close_trade_date_range(
+            max_date_range(dfs)
+        )
 
-        self.codes = [df.code[0] for df in self.dfs]
-        self.longest_index = max([df.index for df in dfs], key=len)
-        self.accounts = [None] * self.longest_index  # type: List[EmuAccount]
-        # self.index_map = {i: index for i, index in enumerate(self.longest_index)}
+        self.drop_days = 1
+        self.accounts = [None] * len(self.l_daterange)  # type: List[EmuAccount]
 
     def need_buy(self, df, date, drop_days):
         i_date = df.index.get_loc(date)
@@ -80,6 +97,9 @@ class ModelBuyAfterDropTester:
 
     def run(self):
         self.accounts[0] = EmuAccount(balance=1, total_assert=1)
+        for day in islice(self.l_daterange, 1, None):
+            for stock, data in self.df_map:
+                if self.need_buy()
         for i, date in islice(enumerate(self.longest_index), 1, None):
             cur_account = copy.deepcopy(self.accounts[i - 1])
             for df in self.dfs:

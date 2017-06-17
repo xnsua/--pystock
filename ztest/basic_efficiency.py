@@ -26,6 +26,7 @@ class Foo:
 
 foo = Foo()
 l = [] * 1000
+d = {'a': 10}
 statement_list = [
     'a = 1',
     'a = 1 + 2',
@@ -36,6 +37,9 @@ statement_list = [
     'a = 1 / 2.0',
     'l.append(1)',
     'l[10] = 5',
+    'a = l[10] ',
+    'a = d["a"] ',
+    'd["a"] = 3 ',
     'a = df.open',
     'a = open_.iat[0]',
     'a = open_[0]',

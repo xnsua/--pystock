@@ -125,6 +125,9 @@ class BuyResultError:
     def no_support_for_this_stock(self):
         return self.err_text.find('不支持该证券交易') != -1
 
+    def __repr__(self):
+        return f'BuyResultError: {self.err_text}'
+
 
 def test_buy_result_error():
     assert BuyResultError('在非正常时间内').not_in_trade_time()
@@ -153,6 +156,9 @@ class SellResultError:
 
     def no_support_for_this_stock(self):
         return self.err_text.find('不支持该证券交易') != -1
+
+    def __repr__(self):
+        return f'SellResultError: {self.err_text}'
 
 
 class SellResult(BasicResult):

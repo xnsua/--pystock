@@ -46,23 +46,44 @@ class TradeDay:
         i_end_date = self.trade_day_map[end_date]
         return self.trade_day_list[i_start_date:i_end_date]
 
-    def get_close_date_range(self, start_date, end_date):
+    def get_close_trade_day_range(self, start_date, end_date):
         i_start_date = self.trade_day_map[start_date]
         i_end_date = self.trade_day_map[end_date]
         return self.trade_day_list[i_start_date:i_end_date + 1]
+
+    def get_nearby_trade_day(self, day, is_before):
+        i_day = self.day_map[day]
+        if is_before:
+            while not self.day_list[i_day] in self.trade_day_map:
+                i_day = i_day - 1
+            return self.day_list[i_day]
+        else:
+            while not self.day_list[i_day] in self.trade_day_map:
+                i_day = i_day + 1
+            return self.day_list[i_day]
+
+    def get_n_trade_days_range(self, day, ndays):
+        if day not in self.trade_day_map:
+            day = self.get_nearby_trade_day(day, ndays < 0)
+        i_day = self.trade_day_map[str(day)]
+        if ndays > 0:
+            return self.trade_day_list[i_day: i_day + ndays]
+        else:
+            return self.trade_day_list[i_day + ndays + 1: i_day + 1]
 
 
 pandas.options.display.max_rows = 10
 
 _trade_day = TradeDay()
 is_trade_day = _trade_day.is_trade_day
-get_close_trade_date_range = _trade_day.get_close_date_range
+get_close_trade_date_range = _trade_day.get_close_trade_day_range
+get_n_trade_days_range = _trade_day.get_n_trade_days_range
 
 
 def main():
-    val = _trade_day.get_date_range('2017-06-16', '2017-06-20')
-    val = _trade_day.get_close_date_range('2017-06-16', '2017-06-20')
-
+    # val = _trade_day.get_date_range('2017-06-16', '2017-06-20')
+    # val = _trade_day.get_close_date_range('2017-06-16', '2017-06-20')
+    val = _trade_day.get_n_trade_days_range('2017-06-18', -1)
     print(val)
 
 

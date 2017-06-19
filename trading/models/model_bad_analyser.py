@@ -95,18 +95,17 @@ class ModelBuyAfterDropTester:
         else:
             return False
 
+    def cal_day_attribute(self, data, day):
+
+
     def run(self):
         self.accounts[0] = EmuAccount(balance=1, total_assert=1)
-        for day in islice(self.l_daterange, 1, None):
+        for index, day in islice(enumerate(self.l_daterange), 1, None):
+            cur_account = copy.deepcopy(self.accounts[index - 1])
             for stock, data in self.df_map:
-                if self.need_buy()
-        for i, date in islice(enumerate(self.longest_index), 1, None):
-            cur_account = copy.deepcopy(self.accounts[i - 1])
-            for df in self.dfs:
-                is_buy = self.need_buy(df, date, self.drop_days)
-                if is_buy:
-                    cur_account.buy_all()
-                    pass
+                if self.need_buy(data, day, self.drop_days):
+                    cur_account.buy_all(stock, data[day][self.i_open])
+
 
 
 def main():

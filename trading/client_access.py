@@ -65,7 +65,7 @@ def is_client_server_running():
 
 
 def test_operation_buy():
-    buy = ClientOperBuy('SH.510900', 1, 100, EntrustType.FIXED_PRICE)
+    buy = ClientOperBuy('SH.510900', 0.8, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(buy)
     # print(result)
     assert isinstance(result, BuyResult), repr(result)
@@ -92,6 +92,14 @@ def test_operation_query_all():
     print(result)
     assert isinstance(result, QueryResult)
     assert isinstance(result.data, AccountInfo)
+
+
+def test_operation_query_cancelentrust():
+    query = ClientOperQuery(ClientConstant.cancelentrust)
+    result = fire_operation(query)
+    print(result)
+    assert isinstance(result, QueryResult)
+
 
 
 def test_operation_query_myshare():

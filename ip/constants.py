@@ -3,6 +3,7 @@ class ClientConstant:
     myshare = 'myshare'
     dayentrust = 'dayentrust'
     dayfinentrust = 'dayfinentrust'
+    cancelentrust = 'cancelentrust'
     hisentrust = 'hisentrust'
     hisfinentrust = 'hisfinentrust'
     moneymovement = 'moneymovement'

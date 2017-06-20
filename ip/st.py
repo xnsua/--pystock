@@ -162,10 +162,10 @@ class SellResultError:
 
 
 class SellResult(BasicResult):
-    def __init__(self, success, entrust_id=None, err_msg=None):
+    def __init__(self, success, entrust_id=None, err=None):
         super().__init__(success)
         self.entrust_id = entrust_id
-        self.err_msg = err_msg
+        self.err_msg = err
 
 
 class CancelEntrustError(enum.Enum):
@@ -308,6 +308,79 @@ class EntrustStatus:
         return text_map[text]
 
 
+class CancelEntrustItem(ObjectWithRepr):
+    def __init__(self):
+        self.code = None
+        self.name = None
+        self.is_buy = None
+        self.entrust_id = None
+        self.entrust_price = None
+        self.cost_price = None
+        self.entrust_amount = None
+        self.commit_amount = None
+        self.batch_num = None
+        self.entrust_status = None
+        self.entrust_dt = None
+
+    @classmethod
+    def parse(cls, item_list) -> List['CancelEntrustItem']:
+        assert len(item_list) == 2
+        data_list = item_list[1]
+        if len(data_list) < 1:
+            mylog.info('The item is is empty. should have at lease one item')
+            return []
+        if len(data_list) == 1:
+            text = ''.join(data_list[0])
+            if text.find('没有相应的查询信息') != -1:
+                return []
+        index_dict = {}
+        index = item_list[0]
+        for idx, name in enumerate(index):
+            index_dict[name] = idx
+        i_code = index_dict["证券代码"]
+        i_name = index_dict["证券名称"]
+        i_amount_entrust = index_dict["委托数量"]
+        i_amount_commit = index_dict["成交数量"]
+        i_amount_cancel = index_dict["批次号"]
+        i_entrust_id = index_dict['委托编号']
+
+        i_entrust_time = index_dict["委托时间"]
+        i_entrust_price = index_dict["委托价格"]
+        try:
+            i_cost_price = index_dict['成交均价']
+        except KeyError:
+            i_cost_price = index_dict["成交价格"]
+
+        i_is_buy = index_dict["买卖标志"]
+        i_entrust_status = index_dict['状态说明']
+
+        s_items = []
+        for val in item_list[1]:
+            s_item = EntrustItem()
+            s_item.entrust_id = val[i_entrust_id]
+            s_item.code = val[i_code]
+            s_item.name = val[i_name]
+            s_item.entrust_amount = float_default_zero(val[i_amount_entrust])
+            s_item.commit_amount = float_default_zero(val[i_amount_commit])
+            s_item.cancel_amount = float_default_zero(val[i_amount_cancel])
+
+            time_str = val[i_entrust_time]
+            if len(time_str) < 6: time_str = '0' + time_str
+            try:
+                time_ = datetime.time(
+                    *map(int, [time_str[i:i + 2] for i in range(0, len(time_str), 2)]))
+            except:
+                time_ = datetime.time(*map(int, time_str.split(':')))
+            s_item.entrust_dt = datetime.datetime.combine(datetime.date.today(), time_)
+            s_item.cost_price = float_default_zero(val[i_cost_price])
+            s_item.entrust_price = float_default_zero(val[i_entrust_price])
+            s_item.entrust_status = EntrustStatus.from_string(val[i_entrust_status])
+
+            s_item.is_buy = (val[i_is_buy] == '买入' or val[i_is_buy] == '买')
+            s_items.append(s_item)
+        return s_items
+
+
 # class EntrustItem(ObjectWithIndentRepr):
 class EntrustItem(ObjectWithRepr):
     def __init__(self):
@@ -378,8 +451,6 @@ class EntrustItem(ObjectWithRepr):
             s_items.append(s_item)
         return s_items
 
-    pass
-
 
 def test_parse_share_item():
     item_list = [
@@ -407,6 +478,36 @@ def test_parse_share_item():
           "-32164.80", "-17.87", "001001001015826", "p001001001015828",
           "上海证券交易所", "", "", "", "", "", "", "30.150", "<null>"]]]
     items = ShareItem.parse(item_list)
+    assert not items
+
+
+def test_parse_cancel_entrust_item():
+    item_list = [
+        ["证券名称", "买卖标志", "委托价格", "委托数量", "成交价格", "成交数量", "状态说明", "委托时间", "委托编号", "批次号", "证券代码",
+         "股东代码"
+         ],
+        [["H股ETF", "卖", "1.15", "100", "0", "10", "未成交", "10:05:15", "627", "", "510900",
+          "A533935434"]]]
+
+    items = CancelEntrustItem.parse(item_list)
+    assert len(items) == 1
+    item1 = items[0]
+    assert item1.name == 'H股ETF'
+    assert item1.code == '510900'
+    assert item1.entrust_id == '627'
+    assert item1.entrust_status == EntrustStatus.no_commit
+    assert math.isclose(item1.entrust_price, 1.15)
+    assert math.isclose(item1.entrust_amount, 100)
+    assert math.isclose(item1.cost_price, 0)
+    assert math.isclose(item1.commit_amount, 10)
+
+    item_list = [
+        ["证券名称", "买卖标志", "委托价格", "委托数量", "成交价格", "成交数量", "状态说明", "委托时间", "委托编号", "批次号", "证券代码",
+         "股东代码"
+         ],
+        [["没有相应的查询信息", "卖", "1.15", "100", "0", "10", "未成交", "10:05:15", "627", "", "510900",
+          "A533935434"]]]
+    items = EntrustItem.parse(item_list)
     assert not items
 
 

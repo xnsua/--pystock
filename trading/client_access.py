@@ -44,12 +44,16 @@ def fire_operation(oper):
     order_str = jsonpickle.dumps(oper)
     # mylog.warn(repr(oper))
     order_str = order_str.strip()
+    success_cnt = 0
+    fail_cnt = 0
     for i in range(3):
         result = _visit_client_server(
             {'operation': type(oper).__name__, **oper.__dict__}, {'object': order_str}, timeout=10)
         if isinstance(result, ErrorResult):
-            mylog.error(f'Visit client error: {result}, Retrying ...{i}')
+            fail_cnt += 1
+            mylog.error(f'Client error: {result}, Retrying {i}, count: {fail_cnt}/{success_cnt}')
         else:
+            success_cnt += 1
             return result
     message_box_error(f'Failed eventually {result}')
 

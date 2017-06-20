@@ -1,11 +1,10 @@
 import pandas
 
-from data_manager.stock_day_bar_manager import DayBar
-
 
 def test_function_call():
     l = [1] * 10000
     import timeit
+
     def foo():
         return l[1000]
 
@@ -56,19 +55,20 @@ def test_pandas():
 
 
 def test_pandas_test_iterator():
-    df = DayBar.read_etf_day_data('510900')
-    index = df.index
-    dl = list(index)
-    import datetime
-    s_time = datetime.datetime.now()
+    pass
+    # df = DayBar.read_etf_day_data('510900')
+    # index = df.index
+    # dl = list(index)
+    # import datetime
+    # s_time = datetime.datetime.now()
     # About two times slow
-    for j in range(1000):
-        for i in index:
-            pass
-    print(datetime.datetime.now() - s_time)
-
-    s_time = datetime.datetime.now()
-    for j in range(1000):
-        for i in dl:
-            pass
-    print(datetime.datetime.now() - s_time)
+    # for j in range(1000):
+    #     for _ in index:
+    #         pass
+    # print(datetime.datetime.now() - s_time)
+    #
+    # s_time = datetime.datetime.now()
+    # for j in range(1000):
+    #     for _ in dl:
+    #         pass
+    # print(datetime.datetime.now() - s_time)

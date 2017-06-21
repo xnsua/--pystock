@@ -1,13 +1,21 @@
+import bisect
+import datetime
+import traceback
+
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import numpy as np
-import scipy.spatial as spatial
+from matplotlib.dates import date2num
 
-pi = np.pi
-cos = np.cos
+from data_manager.stock_day_bar_manager import DayBar
 
 
-def fmt(x, y):
-    return 'x: {x:0.2f}\ny: {y:0.2f}'.format(x=x, y=y)
+def _fmt(x, y):
+    datestr = x.strftime(f'date:  %y-%m-%d')
+    pstr = datestr
+    for name, val in y:
+        name = name + ':'
+        pstr += f'\n{name:6} {val:.3f}'
+    return pstr
 
 
 class FollowDotCursor(object):
@@ -17,58 +25,46 @@ class FollowDotCursor(object):
     https://stackoverflow.com/a/15454427/190597 (unutbu)
     """
 
-    def __init__(self, ax, x, y, tolerance=5, formatter=fmt, offsets=(-20, 20)):
-        try:
-            x = np.asarray(x, dtype='float')
-        except (TypeError, ValueError):
-            x = np.asarray(mdates.date2num(x), dtype='float')
-        y = np.asarray(y, dtype='float')
-        mask = ~(np.isnan(x) | np.isnan(y))
-        x = x[mask]
-        y = y[mask]
-        self._points = np.column_stack((x, y))
+    def __init__(self, ax, x, ys, formatter=_fmt, offsets=(-20, 20)):
+        # ys = np.asarray(ys, dtype='float')
+        # self._points = np.column_stack((x, zip(*y)))
+        self.plot_data_names = [item[0] for item in ys]
+        ys = [item[1] for item in ys]
+        self.plot_data = x, ys
         self.offsets = offsets
-        y = y[np.abs(y - y.mean()) <= 3 * y.std()]
-        self.scale = x.ptp()
-        self.scale = y.ptp() / self.scale if self.scale else 1
-        self.tree = spatial.cKDTree(self.scaled(self._points))
         self.formatter = formatter
-        self.tolerance = tolerance
         self.ax = ax
         self.fig = ax.figure
         self.ax.xaxis.set_label_position('top')
-        self.dot = ax.scatter(
-            [x.min()], [y.min()], s=130, color='green', alpha=0.7)
+        for i in range(len(ys)):
+            self.dot = ax.plot(x, ys[i])
         self.annotation = self.setup_annotation()
         plt.connect('motion_notify_event', self)
 
-    def scaled(self, points):
-        points = np.asarray(points)
-        return points * (self.scale, 1)
-
     def __call__(self, event):
-        ax = self.ax
-        # event.inaxes is always the current axis. If you use twinx, ax could be
-        # a different axis.
-        if event.inaxes == ax:
-            x, y = event.xdata, event.ydata
-        elif event.inaxes is None:
-            return
-        else:
-            inv = ax.transData.inverted()
-            x, y = inv.transform([(event.x, event.y)]).ravel()
-        annotation = self.annotation
-        x, y = self.snap(x, y)
-        annotation.xy = x, y
-        annotation.set_text(self.formatter(x, y))
-        self.dot.set_offsets((x, y))
-        bbox = ax.viewLim
-        event.canvas.draw()
+        try:
+            ax = self.ax
+            # event.inaxes is always the current axis. If you use twinx, ax could be
+            # a different axis.
+            if event.inaxes == ax:
+                x, y = event.xdata, event.ydata
+            elif event.inaxes is None:
+                return
+            else:
+                inv = ax.transData.inverted()
+                x, y = inv.transform([(event.x, event.y)]).ravel()
+            annotation = self.annotation
+            x, y = self.snap(x, y)
+            annotation.xy = x, y[0]
+            annotation.set_text(self.formatter(x, zip(self.plot_data_names, y)))
+            event.canvas.draw()
+        except Exception as e:
+            traceback.print_exc()
 
     def setup_annotation(self):
         """Draw and hide the annotation box."""
         annotation = self.ax.annotate(
-            '', xy=(0, 0), ha='right',
+            '', xy=(0, 0), ha='left',
             xytext=self.offsets, textcoords='offset points', va='bottom',
             bbox=dict(
                 boxstyle='round,pad=0.5', fc='yellow', alpha=0.75),
@@ -77,20 +73,31 @@ class FollowDotCursor(object):
         return annotation
 
     def snap(self, x, y):
-        """Return the value in self.tree closest to x, y."""
-        dist, idx = self.tree.query(self.scaled((x, y)), k=1, p=1)
-        try:
-            return self._points[idx]
-        except IndexError:
-            # IndexError: index out of bounds
-            return self._points[0]
+        xs = [date2num(item) for item in self.plot_data[0]]
+        pos = bisect.bisect_right(xs, x) - 1
+        pos = pos if pos > 0 else 0
+        val = self.plot_data[0][pos], list(item[pos] for item in self.plot_data[1])
+        return val
 
 
-fig, ax = plt.subplots()
-x = np.linspace(0.1, 2 * pi, 10)
-y = cos(x)
-markerline, stemlines, baseline = ax.stem(x, y, '-.')
-plt.setp(markerline, 'markerfacecolor', 'b')
-plt.setp(baseline, 'color', 'r', 'linewidth', 2)
-cursor = FollowDotCursor(ax, x, y, tolerance=20)
-plt.show()
+def plot_stock_info(index_date, values):
+    plt.rcParams["font.family"] = "consolas"
+    fig, ax = plt.subplots()
+    years = mdates.YearLocator()  # every year
+    months = mdates.MonthLocator()  # every month
+    yearsFmt = mdates.DateFormatter('%Y')
+    ax.xaxis.set_major_locator(years)
+    ax.xaxis.set_major_formatter(yearsFmt)
+    ax.xaxis.set_minor_locator(months)
+    cursor = FollowDotCursor(ax, dates, values)
+    plt.show()
+
+
+df = DayBar.read_etf_day_data('510900')
+dates = [datetime.datetime.strptime(item, '%Y-%m-%d') for item in df.index]
+opens = list(df.open)
+length = 1000
+dates = dates[0:length]
+opens = opens[0:length]
+high = list(df.high)[0:length]
+plot_stock_info(dates, (('open', opens), ('high', high)))

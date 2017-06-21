@@ -67,7 +67,7 @@ class DayBar:
         df_update.set_index('date', inplace=True)
         df_concat = pd.concat([df_read, df_update],
                               ignore_index=False)  # type: pdDF
-        df_concat.to_csv(filename)
+        df_concat.to_csv(str(filename))
         return df_concat
 
     @classmethod

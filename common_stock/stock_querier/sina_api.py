@@ -5,6 +5,7 @@ from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
 from common_stock.common_stock_helper import pure_stock_code_to_sina_symbol, \
     stock_symbol_to_pure_stock_code
+from common_stock.stock_config import stock_cache_one_month
 
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
@@ -34,7 +35,7 @@ def get_realtime_stock_info(stock_list) -> pdDF:
         f'In get_price:: status_code: {resp.status_code}, text: {resp.text[:100]}')
 
 
-# @stock_cache_one_month
+@stock_cache_one_month
 def get_etf_info_dict():
     url = "http://vip.stock.finance.sina.com.cn/quotes_service/api/jsonp.php/IO.XSRV2.CallbackList['8mqNVmdg4VG8cx0K']/Market_Center.getHQNodeDataSimple?page=1&num=280&sort=amount&asc=0&node=etf_hq_fund&%5Bobject%20HTMLDivElement%5D=nvdbj"
     resp = firefox_quick_get_url(url)
@@ -64,29 +65,22 @@ def get_etf_info_dict():
     return val
 
 
+@stock_cache_one_month
 def get_etf_sina_symbols():
     val = get_etf_info_dict()
     rval = [item['symbol'] for item in val]
     return rval
 
 
+
 import pandas as pd
 
 pd.set_option('precision', 5)
 
-
 def main():
-    # s_time = datetime.datetime.now()
     val = get_etf_info_dict()
-    val = sorted(val, key=lambda v: v['amount'])
-    val = [(item['symbol'], item['name'], item['amount']) for item in val]
-    val.reverse()
-    print(val)
-    # get_etf_sina_symbols()
-    # print(datetime.datetime.now() - s_time)
-    # ret = get_realtime_stock_info('sh' + v for v in ['510900'])
-    # print(ret.dtypes)
-    # print(type(ret.price[0]))
+
+    print(get_etf_code_list())
 
 
 if __name__ == '__main__':

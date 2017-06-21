@@ -31,6 +31,8 @@ def test_pandas():
     class Foo:
         pass
 
+    def func():
+        pass
     foo = Foo()
     statement_list = [
         'a = 1',
@@ -40,6 +42,9 @@ def test_pandas():
         'a = 1*2',
         'a = 1 / 2.0',
         'a = 1 / 2.0',
+        'a = 1 / 2.0',
+        'a = round(1 / 3, 3)',
+        'a = func',
         'a = df.open',
         'a = open_list[1]',
         'a = open_.iat[0]',

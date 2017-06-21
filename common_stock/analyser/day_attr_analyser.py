@@ -22,7 +22,7 @@ def calc_day_attr(ddr: DayDataRepr):
             rise_cnt[i] = rise_cnt[i - 1]
             drop_cnt[i] = drop_cnt[i - 1]
 
-    ddr.rise_cnt, ddr.drop_cnt = rise_cnt, drop_cnt
+    ddr.rise_cnts, ddr.drop_cnts = rise_cnt, drop_cnt
     return ddr
 
 
@@ -37,5 +37,5 @@ def test_day_attr_analyser():
     s_time = datetime.datetime.now()
     calc_day_attr(ddr)
     print(datetime.datetime.now() - s_time)
-    assert ddr.rise_cnt == [0, 1, 2, 0, 0, 1]
-    assert ddr.drop_cnt == [0, 0, 0, 1, 2, 0]
+    assert ddr.rise_cnts == [0, 1, 2, 0, 0, 1]
+    assert ddr.drop_cnts == [0, 0, 0, 1, 2, 0]

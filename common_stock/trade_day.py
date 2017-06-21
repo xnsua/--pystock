@@ -78,6 +78,7 @@ _trade_day = TradeDay()
 is_trade_day = _trade_day.is_trade_day
 get_close_trade_date_range = _trade_day.get_close_trade_day_range
 get_n_trade_days_range = _trade_day.get_n_trade_days_range
+get_nearby_trade_day = _trade_day.get_nearby_trade_day
 
 
 def main():

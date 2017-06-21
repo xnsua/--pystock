@@ -35,3 +35,4 @@ etf_with_amount = ['sh510900', 'sh510050', 'sh518880', 'sh511010', 'sh510300', '
 
 all_etf_sinacode_list = sina_api.get_etf_sina_symbols()
 all_etf_code_list = [val[2:] for val in all_etf_sinacode_list]
+

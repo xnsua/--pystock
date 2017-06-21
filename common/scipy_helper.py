@@ -1,6 +1,6 @@
 import pandas
 
-pandas.options.display.max_rows = 8
+pandas.options.display.max_rows = 10
 
 
 def set_pandas_max_rows(rows):

@@ -90,7 +90,7 @@ class DayBar:
     def read_etf_day_data(cls, etf_code):
         filename = cls._etf_code_to_csv_filepath(etf_code)
         try:
-            df_read = pd.read_csv(filename, index_col='date')
+            df_read = pd.read_csv(filename, index_col='date', dtype={'code': str})
         except FileNotFoundError:
             df_read = pdDF()
         return df_read
@@ -143,6 +143,10 @@ class DayBarUpdater:
     def update_all(cls):
         cls.update_800()
         cls.update_etfs_with_amount()
+
+
+df1 = (DayBar.update_etf_day_data('510900'))
+# df = DayBar.read_etf_day_data('510090')
 
 # PersistentCache.clear_cache()
 # PersistentCache.print_cache_data()

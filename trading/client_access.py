@@ -89,7 +89,6 @@ def test_operation_sell():
 def test_operation_query_all():
     query = ClientOperQuery(ClientConstant.account_info)
     result = fire_operation(query)
-    print(result)
     assert isinstance(result, QueryResult)
     assert isinstance(result.data, AccountInfo)
 
@@ -97,7 +96,6 @@ def test_operation_query_all():
 def test_operation_query_cancelentrust():
     query = ClientOperQuery(ClientConstant.cancelentrust)
     result = fire_operation(query)
-    print(result)
     assert isinstance(result, QueryResult)
 
 
@@ -105,7 +103,6 @@ def test_operation_query_cancelentrust():
 def test_operation_query_myshare():
     query = ClientOperQuery(ClientConstant.myshare)
     result = fire_operation(query)
-    print(result)
     assert isinstance(result, QueryResult)
     assert isinstance(result.data, List)
     if len(result.data):
@@ -126,4 +123,3 @@ def test_operation_query_dayentrust():
 def test_cancel_order():
     canceller = ClientOperCancel('O1706021110090094021', 'SH.510900', EntrustWay.way_buy)
     result = fire_operation(canceller)
-    print(result)

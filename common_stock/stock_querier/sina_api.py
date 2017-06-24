@@ -1,16 +1,20 @@
 import json
 import re
 
+import pandas as pd
+
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
 from common_stock.common_stock_helper import pure_stock_code_to_sina_symbol, \
     stock_symbol_to_pure_stock_code
 from common_stock.stock_config import stock_cache_one_month
 
+pd.set_option('precision', 5)
+
 _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
 
-def get_realtime_stock_info(stock_list) -> pdDF:
+def get_realtime_stock_infos(stock_list) -> pdDF:
     def extract_result(content_list: str):
         find_results = re.finditer(r'var hq_str_(..\d{6})="(.*)";', content_list)
         stock_codes = []
@@ -73,15 +77,4 @@ def get_etf_sina_symbols():
 
 
 
-import pandas as pd
 
-pd.set_option('precision', 5)
-
-def main():
-    val = get_etf_info_dict()
-
-    print(get_etf_code_list())
-
-
-if __name__ == '__main__':
-    main()

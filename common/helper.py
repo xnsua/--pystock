@@ -90,6 +90,10 @@ def to_seconds_str(o) -> str:
     return o.strftime('%y-%m-%d %H:%M:%S')
 
 
+def dt_from_date_str(text):
+    return datetime.date(*map(int, text.split('-')))
+
+
 def to_datetime_str(o, second_digits=3) -> str:
     ss = o.strftime('%Y-%m-%d %H:%M:%S.%f')
     if second_digits == 0:

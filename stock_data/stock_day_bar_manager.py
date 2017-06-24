@@ -1,28 +1,26 @@
 import datetime
+import pathlib
 import pathlib as pl
 
 import pandas as pd
-import requests
-import tushare
 import tushare as ts
 
-from common.helper import ndays_later_from, ndays_ago_from, dt_day_delta
+from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
-from common.timing import time_this
 from common_stock.common_stock_helper import stock_start_day
-from common_stock.stock_config import stock_cache
-from common_stock.stock_data import etf_with_amount
+from common_stock.stock_config import stock_trade_over_cache
 from common_stock.trade_day import is_trade_day
 from project_helper.config_module import myconfig
 from project_helper.logbook_logger import mylog
+from stock_data.classify import sz50s, hs300s, zz500s, all_stock_index_list, all_etf_code_list
 
 
-class DayBar:
+class StockUpdater:
     @staticmethod
     def _etf_code_to_csv_filepath(etf_code):
         etf_code = etf_code.replace('SH.', '')
         etf_code = etf_code.replace('SZ.', '')
-        path = myconfig.etf_day_data_dir
+        path = myconfig.etf_day_data_dir  # type: pathlib.Path
         filename = pl.Path(path) / (etf_code + '.csv')
         return filename
 
@@ -77,11 +75,10 @@ class DayBar:
 
     @classmethod
     def update_index_data(cls, index):
-        filename = cls._etf_code_to_csv_filepath(index)
+        filename = cls._index_code_to_csv_filepath(index)
         return cls._update_k_data(index, filename, index=True)
 
     @classmethod
-    @time_this
     def update_stock_day_data(cls, stock_code):
         filename = cls._stock_code_to_csv_filepath(stock_code)
         return cls._update_k_data(stock_code, filename)
@@ -98,58 +95,41 @@ class DayBar:
 
 class DayBarUpdater:
     @classmethod
-    @stock_cache(cache_timedelta=dt_day_delta(100))
-    def update_sz50_component(cls):
-        df1 = tushare.get_sz50s()
-        code_dict = dict(zip(df1.code, df1.name))
-        return code_dict
-
-    @classmethod
-    @stock_cache(cache_timedelta=dt_day_delta(100))
-    def update_hs300_component(cls):
-        df2 = tushare.get_hs300s()
-        code_dict = dict(zip(df2.code, df2.name))
-        return code_dict
-
-    @classmethod
-    @stock_cache(cache_timedelta=dt_day_delta(100))
-    def update_zz500_component(cls):
-        df3 = tushare.get_zz500s()
-        code_dict = dict(zip(df3.code, df3.name))
-        return code_dict
-
-    @classmethod
-    @stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
-    def update_800(cls):
-        d50 = cls.update_sz50_component()
-        d300 = cls.update_hs300_component()
-        d500 = cls.update_zz500_component()
+    @stock_trade_over_cache
+    def update_800s(cls):
+        d50 = sz50s
+        d300 = hs300s
+        d500 = zz500s
         d50.update(d300)
         d50.update(d500)
         for code in d50:
-            DayBar.update_stock_day_data(code)
+            StockUpdater.update_stock_day_data(code)
 
     @classmethod
-    @stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
-    def update_etfs_with_amount(cls):
-        try:
-            for code in etf_with_amount:
-                DayBar.update_etf_day_data(code)
-        except requests.exceptions.RequestException as e:
-            mylog.info(e)
+    @stock_trade_over_cache
+    def update_all_etfs(cls):
+        for code in all_etf_code_list:
+            try:
+                StockUpdater.update_etf_day_data(code)
+            except Exception as e:
+                mylog.info(f'Update etf {code} failed: {e}')
 
     @classmethod
-    @stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+    @stock_trade_over_cache
+    def update_stock_index(cls):
+        for index in all_stock_index_list:
+            try:
+                StockUpdater.update_index_data(index)
+            except Exception as e:
+                mylog.info(f'Update index {index} failed: {e}')
+
+    @classmethod
+    @stock_trade_over_cache
     def update_all(cls):
-        cls.update_800()
-        cls.update_etfs_with_amount()
+        cls.update_800s()
+        cls.update_all_etfs()
+        cls.update_stock_index()
 
 
-df1 = (DayBar.update_etf_day_data('510900'))
-# df = DayBar.read_etf_day_data('510090')
-
-# PersistentCache.clear_cache()
-# PersistentCache.print_cache_data()
-# toch run this
-# val = DayBarUpdater.update_all()
-# DayBarUpdater.update_etfs_with_amount()
+def test():
+    DayBarUpdater.update_all_etfs()

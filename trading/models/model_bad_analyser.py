@@ -3,16 +3,17 @@ from typing import List, Dict
 
 from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
-from common_stock.analyser.day_attr_analyser import calc_day_attr
+from common_stock.analyser.day_attr_analyser import calc_fill_day_attr
 from common_stock.trade_day import get_close_trade_date_range
-from data_manager.stock_day_bar_manager import DayBar
+from stock_data.stock_day_bar_manager import StockUpdater
 from trading_emulation.emu_account import EmuAccount
 
 
 class ModelBadAnalyser:
     def __init__(self, dfs: List[pdDF]):
         assert len(dfs) and len(dfs[0])
-        self.ddr_list = [calc_day_attr(DayDataRepr(df)) for df in dfs]
+        self.ddr_list = [calc_fill_day_attr(DayDataRepr(df)) for df in dfs]
+        # noinspection PyUnresolvedReferences
         self.code2ddr = {ddr.code: ddr for ddr in self.ddr_list}  # type: Dict[str, DayDataRepr]
         min_date = min(ddr.index[0] for ddr in self.ddr_list)
         max_date = max(ddr.index[-1] for ddr in self.ddr_list)
@@ -46,7 +47,7 @@ class ModelBadAnalyser:
             self.accounts[index] = cur_account
 
 def main():
-    df = DayBar.read_etf_day_data('510900')
+    df = StockUpdater.read_etf_day_data('510900')
     print(len(df))
     import datetime
     s_time = datetime.datetime.now()

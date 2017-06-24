@@ -6,9 +6,9 @@ import pandas
 from common.scipy_helper import pdDF
 from common_stock.common_stock_helper import trade_bid_end_time, trade1_end_time, \
     trade2_begin_time, trade2_end_time
-from common_stock.stock_data import etf_with_amount
 from common_stock.stock_querier import sina_api
 from project_helper.logbook_logger import mylog
+from stock_data.classify import etf_sz50
 from trading.base_structure.trade_constants import TradeId, MsgPushRealTimePrice, \
     MsgSetRealTimeStocks, \
     MsgBidOver, MsgQuitLoop
@@ -86,7 +86,7 @@ class DataServer:
         if not stock_list:
             return pdDF()
         try:
-            self._df_realtime_stock_info = sina_api.get_realtime_stock_info(stock_list)
+            self._df_realtime_stock_info = sina_api.get_realtime_stock_infos(stock_list)
         except:
             mylog.warn(f'Can not query realtime info from sina api')
         return self._df_realtime_stock_info
@@ -99,7 +99,7 @@ class DataServer:
 
         if datetime.date.today() == self._msg_sent[MsgBidOver]:
             return BidResult(True, False)
-        dfs = sina_api.get_realtime_stock_info(etf_with_amount)
+        dfs = sina_api.get_realtime_stock_infos([etf_sz50])
         open_prices = dfs.open
         is_bid_over = all(open_prices)
 

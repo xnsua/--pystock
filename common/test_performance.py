@@ -1,4 +1,17 @@
+import numpy
 import pandas
+
+
+# noinspection PyUnresolvedReferences
+def parse_date():
+    import datetime
+    import timeit
+    val = timeit.timeit('date = datetime.date(*map(int, "2011-01-01".split("-")))',
+                        globals=globals())
+    print(val)
+    val = timeit.timeit("date = datetime.datetime.strptime('2011-01-01', '%Y-%m-%d').date()",
+                        globals=globals())
+    print(val)
 
 
 def test_function_call():
@@ -25,6 +38,7 @@ def test_pandas():
     import timeit
     df = pandas.DataFrame(index=['2011-01-01', '2011-01-02'], data=[[1, 2], [3, 4]],
                           columns=['open', 'close'])
+    nparr = numpy.array([1, 2, 3, 4])
     open_ = df.open
     open_list = list(df.open)
 
@@ -33,6 +47,7 @@ def test_pandas():
 
     def func():
         pass
+
     foo = Foo()
     statement_list = [
         'a = 1',
@@ -49,6 +64,7 @@ def test_pandas():
         'a = open_list[1]',
         'a = open_.iat[0]',
         'a = df.iat[0,0]',
+        'a = nparr[0]',
     ]
 
     time_origin = timeit.timeit('a=1', globals=globals(), number=10000)

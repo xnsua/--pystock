@@ -2,6 +2,7 @@ import datetime as dt
 
 import pandas
 import tushare
+from nose.tools import assert_equal
 
 from common_stock.stock_config import stock_cache_one_month
 
@@ -62,7 +63,7 @@ class TradeDay:
                 i_day = i_day + 1
             return self.day_list[i_day]
 
-    def get_n_trade_days_range(self, day, ndays):
+    def get_n_trade_days(self, day, ndays):
         if day not in self.trade_day_map:
             day = self.get_nearby_trade_day(day, ndays < 0)
         i_day = self.trade_day_map[str(day)]
@@ -77,16 +78,10 @@ pandas.options.display.max_rows = 10
 _trade_day = TradeDay()
 is_trade_day = _trade_day.is_trade_day
 get_close_trade_date_range = _trade_day.get_close_trade_day_range
-get_n_trade_days_range = _trade_day.get_n_trade_days_range
+get_n_trade_days = _trade_day.get_n_trade_days
 get_nearby_trade_day = _trade_day.get_nearby_trade_day
 
 
-def main():
-    # val = _trade_day.get_date_range('2017-06-16', '2017-06-20')
-    # val = _trade_day.get_close_date_range('2017-06-16', '2017-06-20')
-    val = _trade_day.get_n_trade_days_range('2017-06-18', -1)
-    print(val)
-
-
-if __name__ == '__main__':
-    main()
+def test():
+    val = _trade_day.get_n_trade_days('2017-06-18', -1)
+    assert_equal(val[0], '2017-06-16')

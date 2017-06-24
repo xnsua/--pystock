@@ -4,7 +4,7 @@ from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
 
 
-def calc_day_attr(ddr: DayDataRepr):
+def calc_fill_day_attr(ddr: DayDataRepr):
     index = list(ddr.index)
     open_ = list(ddr.open)
     close = list(ddr.close)
@@ -35,7 +35,7 @@ def test_day_attr_analyser():
     ddr = DayDataRepr(df)
     import datetime
     s_time = datetime.datetime.now()
-    calc_day_attr(ddr)
+    calc_fill_day_attr(ddr)
     print(datetime.datetime.now() - s_time)
     assert ddr.rise_cnts == [0, 1, 2, 0, 0, 1]
     assert ddr.drop_cnts == [0, 0, 0, 1, 2, 0]

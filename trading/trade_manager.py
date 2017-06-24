@@ -5,10 +5,10 @@ from typing import Dict
 
 import pandas
 
-from data_manager.data_server_main import DataServer
 from ip.constants import ClientConstant
 from ip.st import ClientOperQuery, ClientOperBase
 from project_helper.logbook_logger import mylog
+from stock_data.data_server_main import DataServer
 from trading.base_structure.trade_constants import TradeId, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.client_access import is_client_server_running, \

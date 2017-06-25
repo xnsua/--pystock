@@ -2,7 +2,6 @@ from typing import List
 
 import jsonpickle
 import requests
-
 from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
 from ip.constants import ClientConstant
@@ -10,6 +9,7 @@ from ip.st import ClientOperBuy, EntrustType, BuyResult, SellResult, ClientOperS
     ClientOperQuery, AccountInfo, QueryResult, ShareItem, EntrustItem, ClientOperCancel, \
     EntrustWay, ErrorResult
 from project_helper.logbook_logger import mylog
+from trading.client_access_formatter import format_operation
 
 jsonpickle.load_backend('simplejson')
 jsonpickle.set_encoder_options('simplejson', sort_keys=True, ensure_ascii=False)
@@ -41,6 +41,7 @@ def _visit_client_server(url_args, headers, timeout=5):
 
 
 def fire_operation(oper):
+    format_operation(oper)
     order_str = jsonpickle.dumps(oper)
     # mylog.warn(repr(oper))
     order_str = order_str.strip()

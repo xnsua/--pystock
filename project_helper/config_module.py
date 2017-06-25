@@ -13,7 +13,7 @@ class MyConfig:
         self.index_day_data_dir = self.stock_data_dir / 'day/index_data'
         self.index_day_data_dir.mkdir(parents=True, exist_ok=True)
 
-        self.stock_day_data__dir = self.stock_data_dir / 'day/stock_data'
+        self.stock_day_data__dir = self.stock_data_dir / 'day/stock_data_updater'
         self.stock_day_data__dir.mkdir(parents=True, exist_ok=True)
 
 

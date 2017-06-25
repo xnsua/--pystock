@@ -5,8 +5,8 @@ from common.key_value_db import KeyValueDb
 from common.scipy_helper import pdDF
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
 from project_helper.logbook_logger import mylog
-from stock_data.classify import etf_example
-from stock_data.stock_day_bar_manager import StockUpdater
+from stock_data_updater.classify import etf_example
+from stock_data_updater.stock_day_bar_manager import StockUpdater
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 

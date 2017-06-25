@@ -1,7 +1,6 @@
 from typing import Dict
 
 import tushare
-
 from common_stock.stock_config import stock_cache_three_month
 from common_stock.stock_querier import sina_api
 

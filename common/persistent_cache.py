@@ -25,10 +25,11 @@ class _PersistentCacheBase:
         atexit.register(lambda: cls._db.close())
 
     def __init__(self, cache_timedelta=None, day_boundary: datetime.time = None, cache_days=None):
-        # Value of one group is used
-        # Group one
+        assert cache_timedelta is None or (day_boundary is None and cache_days is None)
+        self.is_day_boundary_type = day_boundary is not None
+
         self.cache_timedelta = cache_timedelta
-        # Group two
+
         self.day_boundary = day_boundary
         self.cache_days = cache_days
 
@@ -42,13 +43,13 @@ class _PersistentCacheBase:
         cls._db.clear()
 
     def _in_cache_time_span(self, cache_dt: datetime.datetime):
-        if self.cache_timedelta is not None:
-            return dt_now() - cache_dt < self.cache_timedelta
-        else:
+        if self.is_day_boundary_type:
             base_time = dt_combine(dt_now().date(), self.day_boundary)
             delta1 = cache_dt - base_time
             delta2 = dt_now() - base_time
             return delta1.days + self.cache_days > delta2.days
+        else:
+            return dt_now() - cache_dt < self.cache_timedelta
 
     def __call__(self, func):
         def function_wrapper(*args, **kwargs):

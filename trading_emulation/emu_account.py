@@ -1,7 +1,7 @@
 import copy
 
 from nose.tools import assert_equal
-from stock_data_updater.stock_data import all_etf_code_list
+from stock_data_updater.classify import all_etf_code_list
 
 
 class EmuAccount:
@@ -10,7 +10,7 @@ class EmuAccount:
     sell_fee = 25 / 100_000
     tax = 1 / 1_000
 
-    def __init__(self, balance=0, total_assert=0):
+    def __init__(self, balance=.0, total_assert=.0):
         assert total_assert >= balance
         self.balance = balance * 1.0
         self.total_assert = total_assert * 1.0

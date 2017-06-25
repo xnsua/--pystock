@@ -2,9 +2,8 @@ import datetime as dt
 
 import pandas
 import tushare
-from nose.tools import assert_equal
-
 from common_stock.stock_config import stock_cache_one_month
+from nose.tools import assert_equal
 
 
 class TradeDay:

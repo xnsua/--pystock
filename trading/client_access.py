@@ -124,3 +124,4 @@ def test_operation_query_dayentrust():
 def test_cancel_order():
     canceller = ClientOperCancel('O1706021110090094021', 'SH.510900', EntrustWay.way_buy)
     result = fire_operation(canceller)
+    print(result)

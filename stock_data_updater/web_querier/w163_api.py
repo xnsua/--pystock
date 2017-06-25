@@ -8,7 +8,7 @@ import requests
 # Add the 1 to the stock_code to imply the SZ common_stock
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_get_url
-from common_stock.common_stock_helper import StockTerm, stock_start_day
+from common_stock.stock_helper import stock_start_day
 
 
 def download_stock_history(stock_code, save_path,
@@ -47,7 +47,7 @@ def wget_etf_info(etf_code):
         net_assert = float(net_assert.replace('亿', '')) * 10000 * 10000
     else:
         raise Exception(f'Query etf info for {etf_code} failed, text is {text}')
-    return {StockTerm.scale: net_assert}
+    return {'scale': net_assert}
 
 
 def main():

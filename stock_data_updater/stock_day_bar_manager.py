@@ -6,7 +6,7 @@ import pandas as pd
 import tushare as ts
 from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
-from common_stock.common_stock_helper import stock_start_day
+from common_stock.stock_helper import stock_start_day
 from common_stock.trade_day import is_trade_day
 from project_helper.config_module import myconfig
 from stock_data_updater.classify import sz50s, hs300s, zz500s, all_stock_index_list, \

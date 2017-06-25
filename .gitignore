@@ -1,4 +1,4 @@
-ztest/jqs.py
+ztest/
 log/
 misc.xml
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
@@ -42,7 +42,6 @@ misc.xml
 session_cache_one_day.sqlite
 __pycache__/
 common/__file_cache__/
-common_stock/data_shelve/
 common_stock/stock_cache_data/
 shelve/
 trading/model_buy_after_drop.sqlite

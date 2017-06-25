@@ -9,7 +9,7 @@ def format_price(stock, price):
         price_str = str(round(price, 3))
     else:
         price_str = str(round(price, 2))
-    assert math.isclose(float(price_str), price), f'{price} is not close to {fstr}'
+    assert math.isclose(float(price_str), price), f'{price} is not close to {price_str}'
     return price
 
 

@@ -4,9 +4,9 @@ import re
 import pandas as pd
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
-from common_stock.common_stock_helper import pure_stock_code_to_sina_symbol, \
-    stock_symbol_to_pure_stock_code
 from common_stock.stock_config import stock_cache_one_month
+from common_stock.stock_helper import to_sina_stock_symbol, \
+    to_pure_stock_code
 
 pd.set_option('precision', 5)
 
@@ -19,7 +19,7 @@ def get_realtime_stock_infos(stock_list) -> pdDF:
         stock_codes = []
         attrs = []
         for v in find_results:
-            stock_codes.append(stock_symbol_to_pure_stock_code(v[1]))
+            stock_codes.append(to_pure_stock_code(v[1]))
             content = v[2].split(',')
             content = content[0:6]
             content.append(content.pop(0))
@@ -29,7 +29,7 @@ def get_realtime_stock_infos(stock_list) -> pdDF:
         df['name'] = df['name'].astype(str)
         return df
 
-    list_str = ','.join(map(pure_stock_code_to_sina_symbol, stock_list))
+    list_str = ','.join(map(to_sina_stock_symbol, stock_list))
     url = 'http://hq.sinajs.cn/list=' + list_str
     resp = firefox_quick_get_url(url)
     if resp.status_code == 200:

@@ -6,8 +6,8 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num
 from matplotlib.gridspec import GridSpec
+from stock_analyser.stock_indicator.stock_indicator import calc_trend_indicator
 from stock_data_updater.stock_day_bar_manager import StockUpdater
-from stock_data_updater.stock_indicator.stock_indicator import calc_trend_indicator
 
 
 def _fmt(x, y):
@@ -122,6 +122,7 @@ class FollowDotCursor(object):
         xs = [date2num(item) for item in self.plot_data[0]]
         pos = bisect.bisect_right(xs, x) - 1
         pos = pos if pos > 0 else 0
+        # noinspection PyUnresolvedReferences
         val = self.plot_data[0][pos], list(item[pos] for item in self.plot_data[1])
         return val
 

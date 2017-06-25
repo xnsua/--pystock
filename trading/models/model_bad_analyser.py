@@ -3,8 +3,8 @@ from typing import List, Dict
 
 from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
-from common_stock.analyser.day_attr_analyser import calc_fill_day_attr
 from common_stock.trade_day import get_close_trade_date_range
+from stock_data_updater.analyser.day_attr_analyser import calc_fill_day_attr
 from stock_data_updater.stock_day_bar_manager import StockUpdater
 from trading_emulation.emu_account import EmuAccount
 

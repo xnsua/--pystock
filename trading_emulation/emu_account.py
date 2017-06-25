@@ -1,8 +1,7 @@
 import copy
 
 from nose.tools import assert_equal
-
-from common_stock.stock_data import all_etf_code_list
+from stock_data_updater.stock_data import all_etf_code_list
 
 
 class EmuAccount:

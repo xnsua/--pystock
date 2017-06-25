@@ -4,10 +4,10 @@ import traceback
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from common_stock.stock_indicator.stock_indicator import calc_trend_indicator
 from matplotlib.dates import date2num
 from matplotlib.gridspec import GridSpec
 from stock_data_updater.stock_day_bar_manager import StockUpdater
+from stock_data_updater.stock_indicator.stock_indicator import calc_trend_indicator
 
 
 def _fmt(x, y):

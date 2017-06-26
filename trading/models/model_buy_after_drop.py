@@ -1,3 +1,4 @@
+import pathlib
 from random import choice
 
 from common.helper import dt_today, dt_now
@@ -6,7 +7,7 @@ from common.scipy_helper import pdDF
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
 from project_helper.logbook_logger import mylog
 from stock_data_updater.classify import etf_example
-from stock_data_updater.stock_day_bar_manager import StockUpdater
+from stock_data_updater.day_data import StockUpdater
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
@@ -45,7 +46,8 @@ class ModelBuyAfterDrop(AbstractModel):
 
         self._push_times = 0
 
-        self.db = BadData('model_buy_after_drop.sqlite')
+        path = pathlib.Path(__file__).parent / 'model_buy_after_drop.sqlite'
+        self.db = BadData(str(path))
 
     def log_account_info(self):
         try:

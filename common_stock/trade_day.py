@@ -2,7 +2,7 @@ import datetime as dt
 
 import pandas
 import tushare
-from common_stock.stock_config import stock_cache_one_month
+from common_stock import stock_cache_one_month
 from nose.tools import assert_equal
 
 
@@ -18,8 +18,6 @@ class TradeDay:
     @staticmethod
     @stock_cache_one_month
     def read_df():
-        # path = pathlib.Path(__file__).parent / 'trade_day.csv'
-        # return pd.read_csv(str(path), index_col='index')
         return tushare.trade_cal()
 
     def build_trade_day_map(self):

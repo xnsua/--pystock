@@ -1,8 +1,11 @@
+import pathlib
 import time
 import win32api
 from inspect import stack, getframeinfo
 
 import win32con
+from common.audio.wav import play_wav
+from common.helper import dt_now
 
 
 def message_box_error(*texts):
@@ -24,3 +27,11 @@ def message_beep(seconds=5):
     for i in range(seconds):
         win32api.MessageBeep()
         time.sleep(1)
+
+
+def alert_exception(seconds=3):
+    filepath = pathlib.Path(__file__).parent / 'audio' / 'alarm.wav'
+
+    start_dt = dt_now()
+    while (dt_now() - start_dt).total_seconds() < seconds:
+        play_wav(str(filepath))

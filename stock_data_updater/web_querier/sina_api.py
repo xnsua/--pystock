@@ -4,7 +4,7 @@ import re
 import pandas as pd
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
-from common_stock.stock_config import stock_cache_one_month
+from common_stock import stock_cache_one_month
 from common_stock.stock_helper import to_sina_stock_symbol, \
     to_pure_stock_code
 

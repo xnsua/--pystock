@@ -1,11 +1,4 @@
-import datetime
-
 import requests
-import requests_cache
-
-# noinspection PyTypeChecker
-session_cache_one_day = requests_cache.CachedSession(
-    'session_cache_one_day', expire_after=datetime.timedelta(days=1))
 
 session_nocache = requests.session()
 

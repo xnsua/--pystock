@@ -6,7 +6,7 @@ from typing import List
 
 from common.alert import message_box_error
 from common.base_functions import ObjectWithIndentRepr, ObjectWithRepr
-from common.numeric import float_default_zero
+from common.helper import float_default_zero
 
 # noinspection PyBroadException
 

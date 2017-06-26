@@ -25,4 +25,10 @@ __fh.setFormatter(__formatter)
 cmlog.addHandler(__ch)
 cmlog.addHandler(__fh)
 
-cmlog.warning('hello')
+
+def main():
+    cmlog.warning('hello')
+
+
+if __name__ == '__main__':
+    main()

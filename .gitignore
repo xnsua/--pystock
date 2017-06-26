@@ -44,4 +44,3 @@ __pycache__/
 common/__file_cache__/
 common_stock/stock_cache_data/
 shelve/
-trading/model_buy_after_drop.sqlite

@@ -9,7 +9,7 @@ from common.scipy_helper import pdDF
 from common_stock.stock_helper import stock_start_day
 from common_stock.trade_day import is_trade_day
 from stock_data_updater import day_data_path
-from stock_data_updater.classify import sz50s, hs300s, zz500s, all_stock_index_list, \
+from stock_data_updater.classify import sz50m, hs300m, zz500m, all_stock_index_list, \
     all_etf_code_list
 
 
@@ -18,7 +18,7 @@ class StockUpdater:
     def _etf_code_to_csv_filepath(etf_code):
         etf_code = etf_code.replace('SH.', '')
         etf_code = etf_code.replace('SZ.', '')
-        path = day_data_path.etf_day_data_dir  # type: pathlib.Path
+        path = day_data_path.etf  # type: pathlib.Path
         filename = pl.Path(path) / (etf_code + '.csv')
         return filename
 
@@ -26,7 +26,7 @@ class StockUpdater:
     def _index_code_to_csv_filepath(index):
         index = index.replace('SH.', '')
         index = index.replace('SZ.', '')
-        path = day_data_path.index_day_data_dir
+        path = day_data_path.index
         filename = pl.Path(path) / (index + '.csv')
         return filename
 
@@ -34,7 +34,7 @@ class StockUpdater:
     def _stock_code_to_csv_filepath(stock_code):
         stock_code = stock_code.replace('SH.', '')
         stock_code = stock_code.replace('SZ.', '')
-        path = day_data_path.stock_day_data__dir
+        path = day_data_path.stock
         filename = pl.Path(path) / (stock_code + '.csv')
         return filename
 
@@ -96,9 +96,9 @@ class DayBarUpdater:
     @classmethod
     # @stock_trade_over_cache
     def update_800s(cls):
-        d50 = sz50s
-        d300 = hs300s
-        d500 = zz500s
+        d50 = sz50m
+        d300 = hs300m
+        d500 = zz500m
         d_all = {**d50, **d300, **d500}
         failed_code = {}
         for code in d_all:

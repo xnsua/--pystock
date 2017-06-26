@@ -3,11 +3,12 @@ import traceback
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from common.helper import dt_date_from_str
 from matplotlib.dates import date2num
 from matplotlib.gridspec import GridSpec
+
+from common.helper import dt_date_from_str
 from stock_analyser.stock_indicator.stock_indicator import calculate_trend_indicator
-from stock_data_updater.day_data import read_etf_day_data, read_index_day_data
+from stock_data_updater.day_data_updater import read_etf_day_data, read_index_day_data
 
 
 class StockTrendPlotter(object):

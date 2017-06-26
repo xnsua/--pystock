@@ -7,7 +7,7 @@ from common.scipy_helper import pdDF
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
 from project_helper.logbook_logger import mylog
 from stock_data_updater.classify import etf_example
-from stock_data_updater.day_data import SingleStockUpdater
+from stock_data_updater.day_data_updater import SingleStockUpdater
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 

@@ -53,7 +53,10 @@ class _PersistentCacheBase:
 
     def __call__(self, func):
         def function_wrapper(*args, **kwargs):
-            key_text = '_'.join(map(str, [func.__module__, func.__name__, *args, *kwargs.items()]))
+            import ntpath
+            filename = ntpath.basename(func.__code__.co_filename)
+            key_text = '.'.join(
+                map(str, [filename, func.__name__, *args, *kwargs.items()]))
             val = self._db.get(key_text, None)
             if val and self._in_cache_time_span(val[0]):
                 return val[1]

@@ -4,6 +4,7 @@ import pathlib as pl
 
 import pandas as pd
 import tushare as ts
+
 from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
 from common_stock import stock_trade_over_cache
@@ -178,10 +179,12 @@ class DayBarUpdater:
             f'Update data result {stock_code2except}, {etf_code2except}, {index_code2except}')
         return stock_code2except, etf_code2except, index_code2except
 
+    @classmethod
+    def update_all(cls):
+        SingleStockUpdater.update_etf_day_data('510900')
 
 def main():
-    failcodes = DayBarUpdater.update_all()
-    print(failcodes)
+    DayBarUpdater.update_all()
 
 
 if __name__ == '__main__':

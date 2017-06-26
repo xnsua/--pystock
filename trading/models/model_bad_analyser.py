@@ -5,7 +5,7 @@ from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
 from common_stock.trade_day import get_close_trade_date_range
 from stock_analyser.day_attr_analyser import calc_fill_day_attr
-from stock_data_updater.day_data import SingleStockUpdater
+from stock_data_updater.day_data_updater import SingleStockUpdater
 from trading_emulation.emu_account import EmuAccount
 
 

@@ -19,6 +19,7 @@ class DayDataPath:
         self.stock.mkdir(parents=True, exist_ok=True)
 
 
+# noinspection PyTypeChecker
 day_data_path = DayDataPath(_stock_data_root)
 
 

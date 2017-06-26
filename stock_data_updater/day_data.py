@@ -6,14 +6,16 @@ import pandas as pd
 import tushare as ts
 from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
+from common_stock import stock_trade_over_cache
 from common_stock.stock_helper import stock_start_day
 from common_stock.trade_day import is_trade_day
 from stock_data_updater import day_data_path
 from stock_data_updater.classify import sz50m, hs300m, zz500m, all_stock_index_list, \
     all_etf_code_list
+from stock_data_updater.data_updater_logger import updatelog
 
 
-class StockUpdater:
+class SingleStockUpdater:
     @staticmethod
     def _etf_code_to_csv_filepath(etf_code):
         etf_code = etf_code.replace('SH.', '')
@@ -39,6 +41,7 @@ class StockUpdater:
         return filename
 
     @staticmethod
+    @stock_trade_over_cache
     def _update_k_data(stock_code: str, filename, index=False):
         print(f'Updating for {stock_code}')
         try:
@@ -91,10 +94,32 @@ class StockUpdater:
             df_read = pdDF()
         return df_read
 
+    @classmethod
+    def read_stock_day_data(cls, etf_code):
+        filename = cls._stock_code_to_csv_filepath(etf_code)
+        try:
+            df_read = pd.read_csv(filename, index_col='date', dtype={'code': str})
+        except FileNotFoundError:
+            df_read = pdDF()
+        return df_read
+
+    @classmethod
+    def read_index_day_data(cls, etf_code):
+        filename = cls._index_code_to_csv_filepath(etf_code)
+        try:
+            df_read = pd.read_csv(filename, index_col='date', dtype={'code': str})
+        except FileNotFoundError:
+            df_read = pdDF()
+        return df_read
+
+
+read_etf_day_data = SingleStockUpdater.read_etf_day_data
+read_index_day_data = SingleStockUpdater.read_index_day_data
+read_stock_day_data = SingleStockUpdater.read_stock_day_data
+
 
 class DayBarUpdater:
     @classmethod
-    # @stock_trade_over_cache
     def update_800s(cls):
         d50 = sz50m
         d300 = hs300m
@@ -103,35 +128,37 @@ class DayBarUpdater:
         failed_code = {}
         for code in d_all:
             try:
-                StockUpdater.update_stock_day_data(code)
+                SingleStockUpdater.update_stock_day_data(code)
             except Exception as e:
+                updatelog.warn(f'Update stock failed. {code}:{e}')
                 failed_code[code] = e
         return failed_code
 
     @classmethod
-    # @stock_trade_over_cache
     def update_all_etfs(cls):
         fail_codes = {}
         for code in all_etf_code_list:
             try:
-                StockUpdater.update_etf_day_data(code)
+                SingleStockUpdater.update_etf_day_data(code)
             except Exception as e:
+                updatelog.warn(f'Update etfs failed. {code}:{e}')
                 fail_codes[code] = e
         return fail_codes
 
     @classmethod
-    # @stock_trade_over_cache
     def update_stock_index(cls):
         fail_codes = {}
         for index in all_stock_index_list:
             try:
-                StockUpdater.update_index_data(index)
+                SingleStockUpdater.update_index_data(index)
             except Exception as e:
+                updatelog.warn(f'Update index failed. {index}:{e}')
                 fail_codes[index] = e
         return fail_codes
 
     @classmethod
     def update_all(cls):
+        updatelog.notice('Begin update all data')
         stock_code2except = {}
         etf_code2except = {}
         index_code2except = {}
@@ -147,6 +174,8 @@ class DayBarUpdater:
             index_code2except = cls.update_stock_index()
             if not index_code2except:
                 break
+        updatelog.notice(
+            f'Update data result {stock_code2except}, {etf_code2except}, {index_code2except}')
         return stock_code2except, etf_code2except, index_code2except
 
 

@@ -8,3 +8,4 @@ def set_pandas_max_rows(rows):
 
 
 pdDF = pandas.DataFrame
+pdSr = pandas.Series

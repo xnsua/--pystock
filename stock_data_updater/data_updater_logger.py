@@ -2,6 +2,8 @@ import datetime
 import pathlib
 import sys
 
+from project_helper.logbook_logger import mylog
+
 try:
     import logbook
 except:
@@ -56,25 +58,26 @@ def file_formatter(record, handler):
     return log
 
 
-stdout_handler = StreamHandler(sys.stdout, bubble=True, level=logbook.INFO)
+stdout_handler = StreamHandler(sys.stdout, bubble=False, level=logbook.INFO)
 stdout_handler.formatter = stdout_formatter
 
 _file_path = pathlib.Path(__file__).parent / 'updater.log'
-_file_handler = logbook.FileHandler(_file_path, bubble=False, level=logbook.DEBUG)
+_file_handler = logbook.FileHandler(_file_path, bubble=True, level=logbook.NOTICE)
 
 # file_handler = logbook.RotatingFileHandler(_file_path, bubble=True, max_size=5 * 1024 * 1024,
 #                                            backup_count=10)
 _file_handler.formatter = file_formatter
 
 updatelog = logbook.Logger("update_log")
-updatelog.handlers.append(stdout_handler)
 updatelog.handlers.append(_file_handler)
+updatelog.handlers.append(stdout_handler)
 
 s_time = datetime.datetime.now()
 
 
 def main():
-    updatelog.info('Hello')
+    updatelog.info('Hello6')
+    mylog.warn('war7')
 
 
 if __name__ == '__main__':

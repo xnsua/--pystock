@@ -5,7 +5,7 @@ from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
 from common_stock.trade_day import get_close_trade_date_range
 from stock_analyser.day_attr_analyser import calc_fill_day_attr
-from stock_data_updater.day_data import StockUpdater
+from stock_data_updater.day_data import SingleStockUpdater
 from trading_emulation.emu_account import EmuAccount
 
 
@@ -47,7 +47,7 @@ class ModelBadAnalyser:
             self.accounts[index] = cur_account
 
 def main():
-    df = StockUpdater.read_etf_day_data('510900')
+    df = SingleStockUpdater.read_etf_day_data('510900')
     print(len(df))
     import datetime
     s_time = datetime.datetime.now()

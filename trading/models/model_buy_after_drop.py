@@ -7,7 +7,7 @@ from common.scipy_helper import pdDF
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
 from project_helper.logbook_logger import mylog
 from stock_data_updater.classify import etf_example
-from stock_data_updater.day_data import StockUpdater
+from stock_data_updater.day_data import SingleStockUpdater
 from trading.models.model_base import AbstractModel
 from trading.trade_context import TradeContext
 
@@ -136,5 +136,5 @@ class ModelBuyAfterDrop(AbstractModel):
 def read_df_dict(etfs):
     etf_dict = {}
     for etf in etfs:
-        etf_dict[etf] = StockUpdater.read_etf_day_data(etf)
+        etf_dict[etf] = SingleStockUpdater.read_etf_day_data(etf)
     return etf_dict

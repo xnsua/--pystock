@@ -1,65 +1,49 @@
 import bisect
-import datetime
 import traceback
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+from common.helper import dt_date_from_str
 from matplotlib.dates import date2num
 from matplotlib.gridspec import GridSpec
-from stock_analyser.stock_indicator.stock_indicator import calc_trend_indicator
-from stock_data_updater.day_data import StockUpdater
+from stock_analyser.stock_indicator.stock_indicator import calculate_trend_indicator
+from stock_data_updater.day_data import read_etf_day_data, read_index_day_data
 
 
-def _fmt(x, y):
-    datestr = x.strftime(f'date:  %y-%m-%d')
-    str1 = f'\nvalue: {y[0]:.3f}'
-    str2 = f'\nbase:  {y[1]:.3f}'
-    return datestr + str1 + str2
-
-
-class FollowDotCursor(object):
+class StockTrendPlotter(object):
     """Display the x,y location of the nearest data point.
     https://stackoverflow.com/a/4674445/190597 (Joe Kington)
     https://stackoverflow.com/a/13306887/190597 (unutbu)
     https://stackoverflow.com/a/15454427/190597 (unutbu)
     """
 
-    def __init__(self, ax_fig, ax_text, xvals, yvals, ybase_vals, formatter=_fmt,
-                 offsets=(-20, 20)):
+    def __init__(self, ax_fig, ax_text, plot_data):
         self.ax_fig = ax_fig
         self.ax_text = ax_text
-        self.plot_data = xvals, (yvals, ybase_vals)
-        self.formatter = formatter
-        self.offsets = offsets
-        self.indicator = calc_trend_indicator(self.plot_data[0], self.plot_data[1][0])
-        self.indicator_base = calc_trend_indicator(self.plot_data[0], self.plot_data[1][1])
+        self.plot_data = plot_data
 
-        normal_factor = yvals[0] / ybase_vals[0]
-        normal_ybase_vals = [item * normal_factor for item in ybase_vals]
-        relative_normal_factor = yvals[0]
-        normal_relative_vals = [x / y * relative_normal_factor for x, y in
-                                zip(yvals, normal_ybase_vals)]
+        self.plot_lines()
 
-        self.relative_indicator = calc_trend_indicator(self.plot_data[0], self.plot_data[1][1])
-        ax_fig.grid(True, alpha=0.4)
-        # self.fig = ax_fig.figure
-        self.ax_fig.xaxis.set_label_position('top')
-        ax_fig.plot(xvals, yvals)
-        ax_fig.plot(xvals, normal_ybase_vals)
-        ax_fig.plot(xvals, normal_relative_vals)
-        # ax_fig.legend()
-
-        # mdd = self.plot_max_drawdrop(ax_fig, xvals, yvals[0])
-        # self.draw_text(ax_text, {'mdd': mdd})
         self.draw_text()
+
         self.plot_max_drawdrop()
 
         self.annotation = self.setup_annotation()
         plt.connect('motion_notify_event', self)
 
+    def plot_lines(self):
+        values = self.plot_data['values']
+        normal_base = self.plot_data['normal_base_values']
+        ratio = self.plot_data['ratios_values']
+        xdata = [dt_date_from_str(item) for item in values.index]
+        self.ax_fig.plot(xdata, values, label='values')
+        self.ax_fig.plot(xdata, normal_base, label='base')
+        self.ax_fig.plot(xdata, ratio, label='ratio')
+        self.ax_fig.legend()
+
     def draw_text(self):
-        indicator = self.indicator
-        indicator_base = self.indicator_base
+        indicator = self.plot_data['value_attr']
+        indicator_base = self.plot_data['base_attr']
         mdd1 = indicator['mdd_info']
 
         line1pos = [(x / 10, 0.6) for x in range(0, 10, 1)]
@@ -78,8 +62,8 @@ class FollowDotCursor(object):
                           alpha=0.5)
 
     def plot_max_drawdrop(self):
-        # Plot maxdrawdown info
-        mdd_info = self.indicator['mdd_info']
+        indicator = self.plot_data['value_attr']
+        mdd_info = indicator['mdd_info']
         leftp, rightp, endp = mdd_info[1]
 
         self.ax_fig.plot(*zip(leftp, rightp), alpha=0.3)
@@ -98,9 +82,9 @@ class FollowDotCursor(object):
                 inv = ax.transData.inverted()
                 x, y = inv.transform([(event.x, event.y)]).ravel()
             annotation = self.annotation
-            x, y = self.snap(x, y)
-            annotation.xy = x, y[0]
-            annotation.set_text(self.formatter(x, y))
+            x, ys = self.snap(x, y)
+            annotation.xy = x, ys[0]
+            annotation.set_text(self._fmt(x, ys))
             event.canvas.draw()
         except Exception:
             traceback.print_exc()
@@ -109,7 +93,7 @@ class FollowDotCursor(object):
         """Draw and hide the annotation box."""
         annotation = self.ax_fig.annotate(
             '', xy=(0, 0), ha='left',
-            xytext=self.offsets, textcoords='offset points', va='bottom',
+            xytext=(-20, 20), textcoords='offset points', va='bottom',
             bbox=dict(
                 boxstyle='round,pad=0.5', fc='yellow', alpha=0.2),
             arrowprops=dict(
@@ -118,49 +102,60 @@ class FollowDotCursor(object):
 
     # noinspection PyUnusedLocal
     def snap(self, x, y):
-        # print(x, y)
-        xs = [date2num(item) for item in self.plot_data[0]]
+        # print('xxyy', x, y)
+        values = self.plot_data['values']
+        base = self.plot_data['base_values']
+        ratio = self.plot_data['ratios_values']
+        index_date = [dt_date_from_str(item) for item in values.index]
+        # xs = [date2num(date) for date in index_date]
+        xs = date2num(index_date)
         pos = bisect.bisect_right(xs, x) - 1
         pos = pos if pos > 0 else 0
         # noinspection PyUnresolvedReferences
-        val = self.plot_data[0][pos], list(item[pos] for item in self.plot_data[1])
+        x = dt_date_from_str(values.index[pos])
+        val = x, (values[pos], base[pos], ratio[pos])
         return val
 
+    def _fmt(self, x, y):
+        datestr = x.strftime(f'date:  %y-%m-%d')
+        str1 = f'\nvalue: {y[0]:.3f}'
+        str2 = f'\nbase:  {y[1]:.3f}'
+        return datestr + str1 + str2
 
-def plot_stock_info(index_date, values, base_values):
-    """
-    :param index_date:
-    :param base_values:
-    :param values: values[0] for stratege value
-                   values[1] for base value
-    """
+
+def plot_stock_values(plot_values):
     plt.rcParams["font.family"] = "consolas"
-
     fig = plt.figure(figsize=(16, 4))
     gs = GridSpec(2, 1, height_ratios=[1, 4])
-
     ax_text = fig.add_subplot(gs[0, 0])
     ax_text.axis('off')
     ax_fig = fig.add_subplot(gs[1, 0])
+    ax_fig.grid(True, alpha=0.4)
     fig.tight_layout()
-    # fig, ax = plt.subplots(figsize=(16, 4))
     years = mdates.YearLocator()  # every year
     months = mdates.MonthLocator()  # every month
     year_fmt = mdates.DateFormatter('%Y')
     ax_fig.xaxis.set_major_locator(years)
     ax_fig.xaxis.set_major_formatter(year_fmt)
     ax_fig.xaxis.set_minor_locator(months)
+    ax_fig.xaxis.set_label_position('top')
     # noinspection PyUnusedLocal
-    cursor = FollowDotCursor(ax_fig, ax_text, index_date, values, base_values)
+    cursor = StockTrendPlotter(ax_fig, ax_text, plot_values)
     plt.show()
 
 
-df = StockUpdater.read_etf_day_data('510900')
-dates = [datetime.datetime.strptime(item, '%Y-%m-%d') for item in df.index]
-opens = list(df.open)
-length = 1000
-dates = dates[0:length]
-opens = opens[0:length]
-high = list(df.high)[0:length]
-df2 = StockUpdater.read_etf_day_data('')
-plot_stock_info(dates, opens, high)
+def plot_trend(value, base):
+    val = calculate_trend_indicator(value, base)
+    plot_stock_values(val)
+
+
+def main():
+    df_etf = read_etf_day_data('510900')
+    df_etf = df_etf.tail(8000)  # print(df_etf.open)
+    df_index = read_index_day_data('000001')
+    # val = (df_index.loc[df_etf.index, :])
+    plot_trend(df_etf.open, df_index.open)
+
+
+if __name__ == '__main__':
+    main()

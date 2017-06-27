@@ -82,7 +82,7 @@ def test_operation_buy_market_price():
 def test_operation_sell():
     sell = ClientOperSell('SH.510900', 2, 100, EntrustType.FIXED_PRICE)
     result = fire_operation(sell)
-    # print(result)
+    print(result)
     assert isinstance(result, SellResult)
     return result.entrust_id
 
@@ -113,7 +113,7 @@ def test_operation_query_myshare():
 def test_operation_query_dayentrust():
     query = ClientOperQuery(ClientConstant.dayentrust)
     result = fire_operation(query)
-    # print(result)
+    print(result)
     assert isinstance(result, QueryResult)
     assert isinstance(result.data, List)
     if len(result.data):

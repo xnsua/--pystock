@@ -6,3 +6,5 @@ __pycache__/
 
 .idea/**/workspace.xml
 .idea/**/tasks.xml
+.idea/misc.xml
+.idea/PStock.iml

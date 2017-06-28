@@ -4,7 +4,7 @@ from nose.tools import assert_equal
 from stock_data_updater.classify import all_etf_code_list
 
 
-class EmuAccount:
+class Account:
     buy_fee = 25 / 100_000
     buy_fee_tuple = (25, 100_000)
     sell_fee = 25 / 100_000
@@ -19,7 +19,7 @@ class EmuAccount:
         self.non_sell_stocks2amount = {}
 
     def copy_for_new_day(self):
-        ea = EmuAccount(self.balance, self.balance)
+        ea = Account(self.balance, self.balance)
         ea.stock2amount = copy.deepcopy(self.stock2amount)
         return ea
 
@@ -60,14 +60,14 @@ class EmuAccount:
 
 
 def test_copy_for_new_day():
-    ea = EmuAccount(1000, 1000)
+    ea = Account(1000, 1000)
     ea.non_sell_stocks = {1: 2}
     ea_new = ea.copy_for_new_day()
     assert not ea_new.non_sell_stocks2amount
 
 
 def test_buy_etf():
-    ea = EmuAccount(100_025, 100_1025)
+    ea = Account(100_025, 100_1025)
     ea.buy_stock('510900', 1, 100_000)
     assert_equal(ea.balance, 0)
     assert ea.stock2amount == {'510900': 100000}
@@ -75,28 +75,28 @@ def test_buy_etf():
 
 
 def test_buy_stock():
-    ea = EmuAccount(100_025, 100_1025)
+    ea = Account(100_025, 100_1025)
     ea.buy_stock('510900', 1, 100_000)
     assert ea.stock2amount == {'510900': 100000}
     assert ea.non_sell_stocks2amount == {'510900': 100000}
 
 
 def test_sell_etf():
-    ea = EmuAccount()
+    ea = Account()
     ea.stock2amount = {'510900': 100000}
     ea.sell_stock('510900', 1, 100000)
     assert ea.balance == 99975
 
 
 def test_sell_stock():
-    ea = EmuAccount()
+    ea = Account()
     ea.stock2amount = {'000001': 100000}
     ea.sell_stock('000001', 1, 100000)
     assert ea.balance == 99875.025
 
 
 def test_buy_all():
-    ea = EmuAccount()
+    ea = Account()
     ea.balance = 100025
     ea.buy_all('510900', 1)
     assert_equal(ea.balance, 0)

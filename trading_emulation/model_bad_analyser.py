@@ -6,7 +6,7 @@ from common.scipy_helper import pdDF
 from common_stock.trade_day import get_close_trade_date_range
 from stock_analyser.day_attr_analyser import calc_fill_day_attr
 from stock_data_updater.day_data_updater import SingleStockUpdater
-from trading_emulation.emu_account import EmuAccount
+from trading_emulation.account import Account
 
 
 class ModelBadAnalyser:
@@ -20,12 +20,12 @@ class ModelBadAnalyser:
         self.daterange = get_close_trade_date_range(min_date, max_date)
 
         self.drop_day_cnt = 1
-        self.accounts = [None] * len(self.daterange)  # type: List[EmuAccount]
+        self.accounts = [None] * len(self.daterange)  # type: List[Account]
 
     def run(self):
-        self.accounts[0] = EmuAccount(balance=100000, total_assert=100000)
+        self.accounts[0] = Account(balance=100000, total_assert=100000)
         for index, day in islice(enumerate(self.daterange), 1, None):
-            cur_account = self.accounts[index - 1].copy_for_new_day()  # type: EmuAccount
+            cur_account = self.accounts[index - 1].copy_for_new_day()  # type: Account
             for stock, data in self.code2ddr.items():
                 cur_ddr = self.code2ddr[stock]  # type: DayDataRepr
                 if day not in cur_ddr.index:

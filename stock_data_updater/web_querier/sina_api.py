@@ -14,6 +14,8 @@ _column_names = ['open', 'yclose', 'price', 'high', 'low', 'name']
 
 
 def get_realtime_stock_infos(stock_list) -> pdDF:
+    #          open  yclose  price   high    low   name
+    # 510900  1.141   1.147  1.134  1.143  1.133  H股ETF
     def extract_result(content_list: str):
         find_results = re.finditer(r'var hq_str_(..\d{6})="(.*)";', content_list)
         stock_codes = []
@@ -73,7 +75,6 @@ def get_etf_sina_symbols():
     val = get_etf_info_dict()
     rval = [item['symbol'] for item in val]
     return rval
-
 
 
 

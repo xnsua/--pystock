@@ -1,7 +1,4 @@
-import datetime
-
 import requests
-import requests_cache
 
 session_nocache = requests.session()
 # session_nocache = session_cache_one_day = requests_cache.CachedSession(

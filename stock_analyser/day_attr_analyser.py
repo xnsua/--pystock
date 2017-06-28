@@ -1,4 +1,6 @@
+import threading
 from itertools import islice
+from typing import Dict
 
 from nose.tools import assert_equal
 
@@ -7,11 +9,11 @@ from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
 from common_stock.trade_day import gtrade_day
 from stock_data_updater.day_data_updater import read_etf_day_data
-from trading_emulation.data_provider import gdata_provider
+from trading_emulation.data_provider import gdata_provider, DataProvider
 
 
 # noinspection PyTypeChecker
-class DropRiseCount:
+class DropRiseIndicator:
     def __init__(self, ddr: DayDataRepr):
         self.ddr = ddr
         self.rise_count = None
@@ -32,6 +34,27 @@ class DropRiseCount:
         self.drop_count = [0, *self.drop_count[0: -1]]
 
 
+class DropRiseProvider:
+    def __init__(self, data_provider: DataProvider):
+        self.data_provider = data_provider
+        self.code2drop_rise = {}  # type: Dict[str, DropRiseIndicator]
+        self.lock = threading.Lock()
+
+    def _calc_drop_rise(self, code):
+        with self.lock:
+            if code not in self.code2drop_rise:
+                self.code2drop_rise[code] = DropRiseIndicator(self.data_provider.ddr(code))
+            return self.code2drop_rise[code]
+
+    def rise(self, code, day):
+        dra = self._calc_drop_rise(code)
+        return dra.rise_count_of(day)
+
+    def drop(self, code, day):
+        dra = self._calc_drop_rise(code)
+        return dra.drop_count_of(day)
+
+
 def test_day_attr_analyser():
     df = pdDF(data=[[1, 2, 1, 1, '111111'],
                     [1, 2, 1, 1, 1],
@@ -43,6 +66,6 @@ def test_day_attr_analyser():
     # ddr = gdata_provider.ddr('bb0900')
     # drc = DropRiseCount(ddr)
     ddr = DayDataRepr(df)
-    rdc = DropRiseCount(ddr)
+    rdc = DropRiseIndicator(ddr)
     assert_equal(rdc.rise_count, [0, 1, 2, 0, 1])
     assert_equal(rdc.drop_count, [0, 0, 0, 1, 0])

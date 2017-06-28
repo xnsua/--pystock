@@ -8,7 +8,7 @@ from trading_emulation.model_base import ModelBase
 class EmuModelBad(ModelBase):
     def __init__(self, code, date_range, params):
         super().init(code, date_range, params)
-        self.drop_cnt =
+        self.rise =
         self.
 
     def init(self, dp: DataProvider):

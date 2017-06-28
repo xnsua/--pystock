@@ -30,19 +30,19 @@ class DataProvider:
 
     def open(self, code, day):
         ddr = self._try_read_data(code)
-        return ddr.open(day)
+        return ddr.open_of(day)
 
     def close(self, code, day):
         ddr = self._try_read_data(code)
-        return ddr.close(day)
+        return ddr.close_of(day)
 
     def high(self, code, day):
         ddr = self._try_read_data(code)
-        return ddr.high(day)
+        return ddr.high_of(day)
 
     def low(self, code, day):
         ddr = self._try_read_data(code)
-        return ddr.low(day)
+        return ddr.low_of(day)
 
     def ddr(self, code) -> DayDataRepr:
         ddr = self._try_read_data(code)

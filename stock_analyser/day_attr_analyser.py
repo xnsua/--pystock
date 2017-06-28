@@ -1,41 +1,48 @@
 from itertools import islice
 
+from nose.tools import assert_equal
+
+from common.algorithm import group_consecutive_count
 from common.data_structures.py_dataframe import DayDataRepr
 from common.scipy_helper import pdDF
+from common_stock.trade_day import gtrade_day
+from stock_data_updater.day_data_updater import read_etf_day_data
+from trading_emulation.data_provider import gdata_provider
 
 
-def calc_fill_day_attr(ddr: DayDataRepr):
-    index = list(ddr.index)
-    open_ = list(ddr.open)
-    close = list(ddr.close)
+# noinspection PyTypeChecker
+class DropRiseCount:
+    def __init__(self, ddr: DayDataRepr):
+        self.ddr = ddr
+        self.rise_count = None
+        self.drop_count = None
+        self.calc_fill_day_attr(ddr)
 
-    drop_cnt = [0] * len(index)
-    rise_cnt = [0] * len(index)
-    for i, day in islice(enumerate(index), 1, None):
-        if close[i - 1] > open_[i - 1]:
-            rise_cnt[i] = rise_cnt[i - 1] + 1
-            drop_cnt[i] = 0
-        elif close[i - 1] < open_[i - 1]:
-            rise_cnt[i] = 0
-            drop_cnt[i] = drop_cnt[i - 1] + 1
-        else:
-            rise_cnt[i] = rise_cnt[i - 1]
-            drop_cnt[i] = drop_cnt[i - 1]
+    def rise_count_of(self, day):
+        return self.rise_cnts[self.ddr.day2index[day]]
 
-    ddr.rise_cnts, ddr.drop_cnts = rise_cnt, drop_cnt
-    return ddr
+    def drop_count_of(self, day):
+        return self.drop_cnts[self.ddr.day2index[day]]
+
+    def calc_fill_day_attr(self, ddr: DayDataRepr):
+        rise = list((ddr.df.close - ddr.df.open) > 0)
+        self.rise_count = group_consecutive_count(rise, True)
+        self.drop_count = group_consecutive_count(rise, False)
+        self.rise_count = [0, *self.rise_count[0: -1]]
+        self.drop_count = [0, *self.drop_count[0: -1]]
 
 
 def test_day_attr_analyser():
-    open_ = [1] * 6
-    close = [1.1] * 6
-    close[2:4] = [0] * 2
-    df = pdDF.from_items([('open', open_), ('close', close)])
-    df = df.assign(code=['510900'] * 6)
+    df = pdDF(data=[[1, 2, 1, 1, '111111'],
+                    [1, 2, 1, 1, 1],
+                    [2, 1, 1, 1, 1],
+                    [1, 2, 1, 1, 1],
+                    [1, 3, 1, 1, 1]],
+              index=['2015-01-01', '2015-01-02', '2015-01-03', '2015-01-04', '2015-01-05'],
+              columns=['open', 'close', 'high', 'low', 'code'])
+    # ddr = gdata_provider.ddr('bb0900')
+    # drc = DropRiseCount(ddr)
     ddr = DayDataRepr(df)
-    import datetime
-    s_time = datetime.datetime.now()
-    calc_fill_day_attr(ddr)
-    print(datetime.datetime.now() - s_time)
-    assert ddr.rise_cnts == [0, 1, 2, 0, 0, 1]
-    assert ddr.drop_cnts == [0, 0, 0, 1, 2, 0]
+    rdc = DropRiseCount(ddr)
+    assert_equal(rdc.rise_count, [0, 1, 2, 0, 1])
+    assert_equal(rdc.drop_count, [0, 0, 0, 1, 0])

@@ -28,20 +28,20 @@ class ModelBadAnalyser:
             cur_account = self.accounts[index - 1].copy_for_new_day()  # type: Account
             for stock, data in self.code2ddr.items():
                 cur_ddr = self.code2ddr[stock]  # type: DayDataRepr
-                if day not in cur_ddr.index:
+                if day not in cur_ddr.day:
                     continue
                 if cur_ddr.get_drop_cnt(day) == self.drop_day_cnt:
-                    cur_account.buy_all(stock, cur_ddr.get_open(day))
+                    cur_account.buy_all(stock, cur_ddr.open(day))
 
                     cur_account.calc_total_asset(
-                        {stock: cur_ddr.get_close(day) for stock in cur_account.stock2amount}
+                        {stock: cur_ddr.close(day) for stock in cur_account.stock2amount}
                     )
                 else:
                     for sell_stock, amount in cur_account.stock2amount.items():
-                        price = self.code2ddr[sell_stock].get_open(day)
+                        price = self.code2ddr[sell_stock].open(day)
                         cur_account.sell_stock(sell_stock, price, amount)
                     cur_account.calc_total_asset(
-                        {stock: cur_ddr.get_close(day) for stock in cur_account.stock2amount}
+                        {stock: cur_ddr.close(day) for stock in cur_account.stock2amount}
                     )
 
             self.accounts[index] = cur_account

@@ -59,32 +59,32 @@ class TradeDay:
         return self.range(start_date, self.next(end_date))
 
 
-trade_day = TradeDay()
+gtrade_day = TradeDay()
 
 
 def test():
     # 24,25 is Saturday and Sunday
-    val = trade_day.next('2017-06-24')
+    val = gtrade_day.next('2017-06-24')
     assert_equal(val, '2017-06-26')
-    val = trade_day.next('2017-06-26')
+    val = gtrade_day.next('2017-06-26')
     assert_equal(val, '2017-06-27')
 
-    val = trade_day.previous('2017-06-24')
+    val = gtrade_day.previous('2017-06-24')
     assert_equal(val, '2017-06-23')
-    val = trade_day.previous('2017-06-27')
+    val = gtrade_day.previous('2017-06-27')
     assert_equal(val, '2017-06-26')
 
-    val = trade_day.shift('2017-06-26', 2)
+    val = gtrade_day.shift('2017-06-26', 2)
     assert_equal(val, '2017-06-28')
-    val = trade_day.shift('2017-06-26', -2)
+    val = gtrade_day.shift('2017-06-26', -2)
     assert_equal(val, '2017-06-22')
 
-    range_list = [i for i in trade_day.range('2017-06-23', '2017-06-26')]
+    range_list = [i for i in gtrade_day.range('2017-06-23', '2017-06-26')]
     assert_equal(range_list, ['2017-06-23'])
-    range_list = [i for i in trade_day.range('2017-06-23', '2017-06-27')]
+    range_list = [i for i in gtrade_day.range('2017-06-23', '2017-06-27')]
     assert_equal(range_list, ['2017-06-23', '2017-06-26'])
 
 
-    range_list = [i for i in trade_day.close_range('2017-06-23', '2017-06-26')]
+    range_list = [i for i in gtrade_day.close_range('2017-06-23', '2017-06-26')]
     assert_equal(range_list, ['2017-06-23', '2017-06-26'])
 

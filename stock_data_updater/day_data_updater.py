@@ -9,7 +9,6 @@ from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
 from common_stock import stock_trade_over_cache
 from common_stock.stock_helper import stock_start_day
-from common_stock.trade_day import is_trade_day
 from stock_data_updater import day_data_path
 from stock_data_updater.classify import sz50m, hs300m, zz500m, all_stock_index_list, \
     all_etf_code_list

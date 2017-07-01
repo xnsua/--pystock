@@ -7,7 +7,7 @@ from matplotlib.dates import date2num
 from matplotlib.gridspec import GridSpec
 
 from common.helper import dt_date_from_str
-from stock_analyser.stock_indicator.stock_indicator import calculate_trend_indicator
+from stock_analyser.stock_indicator.stock_indicator import calculate_plot_indicator
 from stock_data_updater.day_data_updater import read_etf_day_data, read_index_day_data
 
 
@@ -35,17 +35,18 @@ class StockTrendPlotter(object):
     def plot_lines(self):
         values = self.plot_data['values']
         normal_base = self.plot_data['normal_base_values']
-        ratio = self.plot_data['ratios_values']
+        # ratio = self.plot_data['ratios_values']
         xdata = [dt_date_from_str(item) for item in values.index]
         self.ax_fig.plot(xdata, values, label='values')
         self.ax_fig.plot(xdata, normal_base, label='base')
-        self.ax_fig.plot(xdata, ratio, label='ratio')
+        # self.ax_fig.plot(xdata, ratio, label='ratio')
         self.ax_fig.legend()
 
     def draw_text(self):
         indicator = self.plot_data['value_attr']
         indicator_base = self.plot_data['base_attr']
         mdd1 = indicator['mdd_info']
+        mdd2 = indicator_base['mdd_info']
 
         line1pos = [(x / 10, 0.6) for x in range(0, 10, 1)]
         line2pos = [(x / 10, 0.3) for x in range(0, 10, 1)]
@@ -61,6 +62,7 @@ class StockTrendPlotter(object):
         self.ax_text.text(*line2pos[1],
                           f"Y_YIELD: {indicator_base['year_yield']:.1%}".replace('%', ' %'),
                           alpha=0.5)
+        self.ax_text.text(*line2pos[2], f"MDD: {mdd2[0]:.1%}".replace('%', ' %'), color='g')
 
     def plot_max_drawdrop(self):
         indicator = self.plot_data['value_attr']
@@ -124,7 +126,7 @@ class StockTrendPlotter(object):
         return datestr + str1 + str2
 
 
-def plot_stock_values(plot_values):
+def plot_stock_values(plot_values, filename=None, show=True):
     plt.rcParams["font.family"] = "consolas"
     fig = plt.figure(figsize=(16, 4))
     gs = GridSpec(2, 1, height_ratios=[1, 4])
@@ -142,20 +144,28 @@ def plot_stock_values(plot_values):
     ax_fig.xaxis.set_label_position('top')
     # noinspection PyUnusedLocal
     cursor = StockTrendPlotter(ax_fig, ax_text, plot_values)
-    plt.show()
+    if filename:
+        plt.savefig(filename, format='png')
+    if show:
+        plt.show()
+    plt.close()
 
 
-def plot_trend(value, base):
-    val = calculate_trend_indicator(value, base)
-    plot_stock_values(val)
+def plot_trend(value, base, filename=None, show=True):
+    if base is None:
+        base = read_index_day_data('000001').open
+    elif isinstance(base, str):
+        base = read_index_day_data(base).open
+    val = calculate_plot_indicator(value, base)
+    plot_stock_values(val, filename, show=show)
 
 
 def main():
     df_etf = read_etf_day_data('510900')
     df_etf = df_etf.tail(8000)  # print(df_etf.open)
-    df_index = read_index_day_data('000001')
+    # df_index = read_index_day_data('000001')
     # val = (df_index.loc[df_etf.index, :])
-    plot_trend(df_etf.open, df_index.open)
+    plot_trend(df_etf.open, None)
 
 
 if __name__ == '__main__':

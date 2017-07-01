@@ -46,21 +46,29 @@ class TradeDay:
             i_day = i_day - 1
         return self.day_list[i_day]
 
-    def shift(self, date_: dt.date, offset):
+    def shift(self, date_, offset):
         i_trade_day = self.trade_day_map[str(date_)]
         return self.trade_day_list[i_trade_day + offset]
 
-    def range(self, start_date, end_date):
+    def rangel(self, start_date, end_date):
+        if start_date not in self.trade_day_map:
+            start_date = self.next(start_date)
         i_start_date = self.trade_day_map[start_date]
+        if end_date not in self.trade_day_map:
+            end_date = self.next(end_date)
         i_end_date = self.trade_day_map[end_date]
-        return (self.trade_day_list[i] for i in range(i_start_date, i_end_date))
+        return [self.trade_day_list[i] for i in range(i_start_date, i_end_date)]
 
-    def close_range(self, start_date, end_date):
-        return self.range(start_date, self.next(end_date))
+    def close_rangel(self, start_date, end_date):
+        return self.rangel(start_date, self.next(end_date))
+
+    def range_len(self, start_date, end_date):
+        i = self.day_map[start_date]
+        j = self.day_map[end_date]
+        return j - i
 
 
 gtrade_day = TradeDay()
-
 
 def test():
     # 24,25 is Saturday and Sunday
@@ -79,12 +87,10 @@ def test():
     val = gtrade_day.shift('2017-06-26', -2)
     assert_equal(val, '2017-06-22')
 
-    range_list = [i for i in gtrade_day.range('2017-06-23', '2017-06-26')]
+    range_list = [i for i in gtrade_day.rangel('2017-06-23', '2017-06-26')]
     assert_equal(range_list, ['2017-06-23'])
-    range_list = [i for i in gtrade_day.range('2017-06-23', '2017-06-27')]
+    range_list = [i for i in gtrade_day.rangel('2017-06-23', '2017-06-27')]
     assert_equal(range_list, ['2017-06-23', '2017-06-26'])
 
-
-    range_list = [i for i in gtrade_day.close_range('2017-06-23', '2017-06-26')]
+    range_list = [i for i in gtrade_day.close_rangel('2017-06-23', '2017-06-26')]
     assert_equal(range_list, ['2017-06-23', '2017-06-26'])
-

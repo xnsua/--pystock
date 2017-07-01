@@ -104,7 +104,7 @@ class AccountManager:
 
 
 # noinspection PyProtectedMember
-def test_cal_push():
+def test_cal_need_client_push():
     account_manager = AccountManager()
     assert account_manager.need_client_push == False
     account_info = AccountInfo()

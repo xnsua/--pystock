@@ -10,14 +10,15 @@ def calc_max_drawdown_infos(xval: np.array, yval: np.array):
     yval = np.array(yval)
     # noinspection PyArgumentList
     right = np.argmax(np.maximum.accumulate(yval) - yval)  # end of the period
-    left = np.argmax(yval[:right])  # start of period
+    left = np.argmax(yval[:right]) if right != 0 else 0  # start of period
 
     vals2 = yval[right + 1:]
     # From begin of max drawdown to end of lose
     # noinspection PyTypeChecker
-    poses = np.flatnonzero(vals2 >= yval[left])
-    if poses:
-        drawdown_duration_end = poses[0] + right
+    for i, val in enumerate(vals2):
+        if val and not np.isnan(val) is not  val > yval[left]:
+            drawdown_duration_end = i + right
+            break
     else:
         drawdown_duration_end = len(yval) - 1
     mdd = (yval[left] - yval[right]) / yval[left]
@@ -40,9 +41,10 @@ def calc_trend_indicator(x, y):
     return name2value
 
 
-def calculate_trend_indicator(vals: pdSr, base: pdSr):
+def calculate_plot_indicator(vals: pdSr, base: pdSr):
     base = base[vals.index]
     l1 = list(vals)
+
     l2 = list(base)
     ratio = 1
     val1_ratio = 1

@@ -7,21 +7,21 @@ import pandas
 
 from ip.constants import ClientConstant
 from ip.st import ClientOperQuery, ClientOperBase
-from models import ModelBuyAfterDrop
+from models.model_buy_after_drop import ModelBuyAfterDrop
 from project_helper.logbook_logger import mylog
 from trading.base_structure.trade_constants import TradeId, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.client_access import is_client_server_running, \
     fire_operation
 from trading.data_server_main import DataServer
-from trading.model_runner import ModelRunnerThread
+from trading.model_runner_thread import ModelRunnerThread
 from trading.trade_context import TradeContext
 
 pandas.options.display.max_rows = 10
 
 
 def begin_trade():
-    trade = TradeManager(trade_models=[ModelBuyAfterDrop])
+    trade = TradeManager(trade_models=[ModelBuyAfterDrop()])
     trade.start_threads()
     trade.handle_msgs()
 
@@ -37,7 +37,7 @@ class TradeManager:
 
         # Trade context
         self.trade_context = self.init_trade_context()
-        self.account_manager = self.trade_context.account_manager
+        self.account_manager = self.trade_context.account
 
         self.data_push_time_interval = datetime.timedelta(seconds=2)
         self.client_push_time_interval = datetime.timedelta(seconds=2)
@@ -55,14 +55,13 @@ class TradeManager:
         data_server_thread.start()
         self.threads[data_server_thread] = TradeId.data_server
 
-        for model_class in self.trade_models:
+        for model in self.trade_models:
             def thread_fun():
-                runner = ModelRunnerThread(self.trade_context,
-                                           model_class(self.trade_context))
+                runner = ModelRunnerThread(self.trade_context, model)
                 runner.run_loop()
 
             thread = threading.Thread(target=thread_fun)
-            self.threads[thread] = model_class.name()
+            self.threads[thread] = model.name()
             thread.start()
 
     def init_trade_context(self):

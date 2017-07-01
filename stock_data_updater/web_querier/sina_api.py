@@ -1,7 +1,9 @@
 import json
 import re
+from collections import OrderedDict
 
 import pandas as pd
+
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
 from common_stock import stock_cache_one_month
@@ -70,11 +72,13 @@ def get_etf_info_dict():
     return val
 
 
+# @stock_cache_one_sec
 @stock_cache_one_month
 def get_etf_sina_symbols():
     val = get_etf_info_dict()
-    rval = [item['symbol'] for item in val]
-    return rval
+    symbol = [item['symbol'] for item in val]
+    names = [item['name'] for item in val]
+    return OrderedDict(zip(symbol,names))
 
 
 

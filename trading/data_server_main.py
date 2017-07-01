@@ -6,7 +6,6 @@ from common.scipy_helper import pdDF
 from common_stock.stock_helper import trade_bid_end_time, trade1_end_time, \
     trade2_begin_time, trade2_end_time
 from project_helper.logbook_logger import mylog
-from stock_data_updater.classify import etf_sz50
 from stock_data_updater.web_querier import sina_api
 from trading.base_structure.trade_constants import TradeId, MsgPushRealTimePrice, \
     MsgSetRealTimeStocks, \
@@ -98,7 +97,7 @@ class DataServer:
 
         if datetime.date.today() == self._msg_sent[MsgBidOver]:
             return BidResult(True, False)
-        dfs = sina_api.get_realtime_stock_infos([etf_sz50])
+        dfs = sina_api.get_realtime_stock_infos(['510050'])
         open_prices = dfs.open
         is_bid_over = all(open_prices)
 

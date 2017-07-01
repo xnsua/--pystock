@@ -9,9 +9,10 @@ from common.helper import ndays_later_from, ndays_ago_from
 from common.scipy_helper import pdDF
 from common_stock import stock_trade_over_cache
 from common_stock.stock_helper import stock_start_day
+from common_stock.trade_day import gtrade_day
 from stock_data_updater import day_data_path
-from stock_data_updater.classify import sz50m, hs300m, zz500m, all_stock_index_list, \
-    all_etf_code_list
+from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name, index2name, \
+    etf_code2name
 from stock_data_updater.data_updater_logger import updatelog
 
 
@@ -54,7 +55,7 @@ class SingleStockUpdater:
 
         # Skip the non_trade_day
         query_start_date = ndays_later_from(last_date, 1)
-        while not is_trade_day(query_start_date):
+        while not gtrade_day.is_trade_day(query_start_date):
             query_start_date = ndays_later_from(query_start_date, 1)
 
         now = datetime.datetime.now()
@@ -121,9 +122,9 @@ read_stock_day_data = SingleStockUpdater.read_stock_day_data
 class DayBarUpdater:
     @classmethod
     def update_800s(cls):
-        d50 = sz50m
-        d300 = hs300m
-        d500 = zz500m
+        d50 = sz50_to_name
+        d300 = hs300_to_name
+        d500 = zz500_to_name
         d_all = {**d50, **d300, **d500}
         failed_code = {}
         for code in d_all:
@@ -137,7 +138,7 @@ class DayBarUpdater:
     @classmethod
     def update_all_etfs(cls):
         fail_codes = {}
-        for code in all_etf_code_list:
+        for code in etf_code2name:
             try:
                 SingleStockUpdater.update_etf_day_data(code)
             except Exception as e:
@@ -148,7 +149,7 @@ class DayBarUpdater:
     @classmethod
     def update_stock_index(cls):
         fail_codes = {}
-        for index in all_stock_index_list:
+        for index in index2name:
             try:
                 SingleStockUpdater.update_index_data(index)
             except Exception as e:
@@ -177,10 +178,6 @@ class DayBarUpdater:
         updatelog.notice(
             f'Update data result {stock_code2except}, {etf_code2except}, {index_code2except}')
         return stock_code2except, etf_code2except, index_code2except
-
-    @classmethod
-    def update_all(cls):
-        SingleStockUpdater.update_etf_day_data('510900')
 
 def main():
     DayBarUpdater.update_all()

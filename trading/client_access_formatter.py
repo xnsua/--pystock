@@ -1,11 +1,11 @@
 import math
 
 from ip.st import ClientOperBuy, ClientOperSell
-from stock_data_updater.classify import all_etf_code_list
+from stock_data_updater.classify import etf_code2name
 
 
 def format_price(stock, price):
-    if stock in all_etf_code_list:
+    if stock in etf_code2name:
         price_str = str(round(price, 3))
     else:
         price_str = str(round(price, 2))

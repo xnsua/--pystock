@@ -59,6 +59,11 @@ class EntrustType(Enum):
         return val[param]
 
 
+FIXED_PRICE = EntrustType.FIXED_PRICE
+MARKET_PRICE_AND_CANCEL = EntrustType.MARKET_PRICE_AND_CANCEL
+MARKET_PRICE_AND_FIXED = EntrustType.MARKET_PRICE_AND_FIXED
+
+
 class ClientOperBase(ObjectWithIndentRepr):
     def __init__(self):
         self.result = None

@@ -14,11 +14,12 @@ def run_in_background():
     shed.enter(0, 1, heart_beat)
 
     shed.enterabs_dt(dt_from_time(17, 40, 10), 1, DayBarUpdater.update_all)
-    shed.enterabs_dt(dt_from_time(20, 40, 10), 1, DayBarUpdater.update_all)
+    shed.enterabs_dt(dt_from_time(21, 38, 30), 1, DayBarUpdater.update_all)
     shed.run()
 
 
 def main():
+
     run_in_background()
 
 

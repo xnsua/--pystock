@@ -1,42 +1,50 @@
-from common.scipy_helper import pdDF
-from common_stock.trade_day import gtrade_day
-from trading_emulation.account import Account
-from trading_emulation.data_provider import DataProvider, gdata_provider
-from trading_emulation.model_base import ModelBase
+from common_stock.py_dataframe import RealtimeDataRepr
+from ip.st import FIXED_PRICE
+from models.abstract_model import AbstractModel
+from stock_analyser.day_attr_analyser import gdroprise_pv
+from stock_data_updater.data_provider import gdata_pv
+from trading.abstract_context import AbstractContext
 
 
-class EmuModelBad(ModelBase):
-    def __init__(self, code, date_range, params):
-        super().init(code, date_range, params)
-        self.rise =
-        self.
+class EmuModelBad(AbstractModel):
+    def __init__(self, stock_codes, drop_threshold):
+        super().__init__()
+        self.stock_codes = stock_codes
+        self.drop_threshold = drop_threshold
 
-    def init(self, dp: DataProvider):
-
-
-    def on_trading(self, day: str, acc: Account, rtdata: pdDF):
-        super().on_trading(day, acc, rtdata)
-
-    def on_bid_over(self, day: str, acc: Account, rtdata: pdDF):
-        pass
-
-    def on_trade_over(self, day: str, acc: Account, rtdata: pdDF):
-        pass
-
-    def on_result(self, operation):
-        pass
+        self.rise_cnt = None
+        self.drop_cnt = None
 
     def name(self):
         return 'EmuModelBad'
 
-def main():
-    ebad = EmuModelBad(['510900'], None, None)
-    ebad.init(gdata_provider)
-    ldate = list(ebad.date_range)
-    print(ldate[0], ldate[-1])
+    def init_model(self, ctx: AbstractContext):
+        super().init_model(ctx)
 
+    def on_bid_over(self, context: AbstractContext, rdr: RealtimeDataRepr):
+        date_str = context.date_str
+        super().on_bid_over(context, rdr)
+        code = self.stock_codes[0]
+        ##
+        # if gdata_pv.has_data(code, date_str):
+        #     drop_cnt = gdroprise_pv.drop(code, date_str)
+        #     if drop_cnt == self.drop_threshold:
+        #         context.account.buy_at_most(code, gdata_pv.open(code, date_str), FIXED_PRICE)
+        #         context.account.sell_at_most(code, gdata_pv.open(code, gtrade_day.next(date_str)), FIXED_PRICE)
+        #     print(context.date_str, context.account.available)
 
+        #
+        if gdata_pv.has_data(code, date_str):
+            drop_cnt = gdroprise_pv.drop(code, date_str)
+            if drop_cnt == self.drop_threshold:
+                context.account.buy_at_most(code, gdata_pv.open(code, date_str), FIXED_PRICE)
+            else:
+                context.account.sell_at_most(code, gdata_pv.open(code, date_str), FIXED_PRICE)
+            # print(context.date_str, context.account.available)
 
-if __name__ == '__main__':
-    main()
+    def handle_bar(self, context: AbstractContext, rdr: RealtimeDataRepr):
+        super().handle_bar(context, rdr)
+
+    def on_trade_over(self, context: AbstractContext, rdr: RealtimeDataRepr):
+        super().on_trade_over(context, rdr)
 

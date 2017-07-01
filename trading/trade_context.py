@@ -3,20 +3,21 @@ import threading
 
 from common.data_structures.object_cabinet import ObjectCabinet
 from project_helper.logbook_logger import mylog
+from trading.abstract_context import AbstractContext
 from trading.account_manager import AccountManager
 from trading.base_structure.trade_constants import TradeId, MsgSetRealTimeStocks, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 
 
-class TradeContext:
+class TradeContext(AbstractContext):
     def __init__(self, queue_dict):
-        self.queue_dict = queue_dict
+        super().__init__()
+        self.account = AccountManager()
 
+        self.queue_dict = queue_dict
         self.queue_cabinet = ObjectCabinet(queue.Queue, None)
         self.thread_local = threading.local()
         self.thread_local.name = None
-
-        self.account_manager = AccountManager()
 
     def post_msg(self, dest, operation):
         assert self.thread_local.name

@@ -1,5 +1,5 @@
 from common.alert import message_box_error
-from models import AbstractModel
+from models.abstract_model import AbstractModel
 from project_helper.logbook_logger import mylog
 from trading.base_structure.trade_constants import MsgPushRealTimePrice, MsgQuitLoop, MsgBidOver
 from trading.base_structure.trade_message import TradeMessage
@@ -15,7 +15,7 @@ class ModelRunnerThread:
         self.model = model
         self.self_queue = trade_context.current_thread_queue
 
-        self.model.init_model()
+        self.model.init_model(trade_context)
 
     def run_loop(self):
         mylog.debug(f'Model: {self.model.name()} ........')
@@ -23,9 +23,9 @@ class ModelRunnerThread:
         while True:
             msg = self.self_queue.get()  # type: TradeMessage
             if isinstance(msg.operation, MsgBidOver):
-                self.model.on_bid_over(msg.operation.stocks)
+                self.model.on_bid_over()
             elif isinstance(msg.operation, MsgPushRealTimePrice):
-                self.model.handle_bar(msg.operation.stocks)
+                self.model.handle_bar()
             elif isinstance(msg.operation, MsgQuitLoop):
                 return
             else:

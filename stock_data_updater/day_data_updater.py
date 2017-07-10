@@ -12,7 +12,7 @@ from common_stock.stock_helper import stock_start_day
 from common_stock.trade_day import gtrade_day
 from stock_data_updater import day_data_path
 from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name, index2name, \
-    etf_code2name
+    etf_stdcode2name
 from stock_data_updater.data_updater_logger import updatelog
 
 
@@ -138,7 +138,7 @@ class DayBarUpdater:
     @classmethod
     def update_all_etfs(cls):
         fail_codes = {}
-        for code in etf_code2name:
+        for code in etf_stdcode2name:
             try:
                 SingleStockUpdater.update_etf_day_data(code)
             except Exception as e:

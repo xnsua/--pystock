@@ -4,7 +4,7 @@ from typing import List
 from nose.tools import assert_equal
 
 from ip.st import EntrustWay
-from stock_data_updater.classify import etf_code2name
+from stock_data_updater.classify import etf_stdcode2name
 from stock_data_updater.data_provider import gdata_pv
 from trading.abstract_account import AbstractAccount
 
@@ -78,7 +78,7 @@ class EmuAccount(AbstractAccount):
     def sell_stock(self, code, price, amount, entrust_type=None):
         assert self.stock2amount.get(code, 0) >= amount
         sell_money = round(price * amount * (1 - self.sell_fee), 3)
-        if code not in etf_code2name and not code.startswith('i'):
+        if code not in etf_stdcode2name and not code.startswith('i'):
             # print('not in etf code list')
             sell_money = round(sell_money * (1 - self.tax), 3)
         self.balance += sell_money

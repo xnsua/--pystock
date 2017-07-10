@@ -6,9 +6,11 @@ from rqalpha.data.base_data_source import BaseDataSource
 from rqalpha.data.data_proxy import DataProxy
 
 from common_stock.py_dataframe import DayDataRepr
-from stock_data_updater.rq_data_proxy import rq_data
+from stock_data_updater.index_info import gindex_pv
+from stock_data_updater.rq_data_proxy import grq_data
 
 dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
+
 
 class DataProvider:
     def __init__(self):
@@ -18,7 +20,8 @@ class DataProvider:
 
     def _try_read_data(self, code):
         with self.lock:
-            self.code2ddr[code] = rq_data.ddr_of()
+            if not code in self.code2ddr:
+                self.code2ddr[code] = grq_data.ddr_of(code)
             return self.code2ddr[code]
 
             # if code in self.code2ddr:
@@ -55,8 +58,24 @@ class DataProvider:
         ddr = self._try_read_data(code)
         return ddr
 
-    def has_data(self, stock, day):
-        return self.ddr(stock).has_day(day)
+    def has_data(self, code, day):
+        return self.ddr(code).has_day(day)
+
+    def component_of(self, code):
+        return gindex_pv.components_of(code)
+
+    def symbol2code(self, symbol):
+        return grq_data.symbol2code(symbol)
 
 
 gdata_pv = DataProvider()
+
+
+def main():
+    # print(gdata_pv.component_of('000001'))
+    print(gdata_pv)
+    pass
+
+
+if __name__ == '__main__':
+    main()

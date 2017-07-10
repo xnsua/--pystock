@@ -4,6 +4,7 @@ from typing import Dict
 import tushare
 
 from common_stock import stock_cache_three_month
+from common_stock.stock_helper import to_stdcodes
 from stock_data_updater.web_querier import sina_api
 
 
@@ -11,40 +12,40 @@ from stock_data_updater.web_querier import sina_api
 @stock_cache_three_month
 def get_stock_index_2_name():
     df = tushare.get_index()
-    return OrderedDict(zip(df.code,df.name))
+    return OrderedDict(zip(to_stdcodes(df.code), df.name))
 
 
 @stock_cache_three_month
 def query_sz50s() -> Dict[str, str]:
     df = tushare.get_sz50s()
-    code_dict = dict(zip(df.code, df.name))
+    code_dict = dict(zip(to_stdcodes(df.code), df.name))
     return code_dict
 
 
 @stock_cache_three_month
 def query_hs300s() -> Dict[str, str]:
     df2 = tushare.get_hs300s()
-    code_dict = dict(zip(df2.code, df2.name))
+    code_dict = dict(zip(to_stdcodes(df2.code), df2.name))
     return code_dict
 
 
 @stock_cache_three_month
 def query_zz500s() -> Dict[str, str]:
     df3 = tushare.get_zz500s()
-    code_dict = dict(zip(df3.code, df3.name))
+    code_dict = dict(zip(to_stdcodes(df3.code), df3.name))
     return code_dict
 
-etf_sinacode2name = sina_api.get_etf_sina_symbols()
-etf_code2name = {key[2:]:val for key, val in etf_sinacode2name.items()}
 
+etf_sinacode2name = sina_api.get_etf_sina_symbols()
+etf_stdcode2name = etf_sinacode2name
 
 sz50_to_name = query_sz50s()
 hs300_to_name = query_hs300s()
 zz500_to_name = query_zz500s()
 
-code2name = {**etf_code2name, **sz50_to_name, **hs300_to_name, **zz500_to_name}
+code2name = {**etf_stdcode2name, **sz50_to_name, **hs300_to_name, **zz500_to_name}
 index2name = get_stock_index_2_name()
-index2name = {**index2name, **{'i' + key:val for key, val in index2name.items()}}
+index2name = {**index2name, **{'i' + key: val for key, val in index2name.items()}}
 
 etf_with_amount = ['sh510900', 'sh510050', 'sh518880', 'sh511010', 'sh510300', 'sh510500',
                    'sz159915', 'sz159919', 'sh510180', 'sz159902', 'sz159934', 'sz159901',

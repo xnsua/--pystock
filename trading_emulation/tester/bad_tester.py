@@ -22,6 +22,8 @@ def run_emu_for_single_code(stock, dropday, show_figure):
     emu_runner = EmuModelRunner(model_bad)
     day_accounts = emu_runner.run_model()
     ana_result = analyse_emu_result(model_bad, day_accounts, show_figure=False)
+    if show_figure:
+        pass
 
     return ana_result
 
@@ -51,12 +53,12 @@ def analyse_emu_result(model, day_accounts: EmuDayAccounts, show_figure=False):
     base_year_yield = base_yield ** (245 / len(day_accounts.date_range))
     yield_ = day_assets[-1] / day_assets[1]
     if trade_times == 0:
-        mylog.warn(f'0 trade times: {self.model.stock_codes}')
+        mylog.warn(f'0 trade times: {model.stock_codes}')
         trade_times = 1
     year_yield = yield_ ** (245 / trade_times)
 
     if show_figure:
-        filename = os.path.expanduser(f'~/{self.model.stock_codes[0]}.png')
+        filename = os.path.expanduser(f'~/{model.stock_codes[0]}.png')
         plot_trend(pandas.Series(data=day_assets, index=date_range),
                    gdp.ddr(model.stock_codes[0]).df.open, filename=filename,
                    add_param_dict={'normal_year_yield': year_yield - 1})

@@ -60,6 +60,9 @@ class DataProvider:
     def name_of(self, symbol, default = None):
         return grq_data.name_of(symbol, default)
 
+    def is_etf(self, stdcode):
+        return grq_data.is_etf(stdcode)
+
 
 gdp = DataProvider()
 

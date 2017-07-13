@@ -1,13 +1,10 @@
+import datetime
 import datetime as dt
 
-import datetime
-
-import pickle
-
-import pathlib
 import tushare
-from common_stock import stock_cache_one_month
 from nose.tools import assert_equal
+
+from common_stock import stock_cache_one_month
 
 
 class TradeDay:
@@ -25,8 +22,6 @@ class TradeDay:
         self._int_to_date = {}
         self._str_to_date = {}
         self._str_to_int = {}
-        import datetime
-        s_time = datetime.datetime.now()
         self.init_converter()
 
     def init_converter(self):

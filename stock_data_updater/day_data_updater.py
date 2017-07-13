@@ -11,8 +11,8 @@ from common_stock import stock_trade_over_cache
 from common_stock.stock_helper import stock_start_day
 from common_stock.trade_day import gtrade_day
 from stock_data_updater import day_data_path
-from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name, index_to_name, \
-    etf_stdcode_to_name
+from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name, \
+    etf_stdcode_to_name, index_to_name
 from stock_data_updater.data_updater_logger import updatelog
 
 

@@ -44,7 +44,7 @@ hs300_to_name = query_hs300s()
 zz500_to_name = query_zz500s()
 
 # code_to_name = {**etf_stdcode_to_name, **sz50_to_name, **hs300_to_name, **zz500_to_name}
-# index_to_name = get_stock_index_2_name()
+index_to_name = get_stock_index_2_name()
 # index_to_name = {**index_to_name, **{'i' + key: val for key, val in index_to_name.items()}}
 
 etf_with_amount = ['sh510900', 'sh510050', 'sh518880', 'sh511010', 'sh510300', 'sh510500',

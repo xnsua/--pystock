@@ -4,7 +4,6 @@ from typing import List, Dict
 from nose.tools import assert_equal
 
 from ip.st import EntrustWay
-from stock_data_updater.classify import etf_stdcode_to_name
 from stock_data_updater.data_provider import gdp
 from trading.abstract_account import AbstractAccount
 
@@ -23,9 +22,6 @@ def set_account_fee():
     EmuAccount.tax = 1 / 1_000
 
 
-set_account_fee()
-
-
 class EmuShare:
     def __init__(self, stock_code, price, amount, time, cost_money):
         self.stock_code = stock_code
@@ -33,6 +29,7 @@ class EmuShare:
         self.price = price
         self.time = time
         self.cost_money = cost_money
+
     def __repr__(self):
         return f'Share{{code:{self.stock_code}, amount:{self.amount}}}'
 
@@ -61,7 +58,7 @@ class EmuAccount(AbstractAccount):
     def available(self):
         return None
 
-    # <editor-fold desc="Description">
+    # <editor-fold desc="Trading fee">
     buy_fee = None
     buy_fee_tuple = None
     sell_fee = None
@@ -99,22 +96,13 @@ class EmuAccount(AbstractAccount):
     def available(self):
         return self.balance
 
-    @staticmethod
-    def _split_amount(amounts, amount):
-        for i in range(len(amounts)):
-            if amounts[i] < amount:
-                amount = amount - amounts[i]
-            else:
-                return i, amounts[i] - amount
-        raise Exception('Not enough stock amount')
-
-    def sell_stock(self, code, price, amount = None):
+    def sell_stock(self, code, price, amount=None, entrust_type=None):
         share = self.stock_to_share[code]
         cost_money = share.cost_money
         amount = share.amount
 
         sell_money = round(price * amount * (1 - self.sell_fee), 3)
-        if code not in etf_stdcode_to_name:
+        if not gdp.is_etf(code):
             sell_money = round(sell_money * (1 - self.tax), 3)
 
         self.balance += sell_money
@@ -170,36 +158,28 @@ class EmuDayAccounts:
         self.accounts[0] = value
 
 
-def test_copy_for_new_day():
-    acc = EmuAccount(1000, 1000)
-    acc.non_sell_stocks = {1: 2}
-    acc_new = acc.copy_for_day('2011-01-05')
-
-
 def test_buy_etf():
+    set_account_fee()
     ea = EmuAccount(100_025, 100_1025)
-    ea.buy_stock('510900', 1, 100_000)
+    ea.buy_stock('sh510900', 1, 100_000)
     assert_equal(ea.balance, 0)
-    assert ea.stock_to_share['510900'].amount == 100000
-
-
-def test_buy_stock():
-    ea = EmuAccount(100_025, 100_1025)
-    ea.buy_stock('510900', 1, 100_000)
-    assert ea.stock_to_share['510900'].amount == 100000
+    assert len(ea.stock_to_share) == 1
+    assert ea.stock_to_share['sh510900'].amount == 100000
 
 
 def test_sell_etf():
-    ea = EmuAccount(1.2, None)
-    ea.stock_to_share = {'510900': EmuShare('510900', 100000, 1, 19220101, 100000)}
-    ea.sell_stock('510900', 1)
+    ea = EmuAccount(0, None)
+    ea.stock_to_share = {'sh510900': EmuShare('510900', 100000, 1, 19220101, 100000)}
+    ea.sell_stock('sh510900', 1)
     assert ea.balance == 99975
+    assert len(ea.stock_to_share) == 0
 
 
 def test_sell_stock():
-    ea = EmuAccount(1, '1900-01-01')
-    ea.stock_to_share = {'510900': EmuShare('510900', 100000, 1, 19220101, 100000)}
-    ea.sell_stock('000001', 1)
+    ea = EmuAccount(0, '1900-01-01')
+    ea.stock_to_share = {'sz000001': EmuShare('sz000001', 1, 100000, 19220101, 100000)}
+    ea.sell_stock('sz000001', 1)
+    assert len(ea.stock_to_share) == 0
     assert ea.balance == 99875.025
 
 
@@ -209,5 +189,3 @@ def test_buy_all():
     ea.buy_at_most('510900', 1)
     assert_equal(ea.balance, 0)
     assert_equal(ea.stock_to_share['510900'].amount, 100000)
-
-    # </editor-fold>

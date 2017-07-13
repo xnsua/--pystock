@@ -1,6 +1,5 @@
 import os
 
-import tushare
 from rqalpha.data.base_data_source import BaseDataSource
 from rqalpha.data.data_proxy import DataProxy
 
@@ -16,7 +15,17 @@ class RqDataProxy:
         self._dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
         self._stock_to_instruments = self._dp.all_instruments('CS')
         self._index_to_instrument = self._dp.all_instruments('INDX')
-        self._etf_to_instrument = self._dp.all_instruments('ETF')
+        self._etf_stdcode_to_instrument = self._dp.all_instruments('ETF')
+        """
+        CS	Common Stock, 即股票
+        ETF	Exchange Traded Fund, 即交易所交易基金
+        LOF	Listed Open-Ended Fund，即上市型开放式基金
+        FenjiMu	Fenji Mu Fund, 即分级母基金
+        FenjiA	Fenji A Fund, 即分级A类基金
+        FenjiB	Fenji B Funds, 即分级B类基金
+        INDX	Index, 即指数
+        Future	Futures，即期货，包含股指、国债和商品期货
+        """
         """
         Instrument(sector_code_name='金融', symbol='平安银行', listed_date=datetime.datetime(1991, 4, 3, 0, 0),
          special_type='Normal', exchange='XSHE', round_lot=100.0, industry_code='J66', abbrev_symbol='PAYH', 
@@ -26,8 +35,8 @@ class RqDataProxy:
         """
         self._stockcode_to_instrument = {to_stdcode(item.order_book_id):
                                              item for item in self._stock_to_instruments}
-        self._etf_to_instrument = {to_stdcode(item.order_book_id): item
-                                   for item in self._etf_to_instrument}
+        self._etf_stdcode_to_instrument = {to_stdcode(item.order_book_id): item
+                                           for item in self._etf_stdcode_to_instrument}
 
         self._index_to_instrumment = {}
         for val in self._index_to_instrument:
@@ -35,7 +44,7 @@ class RqDataProxy:
             self._index_to_instrumment[to_stdcode(val.order_book_id)] = val
 
         self._all_code_to_instrument = {**self._stockcode_to_instrument,
-                                        **self._etf_to_instrument,
+                                        **self._etf_stdcode_to_instrument,
                                         **self._index_to_instrumment}
 
         self._symbol_to_stdcode = {value.symbol: key for key, value in
@@ -64,22 +73,8 @@ class RqDataProxy:
         df = df.set_index('datetime')
         return DayDataRepr(code, df)
 
-
-    def all_etf_instruments(self):
-        """
-        CS	Common Stock, 即股票
-        ETF	Exchange Traded Fund, 即交易所交易基金
-        LOF	Listed Open-Ended Fund，即上市型开放式基金
-        FenjiMu	Fenji Mu Fund, 即分级母基金
-        FenjiA	Fenji A Fund, 即分级A类基金
-        FenjiB	Fenji B Funds, 即分级B类基金
-        INDX	Index, 即指数
-        Future	Futures，即期货，包含股指、国债和商品期货
-        """
-        return self._dp.all_instruments('ETF')
-
-    def all_lof_instruments(self):
-        return self._dp.all_instruments('LOF')
+    def is_etf(self, std_code):
+        return std_code in self._etf_stdcode_to_instrument
 
     def sz50_component_stdcodes(self):
         codes = sz50_to_name

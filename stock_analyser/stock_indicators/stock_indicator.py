@@ -3,7 +3,7 @@ import math
 import numpy
 import numpy as np
 
-from common.algorithm import calc_drop_percentage, calc_rise_percentage
+from common.algorithm import calc_drop_percentage
 from common.helper import dt_date_from_str
 from common.scipy_helper import pdSr
 from common_stock.trade_day import gtrade_day

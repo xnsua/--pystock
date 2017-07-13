@@ -1,5 +1,4 @@
 import os
-import threading
 from typing import List
 
 from common_stock.stock_helper import to_num_code

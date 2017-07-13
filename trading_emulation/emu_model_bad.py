@@ -40,7 +40,7 @@ class EmuModelBad(AbstractModel):
             if drop_cnt == self.drop_threshold:
                 context.account.buy_at_most(code, gdp.open(code, date_int), FIXED_PRICE)
             else:
-                context.account.sell_at_most(code, gdp.open(code, date_int), FIXED_PRICE)
+                context.account.try_sell(code, gdp.open(code, date_int))
             # print(context.date_str, context.account.available)
 
     def handle_bar(self, context: AbstractContext, rdr: RealtimeDataRepr):

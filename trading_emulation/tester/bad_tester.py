@@ -1,19 +1,13 @@
 import concurrent
-import os
 from concurrent import futures
 
-import pandas
-
 from common.scipy_helper import pdDF
-from models.model_utility import fill_none_with_privious
-from project_helper.logbook_logger import mylog
 from stock_data_updater.classify import etf_with_amount
 from stock_data_updater.data_provider import gdp
 from stock_data_updater.index_info import gindex_pv
 from trading_emulation.emu_model_bad import EmuModelBad
-from trading_emulation.emu_model_runner import EmuModelRunner
-from trading_emulation.emuaccount import set_account_none_fee, EmuDayAccounts
-from trading_emulation.plot import plot_trend
+from trading_emulation.emu_model_runner import EmuModelRunner, analyse_emu_result
+from trading_emulation.emuaccount import set_account_none_fee
 
 
 def run_emu_for_single_code(stock, dropday, show_figure):
@@ -26,45 +20,6 @@ def run_emu_for_single_code(stock, dropday, show_figure):
         pass
 
     return ana_result
-
-
-class AnalyseResult:
-    def __init__(self, base_yield, yield_, base_year_yield, year_yield, buy_count, max_lose,
-                 max_earn, win_percentage, date_range):
-        self.base_yield = base_yield
-        self.yield_ = yield_
-        self.year_yield = base_year_yield
-        self.yyield = year_yield
-        self.buy_count = buy_count
-        self.max_lose = max_lose
-        self.max_earn = max_earn
-        self.win_percentage = win_percentage
-        self.date_range = date_range
-
-
-def analyse_emu_result(model, day_accounts: EmuDayAccounts, show_figure=False):
-    date_range = day_accounts.date_range
-    day_assets = [account.calc_total_asset() for account in day_accounts.accounts]
-    day_assets = fill_none_with_privious(day_assets)
-    trade_times = sum([account.buy_count for account in day_accounts.accounts])
-    print(trade_times)
-    code = model.stock_codes[0]
-    base_yield = gdp.ddr(code).open[-1] / gdp.ddr(code).open[0]
-    base_year_yield = base_yield ** (245 / len(day_accounts.date_range))
-    yield_ = day_assets[-1] / day_assets[1]
-    if trade_times == 0:
-        mylog.warn(f'0 trade times: {model.stock_codes}')
-        trade_times = 1
-    year_yield = yield_ ** (245 / trade_times)
-
-    if show_figure:
-        filename = os.path.expanduser(f'~/{model.stock_codes[0]}.png')
-        plot_trend(pandas.Series(data=day_assets, index=date_range),
-                   gdp.ddr(model.stock_codes[0]).df.open, filename=filename,
-                   add_param_dict={'normal_year_yield': year_yield - 1})
-    # rval = EmuModelRunResult(baseyield=base_yield, baseyyield=base_year_yield, yield_=yield_,
-    #                          yyield=year_yield)
-    return rval
 
 
 def run_bad_for_all_etf_non_fee():

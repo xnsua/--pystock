@@ -11,8 +11,8 @@ from common_stock import stock_trade_over_cache
 from common_stock.stock_helper import stock_start_day
 from common_stock.trade_day import gtrade_day
 from stock_data_updater import day_data_path
-from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name, index2name, \
-    etf_stdcode2name
+from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name, index_to_name, \
+    etf_stdcode_to_name
 from stock_data_updater.data_updater_logger import updatelog
 
 
@@ -138,7 +138,7 @@ class DayBarUpdater:
     @classmethod
     def update_all_etfs(cls):
         fail_codes = {}
-        for code in etf_stdcode2name:
+        for code in etf_stdcode_to_name:
             try:
                 SingleStockUpdater.update_etf_day_data(code)
             except Exception as e:
@@ -149,7 +149,7 @@ class DayBarUpdater:
     @classmethod
     def update_stock_index(cls):
         fail_codes = {}
-        for index in index2name:
+        for index in index_to_name:
             try:
                 SingleStockUpdater.update_index_data(index)
             except Exception as e:
@@ -160,24 +160,24 @@ class DayBarUpdater:
     @classmethod
     def update_all(cls):
         updatelog.notice('Begin update all data')
-        stock_code2except = {}
-        etf_code2except = {}
-        index_code2except = {}
+        stock_code_to_except = {}
+        etf_code_to_except = {}
+        index_code_to_except = {}
         for i in range(2):
-            stock_code2except = cls.update_800s()
-            if not stock_code2except:
+            stock_code_to_except = cls.update_800s()
+            if not stock_code_to_except:
                 break
         for i in range(2):
-            etf_code2except = cls.update_all_etfs()
-            if not etf_code2except:
+            etf_code_to_except = cls.update_all_etfs()
+            if not etf_code_to_except:
                 break
         for i in range(2):
-            index_code2except = cls.update_stock_index()
-            if not index_code2except:
+            index_code_to_except = cls.update_stock_index()
+            if not index_code_to_except:
                 break
         updatelog.notice(
-            f'Update data result {stock_code2except}, {etf_code2except}, {index_code2except}')
-        return stock_code2except, etf_code2except, index_code2except
+            f'Update data result {stock_code_to_except}, {etf_code_to_except}, {index_code_to_except}')
+        return stock_code_to_except, etf_code_to_except, index_code_to_except
 
 def main():
     DayBarUpdater.update_all()

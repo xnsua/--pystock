@@ -7,37 +7,37 @@ class DayDataRepr:
     def __init__(self, code, df):
         self.df = df
         self.code = code
-        self.day = list(df.index)
+        self.days = list(df.index)
         self.open = list(df.open)
         self.close = list(df.close)
         self.high = list(df.high)
         self.low = list(df.low)
         self.volume = list(df.volume)
-        self.day2index = dict(zip(self.day, range(len(self.day))))
+        self.day_to_index = dict(zip(self.days, range(len(self.days))))
 
     def open_of(self, day):
-        return self.open[self.day2index[day]]
+        return self.open[self.day_to_index[day]]
 
     def close_of(self, day):
-        return self.close[self.day2index[day]]
+        return self.close[self.day_to_index[day]]
 
     def high_of(self, day):
-        return self.high[self.day2index[day]]
+        return self.high[self.day_to_index[day]]
 
     def low_of(self, day):
-        return self.low[self.day2index[day]]
+        return self.low[self.day_to_index[day]]
 
     def volume_of(self, day):
-        return self.volume[self.day2index[day]]
+        return self.volume[self.day_to_index[day]]
 
     def first_day(self):
-        return self.day[0]
+        return self.days[0]
 
     def last_day(self):
-        return self.day[-1]
+        return self.days[-1]
 
     def has_day(self, day):
-        return day in self.day2index
+        return day in self.day_to_index
 
 
 class RealtimeDataRepr:
@@ -65,8 +65,8 @@ class RealtimeDataRepr:
 class EmuRealTimeDataRepr(RealtimeDataRepr):
     def __init__(self):
         super().__init__(None)
-        from stock_data_updater.data_provider import gdata_pv
-        self.pv = gdata_pv
+        from stock_data_updater.data_provider import gdp
+        self.pv = gdp
         self.day = None
 
     def open_of(self, stock_code):

@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import date2num
 from matplotlib.gridspec import GridSpec
 
-from common.helper import dt_date_from_str
-from stock_analyser.stock_indicator.stock_indicator import calculate_plot_indicator
+from common_stock.trade_day import gtrade_day
+from stock_analyser.stock_indicators.stock_indicator import calc_trend_indicator
 from stock_data_updater.day_data_updater import read_etf_day_data, read_index_day_data
 
 
@@ -36,7 +36,7 @@ class StockTrendPlotter(object):
         values = self.plot_data['values']
         normal_base = self.plot_data['normal_base_values']
         # ratio = self.plot_data['ratios_values']
-        xdata = [dt_date_from_str(item) for item in values.index]
+        xdata = [gtrade_day.int_to_date(item) for item in values.index]
         self.ax_fig.plot(xdata, values, label='values')
         self.ax_fig.plot(xdata, normal_base, label='base')
         # self.ax_fig.plot(xdata, ratio, label='ratio')
@@ -45,16 +45,23 @@ class StockTrendPlotter(object):
     def draw_text(self):
         indicator = self.plot_data['value_attr']
         indicator_base = self.plot_data['base_attr']
-        mdd1 = indicator['mdd_info']
-        mdd2 = indicator_base['mdd_info']
+        mdd = indicator['mdd_info']
+        base_mdd = indicator_base['mdd_info']
 
+        normal_year_yield = self.plot_data.get('normal_year_yield', -1)
+
+        drop_percentage = self.plot_data['drop_percentage']
+        base_drop_percentage = self.plot_data['base_drop_percentage']
         line1pos = [(x / 10, 0.6) for x in range(0, 10, 1)]
         line2pos = [(x / 10, 0.3) for x in range(0, 10, 1)]
+        line3pos = [(x / 10, 0.0) for x in range(0, 10, 1)]
         self.ax_text.text(*line1pos[0], f"YIELD: {indicator['yield_']:.1%}".replace('%', ' %'))
         self.ax_text.text(*line1pos[1],
                           f"Y_YIELD: {indicator['year_yield']:.1%}".replace('%', ' %'),
                           color='r')
-        self.ax_text.text(*line1pos[2], f"MDD: {mdd1[0]:.1%}".replace('%', ' %'), color='g')
+        self.ax_text.text(*line1pos[2], f"MDD: {mdd[0]:.1%}".replace('%', ' %'), color='g')
+        self.ax_text.text(*line1pos[3], f"D_PER: {drop_percentage:.1%}".replace('%', ' %'),
+                          color='g')
 
         self.ax_text.text(*line2pos[0],
                           f"YIELD: {indicator_base['yield_']:.1%}".replace('%', ' %'),
@@ -62,8 +69,12 @@ class StockTrendPlotter(object):
         self.ax_text.text(*line2pos[1],
                           f"Y_YIELD: {indicator_base['year_yield']:.1%}".replace('%', ' %'),
                           alpha=0.5)
-        self.ax_text.text(*line2pos[2], f"MDD: {mdd2[0]:.1%}".replace('%', ' %'), color='g')
+        self.ax_text.text(*line2pos[2], f"MDD: {base_mdd[0]:.1%}".replace('%', ' %'), alpha=0.5)
+        self.ax_text.text(*line2pos[3], f"D_PER: {base_drop_percentage:.1%}".replace('%', ' %'),
+                          alpha=0.5)
 
+        self.ax_text.text(*line3pos[1], f"NY_YIELD: {normal_year_yield:.1%}".replace('%', ' %'),
+                          color='r')
     def plot_max_drawdrop(self):
         indicator = self.plot_data['value_attr']
         mdd_info = indicator['mdd_info']
@@ -109,14 +120,13 @@ class StockTrendPlotter(object):
         values = self.plot_data['values']
         base = self.plot_data['base_values']
         ratio = self.plot_data['ratios_values']
-        index_date = [dt_date_from_str(item) for item in values.index]
-        # xs = [date2num(date) for date in index_date]
+        index_date = [gtrade_day.int_to_date(item) for item in values.index]
         xs = date2num(index_date)
         pos = bisect.bisect_right(xs, x) - 1
         pos = pos if pos > 0 else 0
         # noinspection PyUnresolvedReferences
-        x = dt_date_from_str(values.index[pos])
-        val = x, (values[pos], base[pos], ratio[pos])
+        x = gtrade_day.int_to_date(values.index[pos])
+        val = x, (values.iat[pos], base.iat[pos], ratio.iat[pos])
         return val
 
     def _fmt(self, x, y):
@@ -151,12 +161,13 @@ def plot_stock_values(plot_values, filename=None, show=True):
     plt.close()
 
 
-def plot_trend(value, base, filename=None, show=True):
+def plot_trend(value, base, filename=None, show=True, add_param_dict=None):
     if base is None:
         base = read_index_day_data('000001').open
     elif isinstance(base, str):
         base = read_index_day_data(base).open
-    val = calculate_plot_indicator(value, base)
+    val = calc_trend_indicator(value, base)
+    val.update(add_param_dict)
     plot_stock_values(val, filename, show=show)
 
 

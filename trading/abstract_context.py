@@ -8,6 +8,3 @@ class AbstractContext(metaclass=abc.ABCMeta):
         self.account = account  # type: AbstractAccount
         self.datetime = None  # type: datetime.datetime
 
-    @property
-    def date_str(self):
-        return str(self.datetime.date())

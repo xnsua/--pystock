@@ -54,7 +54,6 @@ def dt_from_time(a, b, c):
 def dt_date_from_str(text):
     return datetime.date(*map(int, text.split('-')))
 
-
 def dt_date_to_dt(date):
     return datetime.datetime(date.year, date.month, date.day)
 
@@ -69,6 +68,7 @@ def n_days(n):
 
 def n_seconds(n):
     return datetime.timedelta(seconds=n)
+
 
 # def to_seconds_str(o) -> str:
 #     return o.strftime('%y-%m-%d %H:%M:%S')

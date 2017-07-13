@@ -1,43 +1,89 @@
 import concurrent
+import os
 from concurrent import futures
 
+import pandas
+
 from common.scipy_helper import pdDF
-from stock_data_updater.classify import index2name
-from stock_data_updater.data_provider import gdata_pv
-from stock_data_updater.rq_data_proxy import grq_data
+from models.model_utility import fill_none_with_privious
+from project_helper.logbook_logger import mylog
+from stock_data_updater.classify import etf_with_amount
+from stock_data_updater.data_provider import gdp
+from stock_data_updater.index_info import gindex_pv
 from trading_emulation.emu_model_bad import EmuModelBad
 from trading_emulation.emu_model_runner import EmuModelRunner
-from trading_emulation.emuaccount import set_account_none_fee
+from trading_emulation.emuaccount import set_account_none_fee, EmuDayAccounts
+from trading_emulation.plot import plot_trend
 
 
-def run_for_code(stock, dropday):
+
+def run_emu_for_single_code(stock, dropday, show_figure):
     set_account_none_fee()
     model_bad = EmuModelBad([stock], dropday)
-    # model_bad = EmuModelBad(['510900'], 1)
     emu_runner = EmuModelRunner(model_bad)
-    ret = emu_runner.run_model()
+    day_accounts = emu_runner.run_model()
+    ana_result = analyse_emu_result(model_bad, day_accounts, show_figure=False)
 
-    name = gdata_pv.name_of(stock, None)
-    return [stock, name, dropday, *ret]
+    name = gdp.name_of(stock, None)
+    ret.stock = stock
+    ret.drop_days = dropday
+    ret.name = name
+    return ret
+
+
+class AnalyseResult:
+    def __init__(self, base_yield, yield_, base_year_yield, year_yield, buy_count, max_lose,
+                 max_earn, win_percentage, date_range):
+        self.base_yield = base_yield
+        self.yield_ = yield_
+        self.year_yield = base_year_yield
+        self.yyield = year_yield
+        self.buy_count = buy_count
+        self.max_lose = max_lose
+        self.max_earn = max_earn
+        self.win_percentage = win_percentage
+        self.date_range = date_range
+
+
+def analyse_emu_result(model, day_accounts: EmuDayAccounts, show_figure=False):
+    date_range = day_accounts.date_range
+    day_assets = [account.calc_total_asset() for account in day_accounts.accounts]
+    day_assets = fill_none_with_privious(day_assets)
+    trade_times = sum([account.buy_count for account in day_accounts.accounts])
+    print(trade_times)
+    code = model.stock_codes[0]
+    base_yield = gdp.ddr(code).open[-1] / gdp.ddr(code).open[0]
+    base_year_yield = base_yield ** (245 / len(day_accounts.date_range))
+    yield_ = day_assets[-1] / day_assets[1]
+    if trade_times == 0:
+        mylog.warn(f'0 trade times: {self.model.stock_codes}')
+        trade_times = 1
+    year_yield = yield_ ** (245 / trade_times)
+
+    if show_figure:
+        filename = os.path.expanduser(f'~/{self.model.stock_codes[0]}.png')
+        plot_trend(pandas.Series(data=day_assets, index=date_range),
+                   gdp.ddr(model.stock_codes[0]).df.open, filename=filename,
+                   add_param_dict={'normal_year_yield': year_yield - 1})
+    # rval = EmuModelRunResult(baseyield=base_yield, baseyyield=base_year_yield, yield_=yield_,
+    #                          yyield=year_yield)
+    return rval
 
 
 def run_bad_for_all_etf_non_fee():
     set_account_none_fee()
-    ## index_list = list(etf_code2name.keys())
-    index_list = ['510500', '510680', '159935', '510180', '159921', '159915', '159939', '510120',
-                  '510270', '510420', '510430', '510190', '159911', '159902', '510290', '159906',
-                  '159908', '159928', '510280', '510260', '159952', '510880', '512310']
-    index_list = grq_data.all_index_code()
-    print(index_list)
-    return
-    ##
-    index_list = index_list[0:1]
-    trade_day = [*[1] * len(index_list), *[2] * len(index_list)]
-    print(len(index_list))
+    etf_list = etf_with_amount
+    # etf_list = etf_list[0:1]
+
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        rlist = list(executor.map(run_for_code, index_list * 2, trade_day))
-    df = pdDF(data=rlist,
-              columns=['index', 'name', 'dropdays', 'oyield', 'yield', 'oyearyield', 'yearyield'])
+        rlist = list(executor.map(run_emu_for_single_code, etf_list, [1] * len(etf_list)))
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        rlist.extend(list(executor.map(run_emu_for_single_code, etf_list, [2] * len(etf_list))))
+    data = [(item.stock, item.name, item.drop_days, item.yield_, item.yyield, item.base_yield,
+             item.base_yyield) for item in rlist]
+    df = pdDF(data=data,
+              columns=['index', 'name', 'dropdays', 'base_yield', 'yield', 'base_yyield',
+                       'yyield'])
     df = df.set_index('index')
     df.to_csv('~/ModelResult/bad_etf.csv', encoding='utf-8')
     return df
@@ -45,22 +91,72 @@ def run_bad_for_all_etf_non_fee():
 
 def run_bad_for_all_index_non_fee():
     set_account_none_fee()
-    # index_list = ['i000001']
-    index_list = list(map(lambda v: 'i' + v, index2name))
-    trade_day = [*[1] * len(index_list), *[2] * len(index_list)]
+    index_list = list(map(gdp.symbol_to_code, gindex_pv.main_index_symbol))
+    # index_list = index_list[0:1]
+
     with concurrent.futures.ProcessPoolExecutor() as executor:
-        rlist = list(executor.map(run_for_code, index_list * 2, trade_day))
-    df = pdDF(data=rlist,
-              columns=['index', 'name', 'dropdays', 'oyield', 'yield', 'oyearyield', 'yearyield'])
-    df.to_csv('~/ModelResult/bad_index.csv')
+        rlist = list(executor.map(run_emu_for_single_code, index_list, [1] * len(index_list)))
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        rlist.extend(
+            list(executor.map(run_emu_for_single_code, index_list, [2] * len(index_list))))
+    data = [(item.stock, item.name, item.drop_days, item.base_yield, item.yield_,
+             item.base_yyield, item.yyield)
+            for item in rlist]
+    df = pdDF(data=data,
+              columns=['index', 'name', 'dropdays', 'base_yield', 'yield', 'base_yyield',
+                       'yyield'])
+    df = df.set_index('index')
+    df.to_csv('~/ModelResult/bad_index.csv', encoding='utf-8')
+    return df
+
+
+def run_bad_for_codes(codes, drop_days, filename, multi_process=True, show_figure=False):
+    set_account_none_fee()
+    code_list = codes
+
+    rlist = []
+    for drop_day in drop_days:
+        if multi_process:
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                # noinspection PyArgumentList
+                rlist.extend(
+                    list(executor.map(run_emu_for_single_code, code_list,
+                                      [drop_day] * len(code_list))),
+                    [show_figure] * len(code_list))
+        else:
+            for code in code_list:
+                rlist.append(run_emu_for_single_code(code, drop_day, show_figure))
+    data = [(item.stock, item.name, item.drop_days, item.base_yield, item.yield_,
+             item.base_yyield, item.yyield)
+            for item in rlist]
+    df = pdDF(data=data,
+              columns=['index', 'name', 'dropdays', 'base_yield', 'yield', 'base_yyield',
+                       'yyield'])
+    df = df.set_index('index')
+    df = df.assign(win=df.yyield > df.base_yyield)
+    df.to_csv(f'~/ModelResult/Bad/{filename}.csv', encoding='utf-8')
     return df
 
 
 def main():
-    df = run_bad_for_all_etf_non_fee()
-    # print(df)
-    # df = run_bad_for_all_index_non_fee()
-    # print(df)
+    # index_list = list(map(gdata_pv.symbol_to_code, gindex_pv.main_index_symbol))
+    # run_bad_for_codes(index_list, [1, 2, 3], 'main_indexes')
+
+    # cons001 = gdata_pv.components_of('sh000001')
+    # cons001 = [item for item in cons001 if not item.startswith('sh9')]
+    # run_bad_for_codes(cons001, [1, 2], 'com000001')
+
+    # cons016 = gdata_pv.components_of('sh000016')
+    # cons016 = [item for item in cons016 if not item.startswith('sh9')]
+    # run_bad_for_codes(cons016, [1, 2], 'cons016')
+
+    # run_bad_for_codes(etf_with_amount, [1, 2], 'etf_with_amount', )
+
+    val = run_bad_for_codes(['sz159919'], [2], 'single_test', show_figure=True,
+                            multi_process=False)
+    print(val)
+
+    pass
 
 
 if __name__ == '__main__':

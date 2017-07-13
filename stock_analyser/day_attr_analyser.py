@@ -7,7 +7,7 @@ from common.algorithm import group_consecutive_count
 from common.scipy_helper import pdDF
 from common_stock.py_dataframe import DayDataRepr
 # noinspection PyTypeChecker
-from stock_data_updater.data_provider import gdata_pv
+from stock_data_updater.data_provider import gdp
 
 
 class DropRiseIndicator:
@@ -18,10 +18,10 @@ class DropRiseIndicator:
         self.calc_fill_day_attr(ddr)
 
     def rise_count_of(self, day):
-        return self.rise_count[self.ddr.day2index[day]]
+        return self.rise_count[self.ddr.day_to_index[day]]
 
     def drop_count_of(self, day):
-        return self.drop_count[self.ddr.day2index[day]]
+        return self.drop_count[self.ddr.day_to_index[day]]
 
     # noinspection PyTypeChecker
     def calc_fill_day_attr(self, ddr: DayDataRepr):
@@ -35,20 +35,24 @@ class DropRiseIndicator:
 
 class DropRiseProvider:
     def __init__(self):
-        self.code2drop_rise = {}  # type: Dict[str, DropRiseIndicator]
+        self.code_to_drop_rise = {}  # type: Dict[str, DropRiseIndicator]
         self.lock = threading.Lock()
 
     def _calc_drop_rise(self, code):
-        with self.lock:
-            if code not in self.code2drop_rise:
-                self.code2drop_rise[code] = DropRiseIndicator(gdata_pv.ddr(code))
-            return self.code2drop_rise[code]
+        # with self.lock:
+            if code not in self.code_to_drop_rise:
+                self.code_to_drop_rise[code] = DropRiseIndicator(gdp.ddr(code))
+            return self.code_to_drop_rise[code]
 
     def rise(self, code, day):
+        if not isinstance(day, int):
+            day = day.year * 10000 + day.month * 100 + day.day
         dra = self._calc_drop_rise(code)
         return dra.rise_count_of(day)
 
     def drop(self, code, day):
+        if not isinstance(day, int):
+            day = day.year * 10000 + day.month * 100 + day.day
         dra = self._calc_drop_rise(code)
         return dra.drop_count_of(day)
 

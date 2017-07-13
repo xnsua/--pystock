@@ -2,7 +2,6 @@ import datetime
 import re
 
 # noinspection PyProtectedMember
-from tushare.stock.cons import _code_to_symbol
 
 stock_start_day = datetime.date(1990, 12, 19)
 stock_start_datetime = datetime.datetime(1990, 12, 19)

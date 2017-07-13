@@ -1,3 +1,5 @@
+from rqalpha import update_bundle
+
 from common.helper import dt_from_time
 from common.sched_with_datetime import SchedulerWithDt
 from stock_data_updater.data_updater_logger import updatelog
@@ -20,7 +22,8 @@ def run_in_background():
 
 def main():
 
-    run_in_background()
+    # run_in_background()
+    update_bundle()
 
 
 if __name__ == '__main__':

@@ -22,6 +22,7 @@ def set_account_fee():
     EmuAccount.sell_fee = 25 / 100_000
     EmuAccount.tax = 1 / 1_000
 
+
 set_account_fee()
 
 
@@ -32,6 +33,16 @@ class EmuShare:
         self.price = price
         self.time = time
         self.cost_money = cost_money
+    def __repr__(self):
+        return f'Share{{code:{self.stock_code}, amount:{self.amount}}}'
+
+
+class WinInfo:
+    def __init__(self, stock_code, buy_day, sell_day, win_percentage):
+        self.buy_day = buy_day
+        self.sell_day = sell_day
+        self.win_percentage = win_percentage
+        self.stock_code = stock_code
 
 
 class EmuAccount(AbstractAccount):
@@ -62,9 +73,10 @@ class EmuAccount(AbstractAccount):
         self.balance = float(balance)
         self._total_asset = None
 
-        self.stock_to_share = {}  # type: Dict[str, List[EmuShare]]
+        self.stock_to_share = {}  # type: Dict[str, EmuShare]
         self.day = day
         self.buy_count = 0
+        self.win_infos = []  # type: List[WinInfo]
         set_account_fee()
 
     def copy_for_day(self, day):
@@ -80,9 +92,7 @@ class EmuAccount(AbstractAccount):
         assert self.balance >= need_money
         self.balance -= need_money
         self.balance = round(self.balance, 3)
-        stock_shares = self.stock_to_share.get(code, [])
-        stock_shares.append(EmuShare(code, price, amount, self.day, cost_money=need_money))
-        self.stock_to_share[code] = stock_shares
+        self.stock_to_share[code] = EmuShare(code, price, amount, self.day, cost_money=need_money)
         return self
 
     @property
@@ -98,35 +108,19 @@ class EmuAccount(AbstractAccount):
                 return i, amounts[i] - amount
         raise Exception('Not enough stock amount')
 
-    def sell_stock(self, code, price, amount, entrust_type=None):
-        # Support only full sell now
-        assert amount is None
-        shares = self.stock_to_share[code]
-        cost_money = sum(item.cost_money for item in shares)
-        # noinspection PyTypeChecker
-        amounts = [item.amount for item in shares[code]]
-        if amount is None:
-            amount = sum(amounts)
-            del self.stock_to_share[code]
-        else:
-            index, remain = self._split_amount(amounts, amount)
-            if remain != 0:
-                shares = shares[index:]
-                shares[0].amount = remain
-            else:
-                shares = shares[index + 1:]
-            self.stock_to_share[code] = shares
+    def sell_stock(self, code, price, amount = None):
+        share = self.stock_to_share[code]
+        cost_money = share.cost_money
+        amount = share.amount
 
-        assert self.stock_to_share.get(code, 0) >= amount
         sell_money = round(price * amount * (1 - self.sell_fee), 3)
-        if code not in etf_stdcode_to_name and not code.startswith('i'):
-            # print('not in etf code list')
+        if code not in etf_stdcode_to_name:
             sell_money = round(sell_money * (1 - self.tax), 3)
+
         self.balance += sell_money
         self.balance = round(self.balance, 3)
-        self.stock_to_share[code] = self.stock_to_share[code] - amount
-        if self.stock_to_share[code] == 0:
-            del self.stock_to_share[code]
+        del self.stock_to_share[code]
+        self.win_infos.append(WinInfo(code, share.time, self.day, sell_money / cost_money - 1))
 
     def buy_at_most(self, code, price, entrust_type=None):
         amount = self.balance * self.buy_fee_tuple[1] // \
@@ -136,13 +130,15 @@ class EmuAccount(AbstractAccount):
 
     def sell_at_most(self, code, price, entrust_type=None):
         if code in self.stock_to_share:
-            self.sell_stock(code, price, self.stock_to_share[code])
+            self.sell_stock(code, price, None)
+        else:
+            assert False, f'There is no {code} to share'
 
     def calc_total_asset(self):
         try:
             self._total_asset = self.balance
-            for stock, amount in self.stock_to_share.items():
-                self._total_asset += gdp.open(stock, self.day) * amount
+            for stock, share in self.stock_to_share.items():
+                self._total_asset += gdp.open(stock, self.day) * share.amount
             return self._total_asset
         except KeyError:
             return None
@@ -173,6 +169,7 @@ class EmuDayAccounts:
     def init_account(self, value):
         self.accounts[0] = value
 
+
 def test_copy_for_new_day():
     acc = EmuAccount(1000, 1000)
     acc.non_sell_stocks = {1: 2}
@@ -183,26 +180,26 @@ def test_buy_etf():
     ea = EmuAccount(100_025, 100_1025)
     ea.buy_stock('510900', 1, 100_000)
     assert_equal(ea.balance, 0)
-    assert ea.stock_to_share['510900'][0].amount == 100000
+    assert ea.stock_to_share['510900'].amount == 100000
 
 
 def test_buy_stock():
     ea = EmuAccount(100_025, 100_1025)
     ea.buy_stock('510900', 1, 100_000)
-    assert ea.stock_to_share['510900'][0].amount == 100000
+    assert ea.stock_to_share['510900'].amount == 100000
 
 
 def test_sell_etf():
     ea = EmuAccount(1.2, None)
-    ea.stock_to_share = {'510900': 100000}
-    ea.sell_stock('510900', 1, 100000)
+    ea.stock_to_share = {'510900': EmuShare('510900', 100000, 1, 19220101, 100000)}
+    ea.sell_stock('510900', 1)
     assert ea.balance == 99975
 
 
 def test_sell_stock():
     ea = EmuAccount(1, '1900-01-01')
-    ea.stock_to_share = {'000001': 100000}
-    ea.sell_stock('000001', 1, 100000)
+    ea.stock_to_share = {'510900': EmuShare('510900', 100000, 1, 19220101, 100000)}
+    ea.sell_stock('000001', 1)
     assert ea.balance == 99875.025
 
 
@@ -211,6 +208,6 @@ def test_buy_all():
     ea.balance = 100025
     ea.buy_at_most('510900', 1)
     assert_equal(ea.balance, 0)
-    assert_equal(ea.stock_to_share['510900'], 100000)
+    assert_equal(ea.stock_to_share['510900'].amount, 100000)
 
     # </editor-fold>

@@ -16,7 +16,6 @@ from trading_emulation.emuaccount import set_account_none_fee, EmuDayAccounts
 from trading_emulation.plot import plot_trend
 
 
-
 def run_emu_for_single_code(stock, dropday, show_figure):
     set_account_none_fee()
     model_bad = EmuModelBad([stock], dropday)
@@ -24,11 +23,7 @@ def run_emu_for_single_code(stock, dropday, show_figure):
     day_accounts = emu_runner.run_model()
     ana_result = analyse_emu_result(model_bad, day_accounts, show_figure=False)
 
-    name = gdp.name_of(stock, None)
-    ret.stock = stock
-    ret.drop_days = dropday
-    ret.name = name
-    return ret
+    return ana_result
 
 
 class AnalyseResult:

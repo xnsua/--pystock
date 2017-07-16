@@ -1,13 +1,21 @@
+import datetime
 import os
 
+s_time = datetime.datetime.now()
 from rqalpha.data.base_data_source import BaseDataSource
 from rqalpha.data.data_proxy import DataProxy
 
+print(datetime.datetime.now() - s_time)
+
+import datetime
+
+s_time = datetime.datetime.now()
 from common.helper import dt_now
 from common.scipy_helper import pdDF
 from common_stock.py_dataframe import DayDataRepr
 from common_stock.stock_helper import to_stdcode
-from stock_data_updater.classify import sz50_to_name, hs300_to_name, zz500_to_name
+
+print(datetime.datetime.now() - s_time)
 
 
 class RqDataProxy:
@@ -42,7 +50,6 @@ class RqDataProxy:
         for val in self._index_to_instrument:
             if val.order_book_id.endswith('.INDX'): continue
             self._index_to_instrumment[to_stdcode(val.order_book_id)] = val
-
         self._all_code_to_instrument = {**self._stockcode_to_instrument,
                                         **self._etf_stdcode_to_instrument,
                                         **self._index_to_instrumment}
@@ -76,17 +83,17 @@ class RqDataProxy:
     def is_etf(self, std_code):
         return std_code in self._etf_stdcode_to_instrument
 
-    def sz50_component_stdcodes(self):
-        codes = sz50_to_name
-        return [to_stdcode(code) for code in codes]
-
-    def hs300_component_stdcodes(self):
-        codes = hs300_to_name
-        return [to_stdcode(code) for code in codes]
-
-    def zz500_component_stdcodes(self):
-        codes = zz500_to_name
-        return [to_stdcode(code) for code in codes]
+    # def sz50_component_stdcodes(self):
+    #     codes = sz50_to_name
+    #     return [to_stdcode(code) for code in codes]
+    #
+    # def hs300_component_stdcodes(self):
+    #     codes = hs300_to_name
+    #     return [to_stdcode(code) for code in codes]
+    #
+    # def zz500_component_stdcodes(self):
+    #     codes = zz500_to_name
+    #     return [to_stdcode(code) for code in codes]
 
     def symbol_to_code(self, symbol):
         return self._all_symbol_to_stdcode[symbol]
@@ -99,6 +106,8 @@ def main():
     # noinspection PyProtectedMember
     data = grq_data._dp.all_instruments('CS')
     cl = [item.order_book_id for item in data]
+    val = grq_data.ddr_of('sh000001').df
+    print(val)
     print(len(cl))
     # print(cl)
     # print(grq_data._dp.history_bars('000001.XSHG', 10, '1d', None, dt_now()))

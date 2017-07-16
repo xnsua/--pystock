@@ -8,11 +8,11 @@ class DayDataRepr:
         self.df = df
         self.code = code
         self.days = list(df.index)
-        self.open = list(df.open)
-        self.close = list(df.close)
-        self.high = list(df.high)
-        self.low = list(df.low)
-        self.volume = list(df.volume)
+        self.open = list(map(float, df.open))
+        self.close = list(map(float, df.close))
+        self.high = list(map(float, df.high))
+        self.low = list(map(float, df.low))
+        self.volume = list(map(float, df.volume))
         self.day_to_index = dict(zip(self.days, range(len(self.days))))
 
     def open_of(self, day):

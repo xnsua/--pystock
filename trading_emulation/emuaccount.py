@@ -43,7 +43,7 @@ class WinInfo:
 
     def __repr__(self):
         # return f'Win{{{self.win_percentage}}}'
-        return f'Win{{{self.win_percentage}, {self.buy_day},{self.sell_day}, {self.stock_code}}}'
+        return f'Win{{{round(self.win_percentage, 3)}, {self.buy_day},{self.sell_day}, {self.stock_code}}}'
 
 
 class EmuAccount(AbstractAccount):
@@ -78,7 +78,6 @@ class EmuAccount(AbstractAccount):
         self.day = day
         self.buy_count = 0
         self.win_info = None  # type: WinInfo
-        set_account_fee()
 
     def copy_for_day(self, day):
         ea = EmuAccount(self.balance, day)
@@ -87,6 +86,7 @@ class EmuAccount(AbstractAccount):
         return ea
 
     def buy_stock(self, code, price, amount, entrust_type=None):
+        assert code not in self.stock_to_share
         self.buy_count += 1
         assert amount % 100 == 0, 'Not proper amount'
         need_money = round(price * amount * (1 + self.buy_fee), 3)
@@ -108,13 +108,13 @@ class EmuAccount(AbstractAccount):
         cost_money = share.cost_money
         amount = share.amount
 
-        sell_money = round(price * amount * (1 - self.sell_fee), 3)
+        money_got = round(price * amount * (1 - self.sell_fee), 3)
         if not gdp.is_etf(code):
-            sell_money = round(sell_money * (1 - self.tax), 3)
+            money_got = round(money_got * (1 - self.tax), 3)
 
-        self.balance += sell_money
+        self.balance += money_got
         self.balance = round(self.balance, 3)
-        self.win_info = WinInfo(code, share.time, self.day, sell_money / cost_money - 1)
+        self.win_info = WinInfo(code, share.time, self.day, money_got / cost_money - 1)
 
     def buy_at_most(self, code, price, entrust_type=None):
         amount = self.balance * self.buy_fee_tuple[1] // \
@@ -128,9 +128,13 @@ class EmuAccount(AbstractAccount):
         else:
             assert False, f'There is no {code} to sell'
 
-    def try_sell(self, code, price):
+    def try_sell_all(self, code, price):
         if code in self.stock_to_share:
-            self.sell_stock(code, price, None)
+            self.sell_at_most(code, price, None)
+
+    def try_buy_all(self, code, price):
+        if code not in self.stock_to_share:
+            self.buy_at_most(code, price)
 
     def calc_total_asset(self):
         try:
@@ -148,12 +152,13 @@ class EmuAccount(AbstractAccount):
 
 class EmuDayAccounts:
     def __init__(self, date_range):
-        self.date_range = date_range
+        self.days = date_range
         self.day_to_index = dict(zip(date_range, range(len(date_range))))
         self.accounts = [None] * len(date_range)  # type: List[EmuAccount]
 
     def account_of(self, day):
         index = self.day_to_index[day]
+        assert self.accounts[index-1]
         if not self.accounts[index]:
             self.accounts[index] = self.accounts[index - 1].copy_for_day(day)
             self.accounts[index].day = day
@@ -178,6 +183,7 @@ def test_buy_etf():
 
 
 def test_sell_etf():
+    set_account_fee()
     ea = EmuAccount(0, None)
     ea.stock_to_share = {'sh510900': EmuShare('sh510900', 1, 100000, 19220101, 100000)}
     ea.sell_stock('sh510900', 1, 100_000)
@@ -186,6 +192,7 @@ def test_sell_etf():
 
 
 def test_sell_stock():
+    set_account_fee()
     ea = EmuAccount(0, '1900-01-01')
     ea.stock_to_share = {'sz000001': EmuShare('sz000001', 1, 100000, 19220101, 100000)}
     ea.sell_stock('sz000001', 1)
@@ -194,6 +201,7 @@ def test_sell_stock():
 
 
 def test_buy_all():
+    set_account_fee()
     ea = EmuAccount(1, '1900-01-01')
     ea.balance = 100025
     ea.buy_at_most('510900', 1)
@@ -202,6 +210,7 @@ def test_buy_all():
 
 
 def test_win_percentage1():
+    set_account_fee()
     ea = EmuAccount(1, '1900-01-01')
     ea.balance = 100025
     ea.buy_at_most('510900', 1)
@@ -211,6 +220,7 @@ def test_win_percentage1():
 
 
 def test_win_percentage2():
+    set_account_fee()
     ea = EmuAccount(1, '1900-01-01')
     ea.balance = 100025
     ea.buy_at_most('510900', 1)

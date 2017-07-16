@@ -60,6 +60,11 @@ class TradeDay:
     def _read_df():
         return tushare.trade_cal()
 
+    def span_of(self, day1, day2):
+        i1 = self.trade_day_map[day1]
+        i2 = self.trade_day_map[day2]
+        return i2 - i1
+
     def _build_trade_day_map(self):
         trade_day_map = {}
         for i, day in enumerate(self.trade_day_list):
@@ -101,7 +106,7 @@ class TradeDay:
         i_trade_day = self.trade_day_map[date_]
         return self.trade_day_list[i_trade_day + offset]
 
-    def rangel(self, start_date, end_date):
+    def range_list(self, start_date, end_date):
         if start_date not in self.trade_day_map:
             start_date = self.next(start_date)
         i_start_date = self.trade_day_map[start_date]
@@ -110,8 +115,8 @@ class TradeDay:
         i_end_date = self.trade_day_map[end_date]
         return [self.trade_day_list[i] for i in range(i_start_date, i_end_date)]
 
-    def close_rangel(self, start_date, end_date):
-        return self.rangel(start_date, self.next(end_date))
+    def close_range_list(self, start_date, end_date):
+        return self.range_list(start_date, self.next(end_date))
 
     def range_len(self, start_date, end_date):
         i = self.day_map[start_date]
@@ -139,10 +144,14 @@ def test():
     val = gtrade_day.shift(20170626, -2)
     assert_equal(val, 20170622)
 
-    range_list = [i for i in gtrade_day.rangel(20170623, 20170626)]
+    range_list = [i for i in gtrade_day.range_list(20170623, 20170626)]
     assert_equal(range_list, [20170623])
-    range_list = [i for i in gtrade_day.rangel(20170623, 20170627)]
+    range_list = [i for i in gtrade_day.range_list(20170623, 20170627)]
     assert_equal(range_list, [20170623, 20170626])
 
-    range_list = [i for i in gtrade_day.close_rangel(20170623, 20170626)]
+    range_list = [i for i in gtrade_day.close_range_list(20170623, 20170626)]
+    # 20170623 is Friday, 20170626 is Monday
     assert_equal(range_list, [20170623, 20170626])
+
+    assert_equal(gtrade_day.span_of(20170623, 20170626), 1)
+    assert_equal(gtrade_day.span_of(20170623, 20170627), 2)

@@ -2,6 +2,7 @@ import datetime
 import re
 
 # noinspection PyProtectedMember
+import numpy
 
 stock_start_day = datetime.date(1990, 12, 19)
 stock_start_datetime = datetime.datetime(1990, 12, 19)
@@ -35,3 +36,24 @@ def to_num_code(code):
     # noinspection PyUnresolvedReferences
     val = re.search('\d+', code)[0]
     return val
+
+
+def dict_with_float_repr(dict_, precision):
+    items = ['{']
+    for key, val in dict_.items():
+        items.append(key)
+        items.append(':')
+        if isinstance(val, float):
+            # noinspection PyTypeChecker
+            items.append(round(val, precision))
+        else:
+            items.append(val)
+        items.append(', ')
+    items.append('}')
+    result = ''.join(map(str,items))
+    return result
+
+def yield_basic_statistics(iterable):
+    log_vals = [numpy.log]
+
+

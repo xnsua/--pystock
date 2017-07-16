@@ -9,27 +9,17 @@ from common.scipy_helper import pdSr
 from common_stock.trade_day import gtrade_day
 
 
-def calc_max_drawdown_infos(xval: np.array, yval: np.array):
-    xval = np.array(xval)
-    yval = np.array(yval)
-    # noinspection PyArgumentList
-    right = np.argmax(np.maximum.accumulate(yval) - yval)  # end of the period
-    left = np.argmax(yval[:right]) if right != 0 else 0  # start of period
+class MddInfo:
+    def __init__(self, mdd,  left_point, right_point, duration):
+        self.mdd = mdd
+        self.left_point = left_point
+        self.right_point = right_point
 
-    vals2 = yval[right + 1:]
-    # From begin of max drawdown to end of lose
-    # noinspection PyTypeChecker
-    for i, val in enumerate(vals2):
-        if val and not np.isnan(val) is not  val > yval[left]:
-            drawdown_duration_end = i + right
-            break
-    else:
-        drawdown_duration_end = len(yval) - 1
-    mdd = (yval[left] - yval[right]) / yval[left]
-    return mdd, ((xval[left], yval[left]),
-                 (xval[right], yval[right]),
-                 (xval[drawdown_duration_end], yval[drawdown_duration_end]))
-
+def calc_max_drawdown_pos(array_like):
+    array_like = np.asarray(array_like)
+    right = np.argmax(np.maximum.accumulate(array_like) - array_like)  # end of the period
+    left = np.argmax(array_like[:right]) if right != 0 else 0  # start of period
+    return left, right
 
 def calc_yield_dropdown(x, y):
     if isinstance(x[0], str):
@@ -43,7 +33,7 @@ def calc_yield_dropdown(x, y):
     yield_ = (y[-1] - y[0]) / y[0]
     name_to_value['yield_'] = yield_
     name_to_value['year_yield'] = pow((1 + yield_), 1 / year_len) - 1
-    name_to_value['mdd_info'] = calc_max_drawdown_infos(x, y)
+    name_to_value['mdd_info'] = calc_max_drawdown_pos(x, y)
     return name_to_value
 
 
@@ -73,14 +63,16 @@ def calc_trend_indicator(vals: pdSr, base: pdSr):
               'value_attr': calc_yield_dropdown(vals.index, vals.values),
               'base_attr': calc_yield_dropdown(base_drop.index, base_drop.values),
               'drop_percentage': drop_percentage,
-              'base_drop_percentage':base_drop_percentage}
+              'base_drop_percentage': base_drop_percentage}
     return result
 
 
 def main():
-    result = calc_max_drawdown_infos(
-        ['2001-01-01', '2001-01-02', '2001-01-03', '2001-01-04', '2001-01-05'],
-        [1, 1, 1.1, 0.9, 0.8])
+    ll =  [1, 1, 1.1, 0.9, 0.8, 0.7,3,3]
+    import datetime
+    s_time = datetime.datetime.now()
+    result = calc_max_drawdown_pos(ll)
+    print(datetime.datetime.now() - s_time)
     print(result)
 
 

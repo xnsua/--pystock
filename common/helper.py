@@ -1,5 +1,7 @@
+import cmath
 import datetime as datetime
 import os
+import statistics
 
 
 class hfile:
@@ -53,6 +55,7 @@ def dt_from_time(a, b, c):
 
 def dt_date_from_str(text):
     return datetime.date(*map(int, text.split('-')))
+
 
 def dt_date_to_dt(date):
     return datetime.datetime(date.year, date.month, date.day)
@@ -131,3 +134,29 @@ def int_default_zero(text):
     if text:
         return int(text)
     return 0
+
+
+def geo_mean_overflow(iterable):
+    for val in iterable:
+        assert val > 0
+    a = [cmath.log(val) for val in iterable]
+    return cmath.exp(sum(a) / len(a)).real
+
+
+def geo_std_deviation(iterable):
+    for val in iterable:
+        assert val > 0
+    a = [cmath.log(val).real for val in iterable]
+
+    deviation = statistics.stdev(a)
+    deviation = cmath.exp(deviation).real
+    return deviation
+
+
+def main():
+    print(geo_mean_overflow([1, 9]))
+    print(geo_std_deviation([1, 9]))
+
+
+if __name__ == '__main__':
+    main()

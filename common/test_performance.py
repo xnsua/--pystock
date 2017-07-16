@@ -1,7 +1,4 @@
-import numpy
 import pandas
-
-
 # noinspection PyUnresolvedReferences
 def parse_date():
     import datetime
@@ -36,12 +33,13 @@ def test_function_call():
 
 def test_pandas():
     import timeit
+    import numpy
     df = pandas.DataFrame(index=['2011-01-01', '2011-01-02'], data=[[1, 2], [3, 4]],
                           columns=['open', 'close'])
     nparr = numpy.array([1, 2, 3, 4])
     open_ = df.open
     open_list = list(df.open)
-
+    open_array = df.open.values
     class Foo:
         pass
 
@@ -62,6 +60,8 @@ def test_pandas():
         'a = func',
         'a = df.open',
         'a = open_list[1]',
+        'a = open_array[1]',
+        'a = numpy.array(open_array, copy=False)',
         'a = open_.iat[0]',
         'a = df.iat[0,0]',
         'a = nparr[0]',

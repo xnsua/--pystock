@@ -15,7 +15,7 @@ def run_emu_for_single_code(stock, dropday, show_figure):
     model_bad = EmuModelBad([stock], dropday)
     emu_runner = EmuModelRunner(model_bad)
     day_accounts = emu_runner.run_model()
-    ana_result = analyse_emu_result(model_bad, day_accounts, show_figure=False)
+    ana_result = analyse_emu_result(model_bad, day_accounts)
     if show_figure:
         pass
 

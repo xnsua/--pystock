@@ -1,14 +1,17 @@
 import bisect
+import datetime
 import traceback
+from itertools import accumulate
+from typing import List
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from matplotlib.dates import date2num
+import numpy
+from matplotlib.dates import date2num, num2date
 from matplotlib.gridspec import GridSpec
 
+from common.helper import dt_date_to_dt
 from common_stock.trade_day import gtrade_day
-from stock_analyser.stock_indicators.stock_indicator import calc_trend_indicator
-from stock_data_updater.day_data_updater import read_etf_day_data, read_index_day_data
 
 
 class StockTrendPlotter(object):
@@ -18,70 +21,73 @@ class StockTrendPlotter(object):
     https://stackoverflow.com/a/15454427/190597 (unutbu)
     """
 
-    def __init__(self, ax_fig, ax_text, plot_data):
-        self.ax_fig = ax_fig
-        self.ax_text = ax_text
-        self.plot_data = plot_data
+    def __init__(self, lines, left_annotations, right_annotations, save_file_name):
+        self.lines = lines  # type: List[LineAndStyle]
+        self.left_annotations = left_annotations
+        self.right_annoations = right_annotations
+        self.save_file_name = save_file_name
 
-        self.plot_lines()
+        # Figure configuration
+        plt.rcParams["font.family"] = "consolas"
+        self.fig = plt.figure(figsize=(16, 4))
+        gs = GridSpec(2, 1, height_ratios=[1, 4])
+        self.ax_text = self.fig.add_subplot(gs[0, 0])
+        self.ax_text.axis('off')
+        self.ax_fig = self.fig.add_subplot(gs[1, 0])
+        self.ax_fig.grid(True, alpha=0.4)
+        self.fig.tight_layout()
+        years = mdates.YearLocator()  # every year
+        months = mdates.MonthLocator()  # every month
+        year_fmt = mdates.DateFormatter('%Y')
+        self.ax_fig.xaxis.set_major_locator(years)
+        self.ax_fig.xaxis.set_major_formatter(year_fmt)
+        self.ax_fig.xaxis.set_minor_locator(months)
+        self.ax_fig.xaxis.set_label_position('top')
 
-        self.draw_text()
+        self.plot_lines2()
+        self.plot_texts2()
 
-        self.plot_max_drawdrop()
-
-        self.annotation = self.setup_annotation()
+        # Moving annotation
+        self.left_annotations = self.setup_annotation()
         plt.connect('motion_notify_event', self)
 
-    def plot_lines(self):
-        values = self.plot_data['values']
-        normal_base = self.plot_data['normal_base_values']
-        # ratio = self.plot_data['ratios_values']
-        xdata = [gtrade_day.int_to_date(item) for item in values.index]
-        self.ax_fig.plot(xdata, values, label='values')
-        self.ax_fig.plot(xdata, normal_base, label='base')
-        # self.ax_fig.plot(xdata, ratio, label='ratio')
+    def show_figure(self):
+        plt.show()
+
+    def save_figure(self, filename):
+        plt.savefig(filename, format='png')
+
+    def close_figure(self):
+        plt.close()
+
+    def plot_lines2(self):
+        for line in self.lines:
+            self.ax_fig.plot(line.xs, line.ys, color=line.color, alpha=line.alpha,
+                             label=line.label)
         self.ax_fig.legend()
 
-    def draw_text(self):
-        indicator = self.plot_data['value_attr']
-        indicator_base = self.plot_data['base_attr']
-        mdd = indicator['mdd_info']
-        base_mdd = indicator_base['mdd_info']
-
-        normal_year_yield = self.plot_data.get('normal_year_yield', -1)
-
-        drop_percentage = self.plot_data['drop_percentage']
-        base_drop_percentage = self.plot_data['base_drop_percentage']
+    def plot_texts2(self):
         line1pos = [(x / 10, 0.6) for x in range(0, 10, 1)]
         line2pos = [(x / 10, 0.3) for x in range(0, 10, 1)]
         line3pos = [(x / 10, 0.0) for x in range(0, 10, 1)]
-        self.ax_text.text(*line1pos[0], f"YIELD: {indicator['yield_']:.1%}".replace('%', ' %'))
-        self.ax_text.text(*line1pos[1],
-                          f"Y_YIELD: {indicator['year_yield']:.1%}".replace('%', ' %'),
-                          color='r')
-        self.ax_text.text(*line1pos[2], f"MDD: {mdd[0]:.1%}".replace('%', ' %'), color='g')
-        self.ax_text.text(*line1pos[3], f"D_PER: {drop_percentage:.1%}".replace('%', ' %'),
-                          color='g')
+        lines = [line1pos, line2pos, line3pos]
+        for i_row, row in enumerate(self.left_annotations):
+            line = lines[i_row]
+            for pos, item in enumerate(row):
+                if item.formatter is None:
+                    text = f'{key}: {value}'
+                else:
+                    text = item.formatter(item.key, item.value)
+                self.ax_text.text(*line[pos], text, color=item.color, alpha=item.alpha)
 
-        self.ax_text.text(*line2pos[0],
-                          f"YIELD: {indicator_base['yield_']:.1%}".replace('%', ' %'),
-                          alpha=0.5)
-        self.ax_text.text(*line2pos[1],
-                          f"Y_YIELD: {indicator_base['year_yield']:.1%}".replace('%', ' %'),
-                          alpha=0.5)
-        self.ax_text.text(*line2pos[2], f"MDD: {base_mdd[0]:.1%}".replace('%', ' %'), alpha=0.5)
-        self.ax_text.text(*line2pos[3], f"D_PER: {base_drop_percentage:.1%}".replace('%', ' %'),
-                          alpha=0.5)
-
-        self.ax_text.text(*line3pos[1], f"NY_YIELD: {normal_year_yield:.1%}".replace('%', ' %'),
-                          color='r')
-    def plot_max_drawdrop(self):
-        indicator = self.plot_data['value_attr']
-        mdd_info = indicator['mdd_info']
-        leftp, rightp, endp = mdd_info[1]
-
-        self.ax_fig.plot(*zip(leftp, rightp), alpha=0.3)
-        self.ax_fig.plot(*zip(leftp, endp), alpha=0.3)
+        for i_row, row in enumerate(self.right_annoations):
+            line = lines[i_row]
+            for pos, item in enumerate(row):
+                if item.formatter is None:
+                    text = f'{key}: {value}'
+                else:
+                    text = item.formatter(item.key, item.value)
+                self.ax_text.text(*line[-pos - 1], text, color=item.color, alpha=item.alpha)
 
     def __call__(self, event):
         try:
@@ -95,10 +101,10 @@ class StockTrendPlotter(object):
             else:
                 inv = ax.transData.inverted()
                 x, y = inv.transform([(event.x, event.y)]).ravel()
-            annotation = self.annotation
-            x, ys = self.snap(x, y)
-            annotation.xy = x, ys[0]
-            annotation.set_text(self._fmt(x, ys))
+            annotation = self.left_annotations
+            x_axis, xpos, yvals = self.snap(x, y)
+            annotation.xy = (x_axis, yvals[0])
+            annotation.set_text(self._format_show_values(xpos, yvals))
             event.canvas.draw()
         except Exception:
             traceback.print_exc()
@@ -116,67 +122,110 @@ class StockTrendPlotter(object):
 
     # noinspection PyUnusedLocal
     def snap(self, x, y):
-        # print('xxyy', x, y)
-        values = self.plot_data['values']
-        base = self.plot_data['base_values']
-        ratio = self.plot_data['ratios_values']
-        index_date = [gtrade_day.int_to_date(item) for item in values.index]
-        xs = date2num(index_date)
-        pos = bisect.bisect_right(xs, x) - 1
-        pos = pos if pos > 0 else 0
-        # noinspection PyUnresolvedReferences
-        x = gtrade_day.int_to_date(values.index[pos])
-        val = x, (values.iat[pos], base.iat[pos], ratio.iat[pos])
-        return val
+        pos_date = num2date(x).date()
+        line1 = self.lines[0]
+        pos = bisect.bisect_right(line1.xs, pos_date) - 1
+        pos = max(0, pos)
+        pos_date = line1.xs[pos]
+        pos_axis = date2num(dt_date_to_dt(pos_date))
 
-    def _fmt(self, x, y):
-        datestr = x.strftime(f'date:  %y-%m-%d')
-        str1 = f'\nvalue: {y[0]:.3f}'
-        str2 = f'\nbase:  {y[1]:.3f}'
+        yvals = []
+        for line in self.lines:
+            if line.show_value_in_annotation:
+                yvals.append(line.ys[pos])
+        return pos_axis, pos_date, yvals
+
+    def _format_show_values(self, pos, values):
+        assert len(values) == 2, 'Two value allowed, Value and Base'
+        show_value0 = values[0]
+        show_value1 = values[1]
+        datestr = pos.strftime(f'date:  %y-%m-%d')
+
+        str1 = f'\nvalue: {show_value0:.3f}'
+        str2 = f'\nbase:  {show_value1:.3f}'
         return datestr + str1 + str2
 
 
-def plot_stock_values(plot_values, filename=None, show=True):
-    plt.rcParams["font.family"] = "consolas"
-    fig = plt.figure(figsize=(16, 4))
-    gs = GridSpec(2, 1, height_ratios=[1, 4])
-    ax_text = fig.add_subplot(gs[0, 0])
-    ax_text.axis('off')
-    ax_fig = fig.add_subplot(gs[1, 0])
-    ax_fig.grid(True, alpha=0.4)
-    fig.tight_layout()
-    years = mdates.YearLocator()  # every year
-    months = mdates.MonthLocator()  # every month
-    year_fmt = mdates.DateFormatter('%Y')
-    ax_fig.xaxis.set_major_locator(years)
-    ax_fig.xaxis.set_major_formatter(year_fmt)
-    ax_fig.xaxis.set_minor_locator(months)
-    ax_fig.xaxis.set_label_position('top')
-    # noinspection PyUnusedLocal
-    cursor = StockTrendPlotter(ax_fig, ax_text, plot_values)
-    if filename:
-        plt.savefig(filename, format='png')
+class LineAndStyle:
+    def __init__(self, xs, ys, color, alpha, show_value_in_annotaion=False, label=''):
+        self.xs = xs
+        self.ys = ys
+        self.alpha = alpha
+        self.color = color
+        self.label = label
+        self.show_value_in_annotation = show_value_in_annotaion
+
+
+class TextAnnotation:
+    def __init__(self, key, value, alpha, color, formatter=None):
+        self.key = key
+        self.value = value
+        self.alpha = alpha
+        self.color = color
+        self.formatter = formatter
+
+
+def percentage_formatter(key, val):
+    return f"{key}: {val:.1%}".replace('%', ' %')
+
+
+class LeftAlignTextAnnotations:
+    def __init__(self, annotations: List[List[TextAnnotation]]):
+        self.annotations = annotations
+
+
+class RightAlignTextAnnotations:
+    def __init__(self, annotations: List[List[TextAnnotation]]):
+        self.annotiation = annotations
+
+
+def plot_image_with_annotation(lines_and_style: List[LineAndStyle],
+                               left_annotation: LeftAlignTextAnnotations,
+                               right_annotation: RightAlignTextAnnotations,
+                               save_file_name=None, show=False):
+    plotter = StockTrendPlotter(lines_and_style, left_annotation, right_annotation, save_file_name)
+    if save_file_name:
+        plotter.save_figure(save_file_name)
     if show:
-        plt.show()
-    plt.close()
+        plotter.show_figure()
+    plotter.close_figure()
 
 
-def plot_trend(value, base, filename=None, show=True, add_param_dict=None):
-    if base is None:
-        base = read_index_day_data('000001').open
-    elif isinstance(base, str):
-        base = read_index_day_data(base).open
-    val = calc_trend_indicator(value, base)
-    val.update(add_param_dict)
-    plot_stock_values(val, filename, show=show)
+def plot_test():
+    days = gtrade_day.close_range_list(20170601, 20170710)
+    days = list(map(gtrade_day.int_to_date, days))
+    values = list(accumulate(numpy.random.randn(len(days))))
+    # pyplot.plot(days, list(values))
+    # pyplot.show()
+    values2 = numpy.array(values) / 2
+    # pyplot.plot(days, list(values))
+    # pyplot.plot(days, list(values2))
+    # pyplot.show()
+    mdd_x = [datetime.date(2017, 6, 1), datetime.datetime(2017, 7, 10)]
+    mdd_y = [1, 2]
+    lines = [
+        LineAndStyle(days, values, 'b', alpha=1, label='Value', show_value_in_annotaion=True),
+        LineAndStyle(days, values2, 'k', alpha=0.3, label='Base', show_value_in_annotaion=True),
+        LineAndStyle(mdd_x, mdd_y, 'k', alpha=0.3)
+    ]
+    line1annotations = [
+        TextAnnotation('Key1', 0.1234, 6, 'b', formatter=percentage_formatter),
+        TextAnnotation('Key2', 0.1234, 6, 'b', formatter=percentage_formatter),
+    ]
+    plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations], show=False, save_file_name='d:/tfile.png')
 
 
 def main():
-    df_etf = read_etf_day_data('510900')
-    df_etf = df_etf.tail(8000)  # print(df_etf.open)
-    # df_index = read_index_day_data('000001')
-    # val = (df_index.loc[df_etf.index, :])
-    plot_trend(df_etf.open, None)
+    plot_test()
+    # df_etf = read_etf_day_data('510900')
+    # # print(df_etf)
+    # df_etf = df_etf.tail(80)
+    # df_etf.index = df_etf.index.map(gtrade_day.str_to_int)
+    # print(df_etf)
+    # # print(df_etf.open)
+    # # df_index = read_index_day_data('000001')
+    # # val = (df_index.loc[df_etf.index, :])
+    # plot_test(df_etf.open, None)
 
 
 if __name__ == '__main__':

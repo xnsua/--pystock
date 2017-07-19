@@ -12,7 +12,7 @@ from common_stock.stock_helper import dict_with_float_repr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
 from models.model_utility import calc_date_range, fill_with_previous_value
-from stock_analyser.stock_indicators.stock_indicator import MddInfo
+from stock_analyser.stock_indicators.stock_indicator import MddInfo, calc_max_drawdown_info
 from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos_and_value
 from stock_data_updater.data_provider import gdp
 from trading_emulation.emu_model_bad import EmuModelBad
@@ -50,14 +50,13 @@ class EmuModelRunner:
 
 
 class AnalyseResult:
-    def __init__(self, model, day_accounts, day_assets, yield_, year_yield, normal_year_yield,
+    def __init__(self, model, day_accounts, yield_, year_yield, normal_year_yield,
                  mdd_info, buy_count, max_lose, max_win, win_time_percenatage, days, hold_days,
                  bench_data, bench_year_yield, bench_yield, bench_mdd_info,
                  additional_param_dict=None):
         self.win_time_percenatage = win_time_percenatage
         self.model = model
         self.day_accounts = day_accounts
-        self.day_asset = day_assets
         self.bench_data = bench_data
         self.yield_ = yield_
         self.year_yield = year_yield
@@ -80,7 +79,7 @@ class AnalyseResult:
 
     def __repr__(self):
         new_dict = copy.deepcopy(self.__dict__)
-        new_dict['date_range'] = [new_dict['date_range'][0], new_dict['date_range'][-1]]
+        new_dict['days'] = [new_dict['date_range'][0], new_dict['date_range'][-1]]
         del new_dict['model']
         del new_dict['day_accounts']
         return dict_with_float_repr(new_dict, 3)
@@ -109,14 +108,14 @@ def analyse_emu_result(model, day_accounts: EmuDayAccounts):
     yield_ = day_asset_arr[-1] / day_asset_arr[1]
     year_yield = yield_ ** (1 / years)
     normal_year_yield = yield_ ** (245 / hold_days if hold_days >= 1 else 1)
-    mdd_info = calc_max_drawdown_pos_and_value(day_asset_arr)
+    mdd_info = calc_max_drawdown_info(days, day_asset_arr)
 
     bench_data = model.model_bench()
     bench_data = bench_data[days]
     bench_vals = list(bench_data)
     bench_yield = bench_vals[-1] / bench_vals[0]
     bench_year_yield = bench_yield ** (245 / len(days))
-    bench_mdd_info = calc_max_drawdown_pos_and_value(bench_data.index.values, bench_data.values)
+    bench_mdd_info = calc_max_drawdown_info(bench_data.index.values, bench_data.values)
 
     return AnalyseResult(model=model, day_accounts=day_accounts, days=days,
                          yield_=yield_, year_yield=year_yield,
@@ -174,7 +173,7 @@ def plot_analyse_result(ana_result: AnalyseResult, figure_filename=None):
 
 
 def main():
-    gdp.ddr('sh510050').df.to_csv('jqt.csv')
+    # gdp.ddr('sh510050').df.to_csv('jqt.csv')
     days = gdp.ddr('sh510050').days[0:100]
     ana_result = run_emu_for_single_code('sh510050', days, 2, plot_figure=True, save_figure=True)
     # balance = [item.balance for item in ana_result.day_accounts.accounts]

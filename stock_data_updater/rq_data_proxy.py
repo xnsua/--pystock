@@ -5,17 +5,12 @@ s_time = datetime.datetime.now()
 from rqalpha.data.base_data_source import BaseDataSource
 from rqalpha.data.data_proxy import DataProxy
 
-print(datetime.datetime.now() - s_time)
 
-import datetime
-
-s_time = datetime.datetime.now()
 from common.helper import dt_now
 from common.scipy_helper import pdDF
 from common_stock.py_dataframe import DayDataRepr
 from common_stock.stock_helper import to_stdcode
 
-print(datetime.datetime.now() - s_time)
 
 
 class RqDataProxy:

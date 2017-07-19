@@ -10,7 +10,7 @@ from common_stock.py_dataframe import EmuRealTimeDataRepr
 from common_stock.stock_helper import dict_with_float_repr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
-from models.model_utility import calc_date_range, fill_none_with_privious
+from models.model_utility import calc_date_range, fill_with_previous_value
 from stock_analyser.stock_indicators.stock_indicator import MddInfo
 from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos
 from stock_data_updater.data_provider import gdp
@@ -88,7 +88,7 @@ def analyse_emu_result(model, day_accounts: EmuDayAccounts):
 
     day_assets = [account.calc_total_asset() for account in day_accounts.accounts]
     # The stock have no data on some day
-    day_assets = fill_none_with_privious(day_assets)
+    day_assets = fill_with_previous_value(day_assets, None)
 
     buy_count = sum([account.buy_count for account in day_accounts.accounts])
 

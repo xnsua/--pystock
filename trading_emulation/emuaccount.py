@@ -136,14 +136,15 @@ class EmuAccount(AbstractAccount):
         if code not in self.stock_to_share:
             self.buy_at_most(code, price)
 
-    def calc_total_asset(self):
+    def _calc_total_asset(self, default):
         try:
             self._total_asset = self.balance
             for stock, share in self.stock_to_share.items():
                 self._total_asset += gdp.open(stock, self.day) * share.amount
             return self._total_asset
         except KeyError:
-            return None
+            self._total_asset = default
+            return default
 
     def __repr__(self):
         asset = -1.0 if self._total_asset is None else self._total_asset
@@ -171,6 +172,12 @@ class EmuDayAccounts:
     @init_account.setter
     def init_account(self, value):
         self.accounts[0] = value
+
+    def calc_total_asserts(self):
+        last_val = 0
+        for item in self.accounts:
+            last_val = item._calc_total_asset(last_val)
+
 
 
 def test_buy_etf():

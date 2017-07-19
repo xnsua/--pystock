@@ -86,7 +86,7 @@ class AnalyseResult:
 def analyse_emu_result(model, day_accounts: EmuDayAccounts):
     days = day_accounts.days
 
-    day_assets = [account.calc_total_asset() for account in day_accounts.accounts]
+    day_assets = [account._calc_total_asset() for account in day_accounts.accounts]
     # The stock have no data on some day
     day_assets = fill_with_previous_value(day_assets, None)
 
@@ -144,7 +144,7 @@ def run_emu_for_single_code(stock, days, dropday, plot_figure, save_figure):
 
     plot_image_path = plpath / (filename + '.png')
 
-    day_asset = [item.calc_total_asset() for item in day_accounts.accounts]
+    day_asset = [item._calc_total_asset() for item in day_accounts.accounts]
     days = day_accounts.days
     assert len(day_asset) == len(days)
     asset_series = pdSr(data=day_asset, index=days)

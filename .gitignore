@@ -8,3 +8,4 @@ __pycache__/
 .idea/**/tasks.xml
 .idea/misc.xml
 .idea/PyStock.iml
+.ipynb_checkpoints/

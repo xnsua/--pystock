@@ -1,3 +1,4 @@
+from common.scipy_helper import pdSr
 from common_stock.py_dataframe import RealtimeDataRepr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
@@ -16,7 +17,7 @@ class EmuModelBad(AbstractModel):
         # self.rise_cnt = None
         # self.drop_cnt = None
 
-    def model_bench(self):
+    def model_bench(self) -> pdSr:
         assert len(self.codes) == 1
         return gdp.ddr(self.codes[0]).df.open
 

@@ -4,19 +4,21 @@ import pathlib
 import pickle
 from operator import attrgetter
 
+import numpy
+
 from common.helper import dt_now
-from common.scipy_helper import pdSr
 from common_stock.py_dataframe import EmuRealTimeDataRepr
 from common_stock.stock_helper import dict_with_float_repr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
 from models.model_utility import calc_date_range, fill_with_previous_value
 from stock_analyser.stock_indicators.stock_indicator import MddInfo
-from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos
+from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos_and_value
 from stock_data_updater.data_provider import gdp
 from trading_emulation.emu_model_bad import EmuModelBad
 from trading_emulation.emu_trade_context import EmuContext
 from trading_emulation.emuaccount import EmuAccount, EmuDayAccounts, set_account_none_fee
+from trading_emulation.plot import LineAndStyle, plot_image_with_annotation
 
 
 class EmuModelRunner:
@@ -43,6 +45,7 @@ class EmuModelRunner:
             self.model.on_bid_over(self.context, rdr)
             self.model.handle_bar(self.context, rdr)
             self.model.on_trade_over(self.context, rdr)
+        day_accounts.calc_total_asserts()
         return day_accounts
 
 
@@ -86,14 +89,14 @@ class AnalyseResult:
 def analyse_emu_result(model, day_accounts: EmuDayAccounts):
     days = day_accounts.days
 
-    day_assets = [account._calc_total_asset() for account in day_accounts.accounts]
+    day_asset_arr = numpy.fromiter((account.total_asset for account in day_accounts.accounts),
+                                   dtype=numpy.float64)
     # The stock have no data on some day
-    day_assets = fill_with_previous_value(day_assets, None)
+    day_asset_arr = fill_with_previous_value(day_asset_arr, None)
 
     buy_count = sum([account.buy_count for account in day_accounts.accounts])
 
     wininfos = [account.win_info for account in day_accounts.accounts]
-
     valid_wininfo = [item for item in wininfos if item]
     max_win = max(valid_wininfo, key=attrgetter('win_percentage'))
     max_lose = min(valid_wininfo, key=attrgetter('win_percentage'))
@@ -103,17 +106,17 @@ def analyse_emu_result(model, day_accounts: EmuDayAccounts):
     years = len(day_accounts.days) / 245
     hold_days = sum(bool(account.stock_to_share) for account in day_accounts.accounts)
 
-    yield_ = day_assets[-1] / day_assets[1]
+    yield_ = day_asset_arr[-1] / day_asset_arr[1]
     year_yield = yield_ ** (1 / years)
     normal_year_yield = yield_ ** (245 / hold_days if hold_days >= 1 else 1)
-    mdd_info = calc_max_drawdown_pos(days, day_assets)
+    mdd_info = calc_max_drawdown_pos_and_value(day_asset_arr)
 
     bench_data = model.model_bench()
     bench_data = bench_data[days]
     bench_vals = list(bench_data)
     bench_yield = bench_vals[-1] / bench_vals[0]
     bench_year_yield = bench_yield ** (245 / len(days))
-    bench_mdd_info = calc_max_drawdown_pos(bench_data.index.values, bench_data.values)
+    bench_mdd_info = calc_max_drawdown_pos_and_value(bench_data.index.values, bench_data.values)
 
     return AnalyseResult(model=model, day_accounts=day_accounts, days=days,
                          yield_=yield_, year_yield=year_yield,
@@ -121,7 +124,7 @@ def analyse_emu_result(model, day_accounts: EmuDayAccounts):
                          buy_count=buy_count,
                          max_win=max_win, max_lose=max_lose,
                          win_time_percenatage=win_time_percentage,
-                         hold_days=hold_days, bench_yield=bench_yield, bench_data= bench_vals,
+                         hold_days=hold_days, bench_yield=bench_yield, bench_data=bench_vals,
                          bench_year_yield=bench_year_yield, bench_mdd_info=bench_mdd_info)
 
 
@@ -142,33 +145,32 @@ def run_emu_for_single_code(stock, days, dropday, plot_figure, save_figure):
     pickle_text_path = plpath / (filename + '.txt')
     pickle_text_path.write_text(repr(ana_result))
 
-    plot_image_path = plpath / (filename + '.png')
-
-    day_asset = [item._calc_total_asset() for item in day_accounts.accounts]
-    days = day_accounts.days
-    assert len(day_asset) == len(days)
-    asset_series = pdSr(data=day_asset, index=days)
+    figure_filename = plpath / (filename + '.png')
+    plot_analyse_result(ana_result, figure_filename)
 
     return ana_result
 
 
-def plot_analyse_result(ana_result: AnalyseResult):
+def plot_analyse_result(ana_result: AnalyseResult, figure_filename=None):
     yvals = ana_result.day_asset
     xvals = [gtrade_day.int_to_date(item) for item in ana_result.days]
     bench_vals = ana_result.bench_data
-    mdd_values = ana_result.md
+    mdd_pos1, mdd_pos2 = calc_max_drawdown_pos_and_value(xvals)
+    mdd_xs = list(xvals[mdd_pos1], xvals[mdd_pos2])
+    mdd_ys = list(yvals[mdd_pos1], yvals[mdd_pos2])
 
     lines = [
         LineAndStyle(xvals, yvals, 'b', alpha=1, label='Value', show_value_in_annotaion=True),
-        LineAndStyle(xvals, bench_vals, 'k', alpha=0.3, label='Base', show_value_in_annotaion=True),
-        LineAndStyle(mdd_x, mdd_y, 'k', alpha=0.3)
+        LineAndStyle(xvals, bench_vals, 'k', alpha=0.3, label='Base',
+                     show_value_in_annotaion=True),
+        LineAndStyle(mdd_xs, mdd_ys, 'k', alpha=0.3)
     ]
     line1annotations = [
-        TextAnnotation('Key1', 0.1234, 6, 'b', formatter=percentage_formatter),
-        TextAnnotation('Key2', 0.1234, 6, 'b', formatter=percentage_formatter),
+        # TextAnnotation('Key1', 0.1234, 6, 'b', formatter=percentage_formatter),
+        # TextAnnotation('Key2', 0.1234, 6, 'b', formatter=percentage_formatter),
     ]
     plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
-                               show=False, save_file_name='d:/tfile.png')
+                               show=False, save_file_name=figure_filename)
 
 
 def main():

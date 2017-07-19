@@ -4,22 +4,30 @@ import numpy
 import numpy as np
 
 from common.algorithm import calc_drop_percentage
+from common.data_structures.geometry import Point
 from common.helper import dt_date_from_str
 from common.scipy_helper import pdSr
 from common_stock.trade_day import gtrade_day
 
 
 class MddInfo:
-    def __init__(self, mdd,  left_point, right_point, duration):
+    def __init__(self, mdd, left_point, right_point):
         self.mdd = mdd
-        self.left_point = left_point
-        self.right_point = right_point
+        self.left_point = left_point  # type: Point
+        self.right_point = right_point  # type: Point
 
-def calc_max_drawdown_pos(array_like):
+
+def calc_max_drawdown_pos_and_value(array_like):
     array_like = np.asarray(array_like)
     right = np.argmax(np.maximum.accumulate(array_like) - array_like)  # end of the period
     left = np.argmax(array_like[:right]) if right != 0 else 0  # start of period
-    return left, right
+    return left, right, array_like[right] / array_like[left]
+
+
+def calc_max_drawdown_info(x_arr, y_arr):
+    left, right, mdd = calc_max_drawdown_pos_and_value(y_arr)
+    return MddInfo(mdd, Point(x_arr[left], y_arr[left]), Point(x_arr[right], y_arr[right]))
+
 
 def calc_yield_dropdown(x, y):
     if isinstance(x[0], str):
@@ -33,7 +41,7 @@ def calc_yield_dropdown(x, y):
     yield_ = (y[-1] - y[0]) / y[0]
     name_to_value['yield_'] = yield_
     name_to_value['year_yield'] = pow((1 + yield_), 1 / year_len) - 1
-    name_to_value['mdd_info'] = calc_max_drawdown_pos(x, y)
+    name_to_value['mdd_info'] = calc_max_drawdown_pos_and_value(x, y)
     return name_to_value
 
 
@@ -68,10 +76,10 @@ def calc_trend_indicator(vals: pdSr, base: pdSr):
 
 
 def main():
-    ll =  [1, 1, 1.1, 0.9, 0.8, 0.7,3,3]
+    ll = [1, 1, 1.1, 0.9, 0.8, 0.7, 3, 3]
     import datetime
     s_time = datetime.datetime.now()
-    result = calc_max_drawdown_pos(ll)
+    result = calc_max_drawdown_pos_and_value(ll)
     print(datetime.datetime.now() - s_time)
     print(result)
 

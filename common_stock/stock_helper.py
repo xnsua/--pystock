@@ -50,10 +50,24 @@ def dict_with_float_repr(dict_, precision):
             items.append(val)
         items.append(', ')
     items.append('}')
-    result = ''.join(map(str,items))
+    result = ''.join(map(str, items))
     return result
+
 
 def yield_basic_statistics(iterable):
     log_vals = [numpy.log]
 
+
+def p_repr(val):
+    # Percentage represenstation of value
+    text = str(val * 100)[0:4]
+    # if text.endswith('.'):
+    #     text = text[0:-1]
+    return text + ' %'
+
+
+def f_repr(val):
+    # Float representation of value
+    text = str(val)[0:5]
+    return text
 

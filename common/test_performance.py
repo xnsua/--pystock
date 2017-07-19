@@ -75,21 +75,3 @@ def test_pandas():
         print('')
 
 
-def test_pandas_test_iterator():
-    pass
-    # df = DayBar.read_etf_day_data('510900')
-    # index = df.index
-    # dl = list(index)
-    # import datetime
-    # s_time = datetime.datetime.now()
-    # About two times slow
-    # for j in range(1000):
-    #     for _ in index:
-    #         pass
-    # print(datetime.datetime.now() - s_time)
-    #
-    # s_time = datetime.datetime.now()
-    # for j in range(1000):
-    #     for _ in dl:
-    #         pass
-    # print(datetime.datetime.now() - s_time)

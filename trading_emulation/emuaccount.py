@@ -3,6 +3,8 @@ from typing import List, Dict
 
 from nose.tools import assert_equal
 
+from common_stock.stock_helper import p_repr
+from common_stock.trade_day import gtrade_day
 from ip.st import EntrustWay
 from stock_data_updater.data_provider import gdp
 from trading.abstract_account import AbstractAccount
@@ -40,10 +42,12 @@ class WinInfo:
         self.sell_day = sell_day
         self.win_percentage = win_percentage
         self.stock_code = stock_code
+        self.day_count = gtrade_day.range_len(self.buy_day, self.sell_day)
+        print(win_percentage)
+        self.year_win_percentage = (1 + win_percentage) ** (245 / self.day_count) - 1
 
     def __repr__(self):
-        # return f'Win{{{self.win_percentage}}}'
-        return f'Win{{{round(self.win_percentage, 3)}, {self.buy_day},{self.sell_day}, {self.stock_code}}}'
+        return f'Win{{{p_repr(self.win_percentage)}, {p_repr(self.year_win_percentage)}, {self.buy_day},{self.sell_day}, {self.stock_code}}}'
 
 
 class EmuAccount(AbstractAccount):
@@ -72,7 +76,7 @@ class EmuAccount(AbstractAccount):
 
     def __init__(self, balance, day):
         self.balance = float(balance)
-        self._total_asset = None
+        self.total_asset = None
 
         self.stock_to_share = {}  # type: Dict[str, EmuShare]
         self.day = day
@@ -138,16 +142,16 @@ class EmuAccount(AbstractAccount):
 
     def _calc_total_asset(self, default):
         try:
-            self._total_asset = self.balance
+            self.total_asset = self.balance
             for stock, share in self.stock_to_share.items():
-                self._total_asset += gdp.open(stock, self.day) * share.amount
-            return self._total_asset
+                self.total_asset += gdp.open(stock, self.day) * share.amount
+            return self.total_asset
         except KeyError:
-            self._total_asset = default
+            self.total_asset = default
             return default
 
     def __repr__(self):
-        asset = -1.0 if self._total_asset is None else self._total_asset
+        asset = -1.0 if self.total_asset is None else self.total_asset
         return f'TotalAssert:{asset: <12.12} Balance:{self.balance:<12} Stocks:{self.stock_to_share}'
 
 
@@ -159,7 +163,7 @@ class EmuDayAccounts:
 
     def account_of(self, day):
         index = self.day_to_index[day]
-        assert self.accounts[index-1]
+        assert index == 0 or self.accounts[index - 1]
         if not self.accounts[index]:
             self.accounts[index] = self.accounts[index - 1].copy_for_day(day)
             self.accounts[index].day = day
@@ -177,7 +181,6 @@ class EmuDayAccounts:
         last_val = 0
         for item in self.accounts:
             last_val = item._calc_total_asset(last_val)
-
 
 
 def test_buy_etf():

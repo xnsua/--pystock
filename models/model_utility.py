@@ -1,3 +1,5 @@
+import numpy as np
+
 from common_stock.trade_day import gtrade_day
 from stock_data_updater.data_provider import DataProvider
 
@@ -9,10 +11,10 @@ def calc_date_range(codes, dp: DataProvider):
 
 
 def fill_with_previous_value(arr, value):
-    import numpy as np
     nparr = np.asarray(arr)
     prev = np.arange(len(nparr))
     prev[np.equal(nparr, value)] = 0
+    # noinspection PyArgumentList
     prev = np.maximum.accumulate(prev)
     return nparr[prev]
 

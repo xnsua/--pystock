@@ -1,6 +1,5 @@
 import numpy
 
-from common.helper import geo_mean_overflow
 from common_stock.trade_day import gtrade_day
 from stock_data_updater.data_provider import gdp
 
@@ -15,7 +14,6 @@ def drop_after_count1(code, days=None):
     buy_count = 0
     if not days: days = ddr.days
     for index, day in enumerate(days):
-        print(money)
         if stock != 0:
             money = stock * gdp.open(code, day)
             stock = 0
@@ -30,6 +28,7 @@ def drop_after_count1(code, days=None):
             drop_count += 1
         else:
             drop_count = 0
+        print(money)
 
     if stock != 0:
         money = stock * gdp.close(code, days[-1])
@@ -198,27 +197,28 @@ def drop_after_count4(code, days):
 def compare():
     c1 = []
     # etf_with_amount = ['sz159919', 'sh510330']
-    codes = ['sz159919', 'sh510330']
+    # codes = ['sh510050']
     # codes = gdp.components_of('sh000016')
-    days = gdp.ddr('sh510050').days[0:100]
+    days = gdp.ddr('sh510050').days[0:30]
+    print(gdp.ddr('sh510050').df)
     codes = ['sh510050']
     for code in codes:
         c1.append(drop_after_count1(code, days))
     print('c1:: ', c1)
-    return
-    ##
-    c2 = []
-    for code in codes:
-        c2.append(drop_after_count4(code, days))
-    # pyplot.plot(c2[0][1])
-    # pyplot.show()
     # return
-    # scomp = numpy.array(c1) /c2
-    # print(scomp)
-    geo_mean_c1 = geo_mean_overflow(c1)
-    geo_mean_c2 = geo_mean_overflow(c2)
-    print('geo_mean_c1:: ', geo_mean_c1)
-    print('geo_mean_c2:: ', geo_mean_c2)
+    # ##
+    # c2 = []
+    # for code in codes:
+    #     c2.append(drop_after_count4(code, days))
+    # # pyplot.plot(c2[0][1])
+    # # pyplot.show()
+    # # return
+    # # scomp = numpy.array(c1) /c2
+    # # print(scomp)
+    # geo_mean_c1 = geo_mean_overflow(c1)
+    # geo_mean_c2 = geo_mean_overflow(c2)
+    # print('geo_mean_c1:: ', geo_mean_c1)
+    # print('geo_mean_c2:: ', geo_mean_c2)
 
 
 if __name__ == '__main__':

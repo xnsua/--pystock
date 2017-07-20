@@ -43,7 +43,6 @@ class WinInfo:
         self.win_percentage = win_percentage
         self.stock_code = stock_code
         self.day_count = gtrade_day.range_len(self.buy_day, self.sell_day)
-        print(win_percentage)
         self.year_win_percentage = (1 + win_percentage) ** (245 / self.day_count) - 1
 
     def __repr__(self):
@@ -160,6 +159,7 @@ class EmuDayAccounts:
         self.days = date_range
         self.day_to_index = dict(zip(date_range, range(len(date_range))))
         self.accounts = [None] * len(date_range)  # type: List[EmuAccount]
+        self.day_assets = None
 
     def account_of(self, day):
         index = self.day_to_index[day]
@@ -177,9 +177,18 @@ class EmuDayAccounts:
     def init_account(self, value):
         self.accounts[0] = value
 
-    def calc_total_asserts(self):
+    @property
+    def total_assets(self):
+        if not self.day_assets:
+            self._calc_total_assets()
+            self.day_assets = [ item.total_asset for item in self.accounts ]
+        return self.day_assets
+
+
+    def _calc_total_assets(self):
         last_val = 0
         for item in self.accounts:
+            # noinspection PyProtectedMember
             last_val = item._calc_total_asset(last_val)
 
 

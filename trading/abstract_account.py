@@ -41,3 +41,9 @@ class AbstractAccount(metaclass=abc.ABCMeta):
     def share_items(self):
         pass
 
+    def try_buy_all(self, code, param):
+        pass
+
+    def try_sell_all(self, code, param):
+        pass
+

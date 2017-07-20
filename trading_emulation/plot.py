@@ -62,7 +62,12 @@ class StockTrendPlotter(object):
 
     def plot_lines2(self):
         for line in self.lines:
-            self.ax_fig.plot(line.xs, line.ys, color=line.color, alpha=line.alpha,
+            ys = line.ys
+            if line.plot_bench:
+                ratio = line.plot_bench[0] / ys[0]
+                ys = [item * ratio for item in ys]
+
+            self.ax_fig.plot(line.xs, ys, color=line.color, alpha=line.alpha,
                              label=line.label)
         self.ax_fig.legend()
 
@@ -75,7 +80,7 @@ class StockTrendPlotter(object):
             line = lines[i_row]
             for pos, item in enumerate(row):
                 if item.formatter is None:
-                    text = f'{key}: {value}'
+                    text = f'{item.key}: {item.value}'
                 else:
                     text = item.formatter(item.key, item.value)
                 self.ax_text.text(*line[pos], text, color=item.color, alpha=item.alpha)
@@ -84,7 +89,7 @@ class StockTrendPlotter(object):
             line = lines[i_row]
             for pos, item in enumerate(row):
                 if item.formatter is None:
-                    text = f'{key}: {value}'
+                    text = f'{item.key}: {item.value}'
                 else:
                     text = item.formatter(item.key, item.value)
                 self.ax_text.text(*line[-pos - 1], text, color=item.color, alpha=item.alpha)
@@ -147,26 +152,28 @@ class StockTrendPlotter(object):
 
 
 class LineAndStyle:
-    def __init__(self, xs, ys, color, alpha, show_value_in_annotaion=False, label=''):
+    def __init__(self, xs, ys, color, alpha, show_value_in_annotaion=False, label='',
+                 bench_vals=None):
         self.xs = xs
         self.ys = ys
         self.alpha = alpha
         self.color = color
         self.label = label
         self.show_value_in_annotation = show_value_in_annotaion
+        self.plot_bench = bench_vals
 
 
 class TextAnnotation:
-    def __init__(self, key, value, alpha, color, formatter=None):
+    def __init__(self, key, value, alpha = 1, color='k', formatter=None):
         self.key = key
         self.value = value
         self.alpha = alpha
         self.color = color
         self.formatter = formatter
 
-
-def percentage_formatter(key, val):
-    return f"{key}: {val:.1%}".replace('%', ' %')
+    @staticmethod
+    def empty_annotation():
+        return TextAnnotation('', '', alpha=0, color='b')
 
 
 class LeftAlignTextAnnotations:
@@ -180,8 +187,8 @@ class RightAlignTextAnnotations:
 
 
 def plot_image_with_annotation(lines_and_style: List[LineAndStyle],
-                               left_annotation: LeftAlignTextAnnotations,
-                               right_annotation: RightAlignTextAnnotations,
+                               left_annotation,
+                               right_annotation,
                                save_file_name=None, show=False):
     plotter = StockTrendPlotter(lines_and_style, left_annotation, right_annotation, save_file_name)
     if save_file_name:
@@ -209,10 +216,11 @@ def plot_test():
         LineAndStyle(mdd_x, mdd_y, 'k', alpha=0.3)
     ]
     line1annotations = [
-        TextAnnotation('Key1', 0.1234, 6, 'b', formatter=percentage_formatter),
-        TextAnnotation('Key2', 0.1234, 6, 'b', formatter=percentage_formatter),
+        TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
+        TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
     ]
-    plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations], show=False, save_file_name='d:/tfile.png')
+    plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
+                               show=False, save_file_name='d:/tfile.png')
 
 
 def main():

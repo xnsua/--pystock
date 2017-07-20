@@ -38,32 +38,27 @@ def to_num_code(code):
     return val
 
 
-def dict_with_float_repr(dict_, precision):
+def dict_with_float_repr(dict_):
     items = ['{']
     for key, val in dict_.items():
         items.append(key)
         items.append(':')
         if isinstance(val, float):
             # noinspection PyTypeChecker
-            items.append(round(val, precision))
+            items.append(f_repr(val))
         else:
-            items.append(val)
+            items.append(str(val))
         items.append(', ')
     items.append('}')
-    result = ''.join(map(str, items))
+    result = ''.join(items)
     return result
-
-
-def yield_basic_statistics(iterable):
-    log_vals = [numpy.log]
 
 
 def p_repr(val):
     # Percentage represenstation of value
+    assert isinstance(val, float), f'{type(val)}'
     text = str(val * 100)[0:4]
-    # if text.endswith('.'):
-    #     text = text[0:-1]
-    return text + ' %'
+    return text + '%'
 
 
 def f_repr(val):
@@ -71,3 +66,11 @@ def f_repr(val):
     text = str(val)[0:5]
     return text
 
+
+def calc_year_yield_arr(yields):
+    yields = numpy.asarray(yields)
+    val2 = yields / yields[0]
+    val3 = numpy.arange(1, len(yields))
+    val3 = 245 / val3
+    val2[1:] = val2[1:] ** val3
+    return val2

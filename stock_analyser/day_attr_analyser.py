@@ -41,7 +41,7 @@ class DropRiseProvider:
     def _calc_drop_rise(self, code):
         # with self.lock:
             if code not in self.code_to_drop_rise:
-                self.code_to_drop_rise[code] = DropRiseIndicator(gdp.ddr(code))
+                self.code_to_drop_rise[code] = DropRiseIndicator(gdp.ddr_of(code))
             return self.code_to_drop_rise[code]
 
     def rise(self, code, day):

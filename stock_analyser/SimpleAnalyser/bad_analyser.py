@@ -6,7 +6,7 @@ from stock_data_updater.data_provider import gdp
 
 def drop_after_count1(code, days=None):
     # Close - Open as drop
-    ddr = gdp.ddr(code)
+    ddr = gdp.ddr_of(code)
 
     money = 10000
     stock = 0
@@ -47,7 +47,7 @@ def drop_after_count1(code, days=None):
 
 
 def drop_after_count2(code):
-    ddr = gdp.ddr(code)
+    ddr = gdp.ddr_of(code)
     money = 100000
     stock = 0
     drop_count = 0
@@ -86,7 +86,7 @@ def drop_after_count2(code):
 
 
 def drop_after_count3(code):
-    ddr = gdp.ddr(code)
+    ddr = gdp.ddr_of(code)
     money = 100000
     stock = 0
     drop_count = 0
@@ -128,7 +128,7 @@ def drop_after_count3(code):
 def drop_after_count4(code, days):
     # Test sz159919 and sh510330
     moneys = []
-    ddr = gdp.ddr(code)
+    ddr = gdp.ddr_of(code)
     money = 100000
     stock = 0
     drop_count = 0
@@ -199,8 +199,8 @@ def compare():
     # etf_with_amount = ['sz159919', 'sh510330']
     # codes = ['sh510050']
     # codes = gdp.components_of('sh000016')
-    days = gdp.ddr('sh510050').days[0:30]
-    print(gdp.ddr('sh510050').df)
+    days = gdp.ddr_of('sh510050').days[0:30]
+    print(gdp.ddr_of('sh510050').df)
     codes = ['sh510050']
     for code in codes:
         c1.append(drop_after_count1(code, days))

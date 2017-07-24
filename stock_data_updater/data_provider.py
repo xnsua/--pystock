@@ -41,7 +41,7 @@ class DataProvider:
         ddr = self._try_read_data(code)
         return ddr.low_of(day)
 
-    def ddr(self, code) -> DayDataRepr:
+    def ddr_of(self, code) -> DayDataRepr:
         ddr = self._try_read_data(code)
         return ddr
 
@@ -49,7 +49,7 @@ class DataProvider:
         if not isinstance(day, int):
 
             day = day.year * 10000 + day.month * 100 + day.day
-        return self.ddr(code).has_day(day)
+        return self.ddr_of(code).has_day(day)
 
     def components_of(self, code):
         return gindex_pv.components_of(code)

@@ -19,7 +19,7 @@ class EmuModelBad(AbstractModel):
 
     def model_bench(self) -> pdSr:
         assert len(self.codes) == 1
-        return gdp.ddr(self.codes[0]).df.open
+        return gdp.ddr_of(self.codes[0]).df.open
 
     def format_parameter(self):
         return EmuModelBad.__name__ + f'.drop_threshold-{self.drop_threshold}'

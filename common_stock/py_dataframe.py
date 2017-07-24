@@ -3,6 +3,35 @@ import math
 from common_stock.trade_day import gtrade_day
 
 
+class DayK:
+    def __init__(self, open_, close, high, low):
+        self.open = open_
+        self.close = close
+        self.high = high
+        self.low = low
+        self.max_open_close = max(open_, close)
+        self.min_open_close = min(open_, close)
+
+    @property
+    def low_shadow(self):
+        return self.min_open_close - self.low
+
+    @property
+    def high_shadow(self):
+        return self.high - self.max_open_close
+
+    @property
+    def body_height(self):
+        return abs(self.open-self.close)
+
+    @property
+    def is_raise(self):
+        return self.close > self.open
+
+    @property
+    def total_height(self):
+        return self.high - self.low
+
 class DayDataRepr:
     def __init__(self, code, df):
         self.df = df
@@ -30,6 +59,10 @@ class DayDataRepr:
     def volume_of(self, day):
         return self.volume[self.day_to_index[day]]
 
+    def k_line_of(self, day):
+        index = self.day_to_index[day]
+        return self.open[index], self.close[index], self.high[index], self.low[index]
+
     def first_day(self):
         return self.days[0]
 
@@ -38,6 +71,23 @@ class DayDataRepr:
 
     def has_day(self, day):
         return day in self.day_to_index
+
+    def clip(self, begin_day, end_day):
+        ddr = DayDataRepr(self.code, self.df.loc[begin_day:end_day, :])
+        return ddr
+
+    def head(self, num):
+        ddr = DayDataRepr(self.code, self.df.head(num))
+        return ddr
+
+    def tail(self, num):
+        ddr = DayDataRepr(self.code, self.df.tail(num))
+        return ddr
+
+    def dayk_of(self, day)->DayK:
+        index = self.day_to_index(day)
+        return DayK(self.open[index], self.close[index], self.high[index], self.low[index])
+
 
 
 class RealtimeDataRepr:

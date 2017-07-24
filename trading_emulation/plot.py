@@ -1,17 +1,98 @@
 import bisect
-import datetime
 import traceback
-from itertools import accumulate
 from typing import List
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import numpy
 from matplotlib.dates import date2num, num2date
 from matplotlib.gridspec import GridSpec
 
 from common.helper import dt_date_to_dt
 from common_stock.trade_day import gtrade_day
+from stock_data_updater.data_provider import gdp
+
+
+# noinspection PyUnusedLocal
+class ZoomPan:
+    def __init__(self):
+        self.press = None
+        self.cur_xlim = None
+        self.cur_ylim = None
+        self.x0 = None
+        self.y0 = None
+        self.x1 = None
+        self.y1 = None
+        self.xpress = None
+        self.ypress = None
+
+
+    def zoom_factory(self, ax, base_scale = 2.):
+        def zoom(event):
+            cur_xlim = ax.get_xlim()
+            cur_ylim = ax.get_ylim()
+
+            xdata = event.xdata # get event x location
+            ydata = event.ydata # get event y location
+
+            if event.button == 'down':
+                # deal with zoom in
+                scale_factor = 1 / base_scale
+            elif event.button == 'up':
+                # deal with zoom out
+                scale_factor = base_scale
+            else:
+                # deal with something that should never happen
+                scale_factor = 1
+                print (event.button)
+
+            new_width = (cur_xlim[1] - cur_xlim[0]) * scale_factor
+            new_height = (cur_ylim[1] - cur_ylim[0]) * scale_factor
+
+            relx = (cur_xlim[1] - xdata)/(cur_xlim[1] - cur_xlim[0])
+            rely = (cur_ylim[1] - ydata)/(cur_ylim[1] - cur_ylim[0])
+
+            ax.set_xlim([xdata - new_width * (1-relx), xdata + new_width * relx])
+            ax.set_ylim([ydata - new_height * (1-rely), ydata + new_height * rely])
+            ax.figure.canvas.draw()
+
+        fig = ax.get_figure() # get the figure of interest
+        fig.canvas.mpl_connect('scroll_event', zoom)
+
+        return zoom
+
+    def pan_factory(self, ax):
+        def onPress(event):
+            if event.inaxes != ax: return
+            self.cur_xlim = ax.get_xlim()
+            self.cur_ylim = ax.get_ylim()
+            self.press = self.x0, self.y0, event.xdata, event.ydata
+            self.x0, self.y0, self.xpress, self.ypress = self.press
+
+        def onRelease(event):
+            self.press = None
+            ax.figure.canvas.draw()
+
+        def onMotion(event):
+            if self.press is None: return
+            if event.inaxes != ax: return
+            dx = event.xdata - self.xpress
+            dy = event.ydata - self.ypress
+            self.cur_xlim -= dx
+            self.cur_ylim -= dy
+            ax.set_xlim(self.cur_xlim)
+            ax.set_ylim(self.cur_ylim)
+
+            ax.figure.canvas.draw()
+
+        fig = ax.get_figure() # get the figure of interest
+
+        # attach the call back
+        fig.canvas.mpl_connect('button_press_event',onPress)
+        fig.canvas.mpl_connect('button_release_event',onRelease)
+        fig.canvas.mpl_connect('motion_notify_event',onMotion)
+
+        #return the function
+        return onMotion
 
 
 class StockTrendPlotter(object):
@@ -21,7 +102,9 @@ class StockTrendPlotter(object):
     https://stackoverflow.com/a/15454427/190597 (unutbu)
     """
 
-    def __init__(self, lines, left_annotations, right_annotations, save_file_name):
+    def __init__(self, lines, left_annotations, right_annotations, save_file_name,
+                 show_float_annotation=True):
+        self.show_float_annotation = show_float_annotation
         self.lines = lines  # type: List[LineAndStyle]
         self.left_annotations = left_annotations
         self.right_annoations = right_annotations
@@ -39,17 +122,23 @@ class StockTrendPlotter(object):
         years = mdates.YearLocator()  # every year
         months = mdates.MonthLocator()  # every month
         year_fmt = mdates.DateFormatter('%Y')
+        # self.ax_fig.xaxis_date()
         self.ax_fig.xaxis.set_major_locator(years)
         self.ax_fig.xaxis.set_major_formatter(year_fmt)
         self.ax_fig.xaxis.set_minor_locator(months)
         self.ax_fig.xaxis.set_label_position('top')
+
+        zp = ZoomPan()
+        zp.zoom_factory(self.ax_fig, base_scale = 1.1)
+        zp.pan_factory(self.ax_fig)
 
         self.plot_lines2()
         self.plot_texts2()
 
         # Moving annotation
         self.left_annotations = self.setup_annotation()
-        plt.connect('motion_notify_event', self)
+        if self.show_float_annotation:
+            plt.connect('motion_notify_event', self)
 
     def show_figure(self):
         plt.show()
@@ -62,13 +151,18 @@ class StockTrendPlotter(object):
 
     def plot_lines2(self):
         for line in self.lines:
+            if isinstance(line, KLine):
+                import mpl_finance
+                mpl_finance.candlestick_ochl(self.ax_fig, line.data, width=0.6,
+                                             colorup=line.up_color, colordown=line.down_color)
+                continue
             ys = line.ys
             if line.plot_bench:
                 ratio = line.plot_bench[0] / ys[0]
                 ys = [item * ratio for item in ys]
 
             self.ax_fig.plot(line.xs, ys, color=line.color, alpha=line.alpha,
-                             label=line.label)
+                             label=line.label, marker = line.marker)
         self.ax_fig.legend()
 
     def plot_texts2(self):
@@ -141,6 +235,8 @@ class StockTrendPlotter(object):
         return pos_axis, pos_date, yvals
 
     def _format_show_values(self, pos, values):
+        if not self.show_float_annotation:
+            return
         assert len(values) == 2, 'Two value allowed, Value and Base'
         show_value0 = values[0]
         show_value1 = values[1]
@@ -152,8 +248,9 @@ class StockTrendPlotter(object):
 
 
 class LineAndStyle:
-    def __init__(self, xs, ys, color, alpha, show_value_in_annotaion=False, label='',
+    def __init__(self, xs, ys, color, alpha = 1, marker = None, show_value_in_annotaion=False, label='',
                  bench_vals=None):
+        self.marker = marker
         self.xs = xs
         self.ys = ys
         self.alpha = alpha
@@ -161,10 +258,18 @@ class LineAndStyle:
         self.label = label
         self.show_value_in_annotation = show_value_in_annotaion
         self.plot_bench = bench_vals
+        # self.style=
+
+
+class KLine:
+    def __init__(self, data, up_color, down_color):
+        self.data = data
+        self.up_color = up_color
+        self.down_color = down_color
 
 
 class TextAnnotation:
-    def __init__(self, key, value, alpha = 1, color='k', formatter=None):
+    def __init__(self, key, value, alpha=1, color='k', formatter=None):
         self.key = key
         self.value = value
         self.alpha = alpha
@@ -189,8 +294,9 @@ class RightAlignTextAnnotations:
 def plot_image_with_annotation(lines_and_style: List[LineAndStyle],
                                left_annotation,
                                right_annotation,
-                               save_file_name=None, show=False):
-    plotter = StockTrendPlotter(lines_and_style, left_annotation, right_annotation, save_file_name)
+                               save_file_name=None, show=False, show_float_annotation=True):
+    plotter = StockTrendPlotter(lines_and_style, left_annotation, right_annotation, save_file_name,
+                                show_float_annotation)
     if save_file_name:
         plotter.save_figure(save_file_name)
     if show:
@@ -198,43 +304,74 @@ def plot_image_with_annotation(lines_and_style: List[LineAndStyle],
     plotter.close_figure()
 
 
-def plot_test():
-    days = gtrade_day.close_range_list(20170601, 20170710)
-    days = list(map(gtrade_day.int_to_date, days))
-    values = list(accumulate(numpy.random.randn(len(days))))
-    # pyplot.plot(days, list(values))
-    # pyplot.show()
-    values2 = numpy.array(values) / 2
-    # pyplot.plot(days, list(values))
-    # pyplot.plot(days, list(values2))
-    # pyplot.show()
-    mdd_x = [datetime.date(2017, 6, 1), datetime.datetime(2017, 7, 10)]
-    mdd_y = [1, 2]
+# def plot_test():
+    # ddr = gdp.ddr_of('sh510900')
+    # ddr = ddr.clip(20170605, gtrade_day.previous(20170710))
+    #
+    # days = [gtrade_day.int_to_date(item) for item in ddr.days]
+    # days_num = list(map(date2num, days))
+    # kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
+    #               down_color='g')
+    # values = ddr.open
+    # mdd_x = [datetime.date(2017, 6, 4), datetime.datetime(2017, 6, 8)]
+    # mdd_y = [1, 0.8]
+    # lines = [
+    #     LineAndStyle(days, values, 'b', marker='o', label='Value', show_value_in_annotaion=True),
+    #     kline,
+    # ]
+    # line1annotations = [
+    #     TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
+    #     TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
+    # ]
+    # plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
+    #                            show=True, save_file_name='d:/tfile.png',
+    #                            show_float_annotation=False)
+
+def plot_ddr_with_marker(ddr, markers):
+    days = [gtrade_day.int_to_date(item) for item in ddr.days]
+    days_num = list(map(date2num, days))
+    marker_value = [ ddr.open_of(item) for item in markers ]
+    markers = map(gtrade_day.int_to_date, markers)
+    markers = list(map(date2num, markers))
+    kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
+                  down_color='g')
     lines = [
-        LineAndStyle(days, values, 'b', alpha=1, label='Value', show_value_in_annotaion=True),
-        LineAndStyle(days, values2, 'k', alpha=0.3, label='Base', show_value_in_annotaion=True),
-        LineAndStyle(mdd_x, mdd_y, 'k', alpha=0.3)
+        LineAndStyle(markers, marker_value, 'b', marker='o', label='Value', show_value_in_annotaion=True),
+        kline,
     ]
-    line1annotations = [
-        TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
-        TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
-    ]
-    plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
-                               show=False, save_file_name='d:/tfile.png')
+    plot_image_with_annotation(lines, [], [],
+                               show=True, save_file_name='d:/tfile.png',
+                               show_float_annotation=False)
+
+# def plot_test2():
+#     date1 = (2014, 12, 1)  # 起始日期，格式：(年，月，日)元组
+#     date2 = (2016, 12, 1)  # 结束日期，格式：(年，月，日)元组
+#     ddr = gdp.ddr_of('sh510900')
+#     df = ddr.df
+#     ddr2 = ddr.clip(20170604, gtrade_day.previous(20170710))
+#
+#     days = ddr2.days
+#     values = ddr2.open
+#     mdd_x = [datetime.date(2017, 6, 1), datetime.datetime(2017, 7, 10)]
+#     mdd_y = [1, 2]
+#     # noinspection PyTypeChecker
+#     lines = [
+#         LineAndStyle(days, values, 'b', alpha=1, label='Value', show_value_in_annotaion=True),
+#         LineAndStyle(mdd_x, mdd_y, 'k', alpha=0.3)
+#     ]
+#     line1annotations = [
+#         TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
+#         TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
+#     ]
+#     plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
+#                                show=False, save_file_name='d:/tfile.png')
 
 
 def main():
-    plot_test()
-    # df_etf = read_etf_day_data('510900')
-    # # print(df_etf)
-    # df_etf = df_etf.tail(80)
-    # df_etf.index = df_etf.index.map(gtrade_day.str_to_int)
-    # print(df_etf)
-    # # print(df_etf.open)
-    # # df_index = read_index_day_data('000001')
-    # # val = (df_index.loc[df_etf.index, :])
-    # plot_test(df_etf.open, None)
-
+    ddr = gdp.ddr_of('sh510900')
+    ddr = ddr.tail(200)
+    days = [ddr.days[1],ddr.days[3],ddr.days[7],   ddr.days[9] ]
+    plot_ddr_with_marker(ddr, days)
 
 if __name__ == '__main__':
     main()

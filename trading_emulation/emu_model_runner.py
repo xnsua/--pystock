@@ -210,8 +210,8 @@ def run_emu_for_single_code(days, model, show_figure):
 
 
 def main():
-    gdp.ddr('sh510050').df.to_csv('jqtt.csv')
-    days = gdp.ddr('sh510050').days[0:900]
+    gdp.ddr_of('sh510050').df.to_csv('jqtt.csv')
+    days = gdp.ddr_of('sh510050').days[0:900]
     model_bad = EmuModelBad(['sh510050'], 2)
     # noinspection PyUnusedLocal
     ana_result = run_emu_for_single_code(days, model_bad, show_figure=True)

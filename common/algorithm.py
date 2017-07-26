@@ -46,3 +46,9 @@ def test_consective_group_count():
 
     val = group_consecutive_count([0, 0, 1, 0, 0, 1, 1, 0], 0)
     assert_equal(val, [1, 2, 0, 1, 2, 0, 0, 1])
+
+
+def find_local_max(array_like):
+    arr = numpy.asarray(array_like)
+
+

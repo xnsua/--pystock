@@ -85,7 +85,7 @@ class DayDataRepr:
         return ddr
 
     def dayk_of(self, day)->DayK:
-        index = self.day_to_index(day)
+        index = self.day_to_index[day]
         return DayK(self.open[index], self.close[index], self.high[index], self.low[index])
 
 

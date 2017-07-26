@@ -152,10 +152,31 @@ def geo_std_deviation(iterable):
     deviation = cmath.exp(deviation).real
     return deviation
 
+class EnterExit:
+    def __init__(self, func_enter, func_exit):
+        self.func_enter = func_enter
+        self.func_exit = func_exit
+
+    def __call__(self, *args, **kwargs):
+        assert len(args) == 1
+        self.func = args[0]
+
+        def func_inner(*args1, **kwargs1):
+            enter_ret = self.func_enter()
+            val = self.func(*args1, **kwargs1)
+            self.func_exit(enter_ret)
+            return val
+
+        return func_inner
+
+    def __enter__(self):
+        self.func_enter()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.func_exit()
 
 def main():
-    print(geo_mean_overflow([1, 9]))
-    print(geo_std_deviation([1, 9]))
+    pass
 
 
 if __name__ == '__main__':

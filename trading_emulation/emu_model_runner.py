@@ -12,6 +12,7 @@ from common_stock.stock_helper import dict_with_float_repr, calc_year_yield_arr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
 from models.model_utility import calc_date_range
+from stock_analyser.plot import LineAndStyle, plot_image_with_annotation, TextAnnotation
 from stock_analyser.stock_indicators.stock_indicator import MddInfo, calc_max_drawdown_info
 from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos_and_value
 from stock_data_updater.data_provider import gdp
@@ -19,7 +20,6 @@ from trading_emulation.emu_model_bad import EmuModelBad
 from trading_emulation.emu_trade_context import EmuContext
 from trading_emulation.emuaccount import EmuAccount, EmuDayAccounts, set_account_none_fee
 from trading_emulation.emuaccount import WinInfo
-from trading_emulation.plot import LineAndStyle, plot_image_with_annotation, TextAnnotation
 
 
 class EmuModelRunner:

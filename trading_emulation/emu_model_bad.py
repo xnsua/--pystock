@@ -2,7 +2,7 @@ from common.scipy_helper import pdSr
 from common_stock.py_dataframe import RealtimeDataRepr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
-from stock_analyser.day_attr_analyser import gdroprise_pv
+from stock_analyser.k_line_analyser.drop_rise_day import gdroprise_pv
 from stock_data_updater.data_provider import gdp
 from trading.abstract_context import AbstractContext
 from trading_emulation.emu_trade_context import EmuContext

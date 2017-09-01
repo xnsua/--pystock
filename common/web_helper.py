@@ -21,13 +21,13 @@ def firefox_quick_get_url(url, headers=None, timeout=5):
     return firefox_get_url(session_nocache, url, headers, timeout=timeout)
 
 
-def firefox_quick_download_file(url, file_path, headers=None):
+def firefox_quick_download_file(url, file_path, headers=None)->bool:
     if headers is None:
         headers = {}
     return firefox_download_file(session_nocache, url, file_path, headers)
 
 
-def firefox_download_file(session, url, file_path, headers_=None):
+def firefox_download_file(session, url, file_path, headers_=None)->bool:
     if headers_ is None:
         headers_ = {}
     r = session.get(url, headers=headers_, stream=True)
@@ -35,6 +35,8 @@ def firefox_download_file(session, url, file_path, headers_=None):
         with open(file_path, 'wb') as f:
             for chunk in r.iter_content(1024):
                 f.write(chunk)
+            return True
+    return False
 
 
 def main():

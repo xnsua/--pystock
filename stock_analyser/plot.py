@@ -9,6 +9,7 @@ from matplotlib.gridspec import GridSpec
 
 from common.helper import dt_date_to_dt
 from common_stock.trade_day import gtrade_day
+from stock_analyser.k_line_analyser.local_max_analyser import calc_peak_info
 from stock_data_updater.data_provider import gdp
 
 
@@ -25,14 +26,13 @@ class ZoomPan:
         self.xpress = None
         self.ypress = None
 
-
-    def zoom_factory(self, ax, base_scale = 2.):
+    def zoom_factory(self, ax, base_scale=2.):
         def zoom(event):
             cur_xlim = ax.get_xlim()
             cur_ylim = ax.get_ylim()
 
-            xdata = event.xdata # get event x location
-            ydata = event.ydata # get event y location
+            xdata = event.xdata  # get event x location
+            ydata = event.ydata  # get event y location
 
             if event.button == 'up':
                 # deal with zoom in
@@ -43,19 +43,19 @@ class ZoomPan:
             else:
                 # deal with something that should never happen
                 scale_factor = 1
-                print (event.button)
+                print(event.button)
 
             new_width = (cur_xlim[1] - cur_xlim[0]) * scale_factor
             new_height = (cur_ylim[1] - cur_ylim[0]) * scale_factor
 
-            relx = (cur_xlim[1] - xdata)/(cur_xlim[1] - cur_xlim[0])
-            rely = (cur_ylim[1] - ydata)/(cur_ylim[1] - cur_ylim[0])
+            relx = (cur_xlim[1] - xdata) / (cur_xlim[1] - cur_xlim[0])
+            rely = (cur_ylim[1] - ydata) / (cur_ylim[1] - cur_ylim[0])
 
-            ax.set_xlim([xdata - new_width * (1-relx), xdata + new_width * relx])
-            ax.set_ylim([ydata - new_height * (1-rely), ydata + new_height * rely])
+            ax.set_xlim([xdata - new_width * (1 - relx), xdata + new_width * relx])
+            ax.set_ylim([ydata - new_height * (1 - rely), ydata + new_height * rely])
             ax.figure.canvas.draw()
 
-        fig = ax.get_figure() # get the figure of interest
+        fig = ax.get_figure()  # get the figure of interest
         fig.canvas.mpl_connect('scroll_event', zoom)
 
         return zoom
@@ -84,14 +84,14 @@ class ZoomPan:
 
             ax.figure.canvas.draw()
 
-        fig = ax.get_figure() # get the figure of interest
+        fig = ax.get_figure()  # get the figure of interest
 
         # attach the call back
-        fig.canvas.mpl_connect('button_press_event',onPress)
-        fig.canvas.mpl_connect('button_release_event',onRelease)
-        fig.canvas.mpl_connect('motion_notify_event',onMotion)
+        fig.canvas.mpl_connect('button_press_event', onPress)
+        fig.canvas.mpl_connect('button_release_event', onRelease)
+        fig.canvas.mpl_connect('motion_notify_event', onMotion)
 
-        #return the function
+        # return the function
         return onMotion
 
 
@@ -129,7 +129,7 @@ class StockTrendPlotter(object):
         self.ax_fig.xaxis.set_label_position('top')
 
         zp = ZoomPan()
-        zp.zoom_factory(self.ax_fig, base_scale = 1.1)
+        zp.zoom_factory(self.ax_fig, base_scale=1.1)
         zp.pan_factory(self.ax_fig)
 
         self.plot_lines2()
@@ -144,7 +144,7 @@ class StockTrendPlotter(object):
         plt.show()
 
     def save_figure(self, filename):
-        plt.savefig(filename, format='png')
+        plt.savefig(filename, format='png', dpi=300)
 
     def close_figure(self):
         plt.close()
@@ -162,7 +162,7 @@ class StockTrendPlotter(object):
                 ys = [item * ratio for item in ys]
 
             self.ax_fig.plot(line.xs, ys, color=line.color, alpha=line.alpha,
-                             label=line.label, marker = line.marker)
+                             label=line.label, marker=line.marker, linewidth=line.line_width)
         self.ax_fig.legend()
 
     def plot_texts2(self):
@@ -248,7 +248,8 @@ class StockTrendPlotter(object):
 
 
 class LineAndStyle:
-    def __init__(self, xs, ys, color, alpha = 1, marker = None, show_value_in_annotaion=False, label='',
+    def __init__(self, xs, ys, color, alpha=1, marker=None, line_width=2,
+                 show_value_in_annotaion=False, label='',
                  bench_vals=None):
         self.marker = marker
         self.xs = xs
@@ -258,6 +259,7 @@ class LineAndStyle:
         self.label = label
         self.show_value_in_annotation = show_value_in_annotaion
         self.plot_bench = bench_vals
+        self.line_width = line_width
         # self.style=
 
 
@@ -305,43 +307,52 @@ def plot_image_with_annotation(lines_and_style: List[LineAndStyle],
 
 
 # def plot_test():
-    # ddr = gdp.ddr_of('sh510900')
-    # ddr = ddr.clip(20170605, gtrade_day.previous(20170710))
-    #
-    # days = [gtrade_day.int_to_date(item) for item in ddr.days]
-    # days_num = list(map(date2num, days))
-    # kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
-    #               down_color='g')
-    # values = ddr.open
-    # mdd_x = [datetime.date(2017, 6, 4), datetime.datetime(2017, 6, 8)]
-    # mdd_y = [1, 0.8]
-    # lines = [
-    #     LineAndStyle(days, values, 'b', marker='o', label='Value', show_value_in_annotaion=True),
-    #     kline,
-    # ]
-    # line1annotations = [
-    #     TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
-    #     TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
-    # ]
-    # plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
-    #                            show=True, save_file_name='d:/tfile.png',
-    #                            show_float_annotation=False)
+# ddr = gdp.ddr_of('sh510900')
+# ddr = ddr.clip(20170605, gtrade_day.previous(20170710))
+#
+# days = [gtrade_day.int_to_date(item) for item in ddr.days]
+# days_num = list(map(date2num, days))
+# kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
+#               down_color='g')
+# values = ddr.open
+# mdd_x = [datetime.date(2017, 6, 4), datetime.datetime(2017, 6, 8)]
+# mdd_y = [1, 0.8]
+# lines = [
+#     LineAndStyle(days, values, 'b', marker='o', label='Value', show_value_in_annotaion=True),
+#     kline,
+# ]
+# line1annotations = [
+#     TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
+#     TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
+# ]
+# plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
+#                            show=True, save_file_name='d:/tfile.png',
+#                            show_float_annotation=False)
 
-def plot_ddr_with_marker(ddr, markers):
+def plot_kline_with_marker(ddr, markers, save_filename = None, show = True):
     days = [gtrade_day.int_to_date(item) for item in ddr.days]
     days_num = list(map(date2num, days))
-    marker_value = [ ddr.open_of(item) for item in markers ]
+    marker_value = [ddr.open_of(item) for item in markers]
     markers = map(gtrade_day.int_to_date, markers)
     markers = list(map(date2num, markers))
     kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
                   down_color='g')
+
+    peak_info = calc_peak_info(ddr.high, 10)
+    peak_xs = [ddr.days[item] for item in peak_info.index.values]
+    peak_ys = [ddr.high_of(item) for item in peak_xs]
+    peak_xs = [gtrade_day.int_to_date(item) for item in peak_xs]
+
     lines = [
         LineAndStyle(markers, marker_value, 'b', marker='o', label='Value', show_value_in_annotaion=True),
+        LineAndStyle(peak_xs, peak_ys, 'k', alpha=0.5, label='Value', line_width=1,
+                     show_value_in_annotaion=True),
         kline,
     ]
     plot_image_with_annotation(lines, [], [],
-                               show=True, save_file_name='d:/tfile.png',
+                               show=show, save_file_name=save_filename,
                                show_float_annotation=False)
+
 
 # def plot_test2():
 #     date1 = (2014, 12, 1)  # 起始日期，格式：(年，月，日)元组
@@ -370,8 +381,9 @@ def plot_ddr_with_marker(ddr, markers):
 def main():
     ddr = gdp.ddr_of('sh510900')
     ddr = ddr.tail(200)
-    days = [ddr.days[1],ddr.days[3],ddr.days[7],   ddr.days[9] ]
-    plot_ddr_with_marker(ddr, days)
+    days = calc_hammer_or_hang(ddr)
+    plot_kline_with_marker(ddr, days)
+
 
 if __name__ == '__main__':
     main()

@@ -3,7 +3,6 @@ import talib
 
 from common.helper import EnterExit
 from common_stock.py_dataframe import DayDataRepr
-from stock_analyser.plot import plot_ddr_with_marker
 from stock_data_updater.data_provider import gdp
 
 
@@ -52,7 +51,6 @@ def main():
     s_time = datetime.datetime.now()
     marker = calc_hammer_or_hang(ddr)
     print(datetime.datetime.now() - s_time)
-    plot_ddr_with_marker(ddr, marker)
 
 
 if __name__ == '__main__':

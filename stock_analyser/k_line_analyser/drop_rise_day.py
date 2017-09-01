@@ -1,4 +1,3 @@
-import threading
 from typing import Dict
 
 from nose.tools import assert_equal
@@ -10,7 +9,7 @@ from common_stock.py_dataframe import DayDataRepr
 from stock_data_updater.data_provider import gdp
 
 
-class DropRiseIndicator:
+class DropRiseDayIndicator:
     def __init__(self, ddr: DayDataRepr):
         self.ddr = ddr
         self.rise_count = None
@@ -32,16 +31,16 @@ class DropRiseIndicator:
         self.rise_count = [0, *self.rise_count[0: -1]]
         self.drop_count = [0, *self.drop_count[0: -1]]
 
-
-class DropRiseProvider:
+# Drop rise count of previous days
+class DropRiseDayProvider:
     def __init__(self):
-        self.code_to_drop_rise = {}  # type: Dict[str, DropRiseIndicator]
-        self.lock = threading.Lock()
+        self.code_to_drop_rise = {}  # type: Dict[str, DropRiseDayIndicator]
+        # self.lock = threading.Lock()
 
     def _calc_drop_rise(self, code):
         # with self.lock:
             if code not in self.code_to_drop_rise:
-                self.code_to_drop_rise[code] = DropRiseIndicator(gdp.ddr_of(code))
+                self.code_to_drop_rise[code] = DropRiseDayIndicator(gdp.ddr_of(code))
             return self.code_to_drop_rise[code]
 
     def rise(self, code, day):
@@ -57,7 +56,7 @@ class DropRiseProvider:
         return dra.drop_count_of(day)
 
 
-gdroprise_pv = DropRiseProvider()
+gdroprise_pv = DropRiseDayProvider()
 
 
 def test_day_attr_analyser():
@@ -71,6 +70,6 @@ def test_day_attr_analyser():
     # ddr = gdata_provider.ddr('bb0900')
     # drc = DropRiseCount(ddr)
     ddr = DayDataRepr('999999', df)
-    rdc = DropRiseIndicator(ddr)
+    rdc = DropRiseDayIndicator(ddr)
     assert_equal(rdc.rise_count, [0, 1, 2, 0, 1])
     assert_equal(rdc.drop_count, [0, 0, 0, 1, 0])

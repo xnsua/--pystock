@@ -163,7 +163,7 @@ def plot_analyse_result(ana_result: AnalyseResult, show_figure=True, figure_file
     ]
     line3annotations = [
         # Hide this
-        TextAnnotation('WinCntPer', ana_result.win_cnt_percentage, color='r',
+        TextAnnotation('WinCntPer', ana_result.win_cnt_percentage, color='k',
                        formatter=percentage_formatter),
         TextAnnotation('  EFFECT', ana_result.normal_year_yield / ana_result.bench_year_yield, 1,
                        'r',

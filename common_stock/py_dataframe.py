@@ -1,5 +1,7 @@
 import math
 
+import numpy
+
 from common_stock.trade_day import gtrade_day
 
 
@@ -22,7 +24,7 @@ class DayK:
 
     @property
     def body_height(self):
-        return abs(self.open-self.close)
+        return abs(self.open - self.close)
 
     @property
     def is_raise(self):
@@ -31,6 +33,7 @@ class DayK:
     @property
     def total_height(self):
         return self.high - self.low
+
 
 class DayDataRepr:
     def __init__(self, code, df):
@@ -43,6 +46,38 @@ class DayDataRepr:
         self.low = list(map(float, df.low))
         self.volume = list(map(float, df.volume))
         self.day_to_index = dict(zip(self.days, range(len(self.days))))
+
+        self._open_nparr = None
+        self._close_nparr = None
+        self._high_nparr = None
+        self._low_nparr = None
+
+    def index_of(self, day):
+        return self.day_to_index[day]
+
+    @property
+    def open_nparr(self):
+        if self._open_nparr is None:
+            self._open_nparr = numpy.asarray(self.df.open)
+        return self._open_nparr
+
+    @property
+    def close_nparr(self):
+        if self._close_nparr is None:
+            self._close_nparr = numpy.asarray(self.df.close)
+        return self._close_nparr
+
+    @property
+    def high_nparr(self):
+        if self._high_nparr is None:
+            self._high_nparr = numpy.asarray(self.df.high)
+        return self._high_nparr
+
+    @property
+    def low_nparr(self):
+        if self._low_nparr is None:
+            self._low_nparr = numpy.asarray(self.df.low)
+        return self._low_nparr
 
     def open_of(self, day):
         return self.open[self.day_to_index[day]]
@@ -84,10 +119,9 @@ class DayDataRepr:
         ddr = DayDataRepr(self.code, self.df.tail(num))
         return ddr
 
-    def dayk_of(self, day)->DayK:
+    def dayk_of(self, day) -> DayK:
         index = self.day_to_index[day]
         return DayK(self.open[index], self.close[index], self.high[index], self.low[index])
-
 
 
 class RealtimeDataRepr:

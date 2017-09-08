@@ -9,10 +9,10 @@ from stock_data_updater.data_provider import gdp
 @EnterExit(lambda: numpy.seterr(all='ignore'), lambda v: numpy.seterr(**v))
 def calc_hammer_or_hang(ddr: DayDataRepr):
     numpy.seterr(all='ignore')
-    open_ = numpy.asarray(ddr.open)
-    close = numpy.asarray(ddr.close)
-    high = numpy.asarray(ddr.high)
-    low = numpy.asarray(ddr.low)
+    open_ = numpy.asarray(ddr.opens)
+    close = numpy.asarray(ddr.closes)
+    high = numpy.asarray(ddr.highs)
+    low = numpy.asarray(ddr.lows)
     days = numpy.asarray(ddr.days)
     body_height = close - open_
     body_height = numpy.absolute(body_height)

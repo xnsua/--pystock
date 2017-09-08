@@ -1,8 +1,6 @@
 import math
 
-import numpy
-
-from common_stock.trade_day import gtrade_day
+from common.scipy_helper import pdSr
 
 
 class DayK:
@@ -36,67 +34,43 @@ class DayK:
 
 
 class DayDataRepr:
-    def __init__(self, code, df):
+    def __init__(self, code, df: pdSr):
         self.df = df
         self.code = code
         self.days = list(df.index)
-        self.open = list(map(float, df.open))
-        self.close = list(map(float, df.close))
-        self.high = list(map(float, df.high))
-        self.low = list(map(float, df.low))
-        self.volume = list(map(float, df.volume))
+        self.opens = list(map(float, df.open))
+        self.closes = list(map(float, df.close))
+        self.highs = list(map(float, df.high))
+        self.lows = list(map(float, df.low))
+        self.volumes = list(map(float, df.volume))
         self.day_to_index = dict(zip(self.days, range(len(self.days))))
 
-        self._open_nparr = None
-        self._close_nparr = None
-        self._high_nparr = None
-        self._low_nparr = None
+        self.open_nparr = df.open.values
+        self.close_nparr = df.close.values
+        self.high_nparr = df.high.values
+        self.low_nparr = df.low.values
 
     def index_of(self, day):
         return self.day_to_index[day]
 
-    @property
-    def open_nparr(self):
-        if self._open_nparr is None:
-            self._open_nparr = numpy.asarray(self.df.open)
-        return self._open_nparr
-
-    @property
-    def close_nparr(self):
-        if self._close_nparr is None:
-            self._close_nparr = numpy.asarray(self.df.close)
-        return self._close_nparr
-
-    @property
-    def high_nparr(self):
-        if self._high_nparr is None:
-            self._high_nparr = numpy.asarray(self.df.high)
-        return self._high_nparr
-
-    @property
-    def low_nparr(self):
-        if self._low_nparr is None:
-            self._low_nparr = numpy.asarray(self.df.low)
-        return self._low_nparr
-
     def open_of(self, day):
-        return self.open[self.day_to_index[day]]
+        return self.opens[self.day_to_index[day]]
 
     def close_of(self, day):
-        return self.close[self.day_to_index[day]]
+        return self.closes[self.day_to_index[day]]
 
     def high_of(self, day):
-        return self.high[self.day_to_index[day]]
+        return self.highs[self.day_to_index[day]]
 
     def low_of(self, day):
-        return self.low[self.day_to_index[day]]
+        return self.lows[self.day_to_index[day]]
 
     def volume_of(self, day):
-        return self.volume[self.day_to_index[day]]
+        return self.volumes[self.day_to_index[day]]
 
     def k_line_of(self, day):
         index = self.day_to_index[day]
-        return self.open[index], self.close[index], self.high[index], self.low[index]
+        return self.opens[index], self.closes[index], self.highs[index], self.lows[index]
 
     def first_day(self):
         return self.days[0]
@@ -121,7 +95,7 @@ class DayDataRepr:
 
     def dayk_of(self, day) -> DayK:
         index = self.day_to_index[day]
-        return DayK(self.open[index], self.close[index], self.high[index], self.low[index])
+        return DayK(self.opens[index], self.closes[index], self.highs[index], self.lows[index])
 
 
 class RealtimeDataRepr:
@@ -169,6 +143,7 @@ class EmuRealTimeDataRepr(RealtimeDataRepr):
         return self.pv.low(stock_code, self.day)
 
     def yclose_of(self, stock_code):
+        from common_stock.trade_day import gtrade_day
         return self.pv.close(stock_code, gtrade_day.previous(self.day))
 
 

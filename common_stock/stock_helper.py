@@ -1,7 +1,5 @@
 import datetime
-import re
 
-# noinspection PyProtectedMember
 import numpy
 
 stock_start_day = datetime.date(1990, 12, 19)
@@ -33,7 +31,7 @@ def to_stdcodes(codes):
 
 
 def to_num_code(code):
-    # noinspection PyUnresolvedReferences
+    import re
     val = re.search('\d+', code)[0]
     return val
 
@@ -74,3 +72,9 @@ def calc_year_yield_arr(yields):
     val3 = 245 / val3
     val2[1:] = val2[1:] ** val3
     return val2
+
+def int_to_date(val):
+    a,b = divmod(val, 10000)
+    b,c = divmod(b, 100)
+    return datetime.date(a,b,c)
+

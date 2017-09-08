@@ -1,10 +1,12 @@
 import datetime
 import datetime as dt
 
-import tushare
 from nose.tools import assert_equal
 
 from common_stock import stock_cache_one_month
+
+
+# ------- Print run time --------------
 
 
 class TradeDay:
@@ -58,6 +60,7 @@ class TradeDay:
     @staticmethod
     @stock_cache_one_month
     def _read_df():
+        import tushare
         return tushare.trade_cal()
 
     def span_of(self, day1, day2):

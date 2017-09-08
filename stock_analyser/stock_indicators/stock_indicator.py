@@ -22,7 +22,6 @@ class MddInfo:
         return f'MDD{{{p_repr(self.mdd)},[{self.left_point},{self.right_point}]}}'
 
 
-
 def calc_max_drawdown_pos_and_value(array_like):
     array_like = np.asarray(array_like)
     # noinspection PyArgumentList
@@ -34,22 +33,6 @@ def calc_max_drawdown_pos_and_value(array_like):
 def calc_max_drawdown_info(x_arr, y_arr):
     left, right, mdd = calc_max_drawdown_pos_and_value(y_arr)
     return MddInfo(mdd, Point(x_arr[left], y_arr[left]), Point(x_arr[right], y_arr[right]))
-
-
-# def calc_yield_dropdown(x, y):
-#     if isinstance(x[0], str):
-#         x = [dt_date_from_str(item) for item in x]
-#     if isinstance(x[0], int) or isinstance(x[0], numpy.int64):
-#         x = [gtrade_day.int_to_date(item) for item in x]
-#     name_to_value = {}
-#     front_date = x[0]
-#     back_date = x[-1]
-#     year_len = ((back_date - front_date).days + 1) / 365
-#     yield_ = (y[-1] - y[0]) / y[0]
-#     name_to_value['yield_'] = yield_
-#     name_to_value['year_yield'] = pow((1 + yield_), 1 / year_len) - 1
-#     name_to_value['mdd_info'] = calc_max_drawdown_pos_and_value(x, y)
-#     return name_to_value
 
 
 def main():

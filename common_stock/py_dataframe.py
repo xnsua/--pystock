@@ -1,5 +1,7 @@
 import math
 
+import numpy
+
 from common.scipy_helper import pdSr
 
 
@@ -37,7 +39,7 @@ class DayDataRepr:
     def __init__(self, code, df: pdSr):
         self.df = df
         self.code = code
-        self.days = list(df.index)
+        self.days = list(df.index.values.astype(numpy.int64))
         self.opens = list(map(float, df.open))
         self.closes = list(map(float, df.close))
         self.highs = list(map(float, df.high))

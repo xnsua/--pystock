@@ -61,7 +61,7 @@ def p_repr(val):
 
 def f_repr(val):
     # Float representation of value
-    text = str(val)[0:5]
+    text = str(val)[0:6]
     return text
 
 

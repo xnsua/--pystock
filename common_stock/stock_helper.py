@@ -36,6 +36,15 @@ def to_num_code(code):
     return val
 
 
+def to_rqcode(code):
+    if code.startswith('60'):
+        return code + '.SHG'
+    elif code.startswith('00'):
+        return code + '.SHE'
+    elif code.startswith('30'):
+        return code + '.SHE'
+
+
 def dict_with_float_repr(dict_):
     items = ['{']
     for key, val in dict_.items():
@@ -73,8 +82,8 @@ def calc_year_yield_arr(yields):
     val2[1:] = val2[1:] ** val3
     return val2
 
-def int_to_date(val):
-    a,b = divmod(val, 10000)
-    b,c = divmod(b, 100)
-    return datetime.date(a,b,c)
 
+def int_to_date(val):
+    a, b = divmod(val, 10000)
+    b, c = divmod(b, 100)
+    return datetime.date(a, b, c)

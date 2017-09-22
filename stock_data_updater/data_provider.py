@@ -1,15 +1,12 @@
-import os
 import threading
 from typing import Dict
 
-from rqalpha.data.base_data_source import BaseDataSource
-from rqalpha.data.data_proxy import DataProxy
-
 from common_stock.py_dataframe import DayDataRepr
-from stock_data_updater.index_info import gindex_pv
-from stock_data_updater.rq_data_proxy import grq_data
-
-dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
+# from stock_data_updater.index_info import gindex_pv
+# from stock_data_updater.rq_data_proxy import grq_data
+#
+# dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
+from stock_data_updater.rq_data_fetcher import rq_history_bars
 
 
 class DataProvider:
@@ -21,7 +18,7 @@ class DataProvider:
     def _try_read_data(self, code):
         # with self.lock:
             if not code in self.code_to_ddr:
-                self.code_to_ddr[code] = grq_data.ddr_of(code)
+                self.code_to_ddr[code] = DayDataRepr(code, rq_history_bars(code))
             return self.code_to_ddr[code]
 
 
@@ -51,11 +48,8 @@ class DataProvider:
             day = day.year * 10000 + day.month * 100 + day.day
         return self.ddr_of(code).has_day(day)
 
-    def components_of(self, code):
-        return gindex_pv.components_of(code)
-
     def symbol_to_code(self, symbol):
-        return grq_data.symbol_to_code(symbol)
+        return r
 
     def name_of(self, symbol, default = None):
         return grq_data.name_of(symbol, default)
@@ -68,10 +62,7 @@ gdp = DataProvider()
 
 
 def main():
-    # print(gdata_pv.component_of('000001'))
-    # print(gdata_pv.open('sh000001',20170705))
-    # for name in main_index:
-    #     print(gdata_pv.symbol_to_code(name))
+    gdp.ddr_of('sh000001')
     pass
 
 

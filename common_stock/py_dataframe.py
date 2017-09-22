@@ -1,8 +1,7 @@
 import math
 
 import numpy
-
-from common.scipy_helper import pdSr
+from common.scipy_helper import pdDF
 
 
 class DayK:
@@ -36,7 +35,8 @@ class DayK:
 
 
 class DayDataRepr:
-    def __init__(self, code, df: pdSr):
+    def __init__(self, code, df: pdDF, ochl_vals = None):
+
         self.df = df
         self.code = code
         self.days = list(df.index.values.astype(numpy.int64))
@@ -95,10 +95,21 @@ class DayDataRepr:
         ddr = DayDataRepr(self.code, self.df.tail(num))
         return ddr
 
+    def head(self, num):
+        ddr = DayDataRepr(self.code, self.df.head(num))
+        return ddr
+
+    def section(self, date_begin,date_end):
+        df = self.df.loc[date_begin:date_end,:]
+        ddr = DayDataRepr(self.code, df)
+        return ddr
+
     def dayk_of(self, day) -> DayK:
         index = self.day_to_index[day]
         return DayK(self.opens[index], self.closes[index], self.highs[index], self.lows[index])
 
+    def ochls(self, index):
+        return self.opens[index], self.closes[index], self.highs[index], self.lows[index]
 
 class RealtimeDataRepr:
     def __init__(self, df):

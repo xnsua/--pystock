@@ -12,7 +12,6 @@ from common_stock.py_dataframe import DayDataRepr
 from common_stock.stock_helper import to_stdcode
 
 
-
 class RqDataProxy:
     def __init__(self):
         self._dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
@@ -73,7 +72,8 @@ class RqDataProxy:
         df = pdDF(data)
         df.datetime = df.datetime // 1000000
         df = df.set_index('datetime')
-        return DayDataRepr(code, df)
+        val = DayDataRepr(code, df)
+        return val
 
     def is_etf(self, std_code):
         return std_code in self._etf_stdcode_to_instrument

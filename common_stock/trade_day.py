@@ -1,7 +1,8 @@
 import datetime
 import datetime as dt
-
-from nose.tools import assert_equal
+import os
+import pickle
+from copyreg import pickle
 
 from common_stock import stock_cache_one_month
 
@@ -13,6 +14,7 @@ class TradeDay:
     def __init__(self):
         self.df = self._read_df()
         self.day_list = list(self.df.calendarDate)
+        print(self.day_list)
         self.day_map = self._build_all_date_map()
         # The list is faster than pd.Series here
         self.trade_day_list = list(self.df.calendarDate[self.df.isOpen == 1])
@@ -127,34 +129,63 @@ class TradeDay:
         return j - i
 
 
-gtrade_day = TradeDay()
+def get_gtrade_day():
+    trade_day = None
+    file_name = 'd:/gtr'
+    if os.path.isfile(file_name):
+        print('hhd')
+        with open(file_name, 'rb') as file:
+            # ------- Print run time --------------
+            import datetime
+            s_time = datetime.datetime.now()
+            trade_day = pickle.load(file)
+            print(datetime.datetime.now() - s_time)
+
+    else:
+        trade_day = TradeDay()
+        print('hh')
+        with open('d:/gtr', 'wb') as file:
+            pickle.dump(trade_day, file)
+    return trade_day
 
 
-def test():
-    # 24,25 is Saturday and Sunday
-    val = gtrade_day.next(20170624)
-    assert_equal(val, 20170626)
-    val = gtrade_day.next(20170626)
-    assert_equal(val, 20170627)
+s_time = datetime.datetime.now()
+# ------- Print run time --------------
+import datetime
 
-    val = gtrade_day.previous(20170624)
-    assert_equal(val, 20170623)
-    val = gtrade_day.previous(20170627)
-    assert_equal(val, 20170626)
+s_time = datetime.datetime.now()
+gtrade_day = get_gtrade_day()
+print(datetime.datetime.now() - s_time)
 
-    val = gtrade_day.shift(20170626, 2)
-    assert_equal(val, 20170628)
-    val = gtrade_day.shift(20170626, -2)
-    assert_equal(val, 20170622)
 
-    range_list = [i for i in gtrade_day.range_list(20170623, 20170626)]
-    assert_equal(range_list, [20170623])
-    range_list = [i for i in gtrade_day.range_list(20170623, 20170627)]
-    assert_equal(range_list, [20170623, 20170626])
 
-    range_list = [i for i in gtrade_day.close_range_list(20170623, 20170626)]
-    # 20170623 is Friday, 20170626 is Monday
-    assert_equal(range_list, [20170623, 20170626])
 
-    assert_equal(gtrade_day.span_of(20170623, 20170626), 1)
-    assert_equal(gtrade_day.span_of(20170623, 20170627), 2)
+# def test():
+#     # 24,25 is Saturday and Sunday
+#     val = gtrade_day.next(20170624)
+#     assert_equal(val, 20170626)
+#     val = gtrade_day.next(20170626)
+#     assert_equal(val, 20170627)
+#
+#     val = gtrade_day.previous(20170624)
+#     assert_equal(val, 20170623)
+#     val = gtrade_day.previous(20170627)
+#     assert_equal(val, 20170626)
+#
+#     val = gtrade_day.shift(20170626, 2)
+#     assert_equal(val, 20170628)
+#     val = gtrade_day.shift(20170626, -2)
+#     assert_equal(val, 20170622)
+#
+#     range_list = [i for i in gtrade_day.range_list(20170623, 20170626)]
+#     assert_equal(range_list, [20170623])
+#     range_list = [i for i in gtrade_day.range_list(20170623, 20170627)]
+#     assert_equal(range_list, [20170623, 20170626])
+#
+#     range_list = [i for i in gtrade_day.close_range_list(20170623, 20170626)]
+#     # 20170623 is Friday, 20170626 is Monday
+#     assert_equal(range_list, [20170623, 20170626])
+#
+#     assert_equal(gtrade_day.span_of(20170623, 20170626), 1)
+#     assert_equal(gtrade_day.span_of(20170623, 20170627), 2)
+#

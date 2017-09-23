@@ -11,7 +11,7 @@ from common.helper import dt_date_to_dt
 from common_stock.trade_day import gtrade_day
 from stock_analyser.k_line_analyser.hammer_or_hang import calc_hammer_or_hang
 from stock_analyser.k_line_analyser.local_max_analyser import calc_peak_info
-from stock_data_updater.data_provider import gdp
+from stock_data_updater.data_provider import data_provider
 
 
 # noinspection PyUnusedLocal
@@ -357,7 +357,7 @@ def plot_kline_with_marker(ddr, markers, save_filename = None, show = True):
 
 
 def main():
-    ddr = gdp.ddr_of('sh510900')
+    ddr = data_provider.ddr_of('sh510900')
     ddr = ddr.tail(200)
     days = calc_hammer_or_hang(ddr)
     plot_kline_with_marker(ddr, days)

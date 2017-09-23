@@ -1,6 +1,7 @@
 import math
 
 import numpy
+
 from common.scipy_helper import pdDF
 
 
@@ -35,16 +36,17 @@ class DayK:
 
 
 class DayDataRepr:
-    def __init__(self, code, df: pdDF, ochl_vals = None):
-
+    def __init__(self, code, df: pdDF):
         self.df = df
         self.code = code
+
         self.days = list(df.index.values.astype(numpy.int64))
         self.opens = list(map(float, df.open))
         self.closes = list(map(float, df.close))
         self.highs = list(map(float, df.high))
         self.lows = list(map(float, df.low))
         self.volumes = list(map(float, df.volume))
+
         self.day_to_index = dict(zip(self.days, range(len(self.days))))
 
         self.open_nparr = df.open.values
@@ -99,8 +101,8 @@ class DayDataRepr:
         ddr = DayDataRepr(self.code, self.df.head(num))
         return ddr
 
-    def section(self, date_begin,date_end):
-        df = self.df.loc[date_begin:date_end,:]
+    def section(self, date_begin, date_end):
+        df = self.df.loc[date_begin:date_end, :]
         ddr = DayDataRepr(self.code, df)
         return ddr
 
@@ -110,6 +112,7 @@ class DayDataRepr:
 
     def ochls(self, index):
         return self.opens[index], self.closes[index], self.highs[index], self.lows[index]
+
 
 class RealtimeDataRepr:
     def __init__(self, df):
@@ -136,8 +139,8 @@ class RealtimeDataRepr:
 class EmuRealTimeDataRepr(RealtimeDataRepr):
     def __init__(self):
         super().__init__(None)
-        from stock_data_updater.data_provider import gdp
-        self.pv = gdp
+        from stock_data_updater.data_provider import data_provider
+        self.pv = data_provider
         self.day = None
 
     def open_of(self, stock_code):

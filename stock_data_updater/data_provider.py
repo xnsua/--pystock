@@ -1,12 +1,6 @@
-import threading
 from typing import Dict
 
 from common_stock.py_dataframe import DayDataRepr
-# from stock_data_updater.index_info import gindex_pv
-# from stock_data_updater.rq_data_proxy import grq_data
-#
-# dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
-from common_stock.stock_helper import to_pcode
 from stock_data_updater.rq_data_fetcher import rq_history_bars
 
 
@@ -14,13 +8,11 @@ class DataProvider:
     def __init__(self):
         self.code_to_ddr = {}  # type: Dict[str, DayDataRepr]
         self.code_to_df = {}
-        self.lock = threading.Lock()
 
     def _try_read_data(self, code):
-        # with self.lock:
-            if not code in self.code_to_ddr:
-                self.code_to_ddr[code] = DayDataRepr(code, rq_history_bars(code))
-            return self.code_to_ddr[code]
+        if not code in self.code_to_ddr:
+            self.code_to_ddr[code] = DayDataRepr(code, rq_history_bars(code))
+        return self.code_to_ddr[code]
 
 
     def open(self, code, day):
@@ -43,28 +35,17 @@ class DataProvider:
         ddr = self._try_read_data(code)
         return ddr
 
-    def has_day_data(self, code, day):
-        if not isinstance(day, int):
+    def has_day_data(self, code, date_or_intday):
+        if not isinstance(date_or_intday, int):
+            date_or_intday = date_or_intday.year * 10000 + date_or_intday.month * 100 + date_or_intday.day
+        return self.ddr_of(code).has_day(date_or_intday)
 
-            day = day.year * 10000 + day.month * 100 + day.day
-        return self.ddr_of(code).has_day(day)
-
-    def symbol_to_code(self, symbol):
-        return r
-
-    def name_of(self, pcode, default = None):
-        pcode = to_pcode(symbol)
-        return (symbol, default)
-
-    def is_etf(self, stdcode):
-        return grq_data.is_etf(stdcode)
-
-
-gdp = DataProvider()
+data_provider = DataProvider()
 
 
 def main():
-    gdp.ddr_of('sh000001')
+    val = data_provider.ddr_of('000001.XSHE')
+    print(val.df)
     pass
 
 

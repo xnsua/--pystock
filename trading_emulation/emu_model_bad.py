@@ -3,7 +3,7 @@ from common_stock.py_dataframe import RealtimeDataRepr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
 from stock_analyser.k_line_analyser.drop_rise_day import gdroprise_pv
-from stock_data_updater.data_provider import gdp
+from stock_data_updater.data_provider import data_provider
 from trading.abstract_context import AbstractContext
 from trading_emulation.emu_trade_context import EmuContext
 
@@ -19,7 +19,7 @@ class EmuModelBad(AbstractModel):
 
     def model_bench(self) -> pdSr:
         assert len(self.codes) == 1
-        return gdp.ddr_of(self.codes[0]).df.open
+        return data_provider.ddr_of(self.codes[0]).df.open
 
     def format_parameter(self):
         return EmuModelBad.__name__ + f'.drop_threshold-{self.drop_threshold}'
@@ -47,12 +47,12 @@ class EmuModelBad(AbstractModel):
         #
         date_int = gtrade_day.date_to_int(context.datetime)
 
-        if gdp.has_day_data(code, context.datetime):
+        if data_provider.has_day_data(code, context.datetime):
             drop_cnt = gdroprise_pv.drop(code, context.datetime)
             if drop_cnt == self.drop_threshold:
-                context.account.try_buy_all(code, gdp.open(code, date_int))
+                context.account.try_buy_all(code, data_provider.open(code, date_int))
             else:
-                context.account.try_sell_all(code, gdp.open(code, date_int))
+                context.account.try_sell_all(code, data_provider.open(code, date_int))
 
     def handle_bar(self, context: AbstractContext, rdr: RealtimeDataRepr):
         super().handle_bar(context, rdr)

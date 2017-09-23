@@ -1,4 +1,4 @@
-gintdays = [20070713,
+kintdays = [20070713,
             20070714,
             20070715,
             20070716,
@@ -3823,4 +3823,4 @@ gintdays = [20070713,
             20171229,
             20171230,
             20171231]
-gintday_to_index = dict(zip(gintdays, range(len(gintdays))))
+kintday_to_index = dict(zip(kintdays, range(len(kintdays))))

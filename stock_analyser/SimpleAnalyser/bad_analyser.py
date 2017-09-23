@@ -1,12 +1,12 @@
 import numpy
 
 from common_stock.trade_day import gtrade_day
-from stock_data_updater.data_provider import gdp
+from stock_data_updater.data_provider import data_provider
 
 
 def drop_after_count1(code, days=None):
     # Close - Open as drop
-    ddr = gdp.ddr_of(code)
+    ddr = data_provider.ddr_of(code)
 
     money = 10000
     stock = 0
@@ -15,39 +15,39 @@ def drop_after_count1(code, days=None):
     if not days: days = ddr.days
     for index, day in enumerate(days):
         if stock != 0:
-            money = stock * gdp.open(code, day)
+            money = stock * data_provider.open(code, day)
             stock = 0
         elif drop_count == 2:
             buy_count += 1
-            stock = money / gdp.open(code, day)
+            stock = money / data_provider.open(code, day)
             money = 0
         else:
             pass
 
-        if gdp.open(code, day) > gdp.close(code, day):
+        if data_provider.open(code, day) > data_provider.close(code, day):
             drop_count += 1
         else:
             drop_count = 0
         print(money)
 
     if stock != 0:
-        money = stock * gdp.close(code, days[-1])
+        money = stock * data_provider.close(code, days[-1])
     yield_ = money / 10000
     year_yield = yield_ ** (245 / buy_count)
-    original_yield = gdp.close(code, ddr.days[-1]) / gdp.open(code, ddr.days[0])
+    original_yield = data_provider.close(code, ddr.days[-1]) / data_provider.open(code, ddr.days[0])
     year_yield_base = original_yield ** (245 / len(ddr.days))
     ycompare = year_yield / year_yield_base
     year_yield = round(year_yield, 3)
     year_yield_base = round(year_yield_base, 3)
     ycompare = round(ycompare, 3)
-    name = gdp.name_of(code)
+    name = data_provider.name_of(code)
     print(
         f'Code: {code}, Name:{name}, BaseYYield:{year_yield_base}, YYield:{year_yield}, YieldRaise: {ycompare}')
     return ycompare
 
 
 def drop_after_count2(code):
-    ddr = gdp.ddr_of(code)
+    ddr = data_provider.ddr_of(code)
     money = 100000
     stock = 0
     drop_count = 0
@@ -55,38 +55,38 @@ def drop_after_count2(code):
     for index, day in enumerate(ddr.days):
         if index == 0: continue
         if stock != 0:
-            money = stock * gdp.open(code, day)
+            money = stock * data_provider.open(code, day)
             stock = 0
         elif drop_count == 2:
             buy_count += 1
-            stock = money / gdp.open(code, day)
+            stock = money / data_provider.open(code, day)
             money = 0
         else:
             pass
 
-        if gdp.close(code, ddr.days[index - 1]) > gdp.close(code, day):
+        if data_provider.close(code, ddr.days[index - 1]) > data_provider.close(code, day):
             drop_count += 1
         else:
             drop_count = 0
 
     if stock != 0:
-        money = stock * gdp.close(code, ddr.days[-1])
+        money = stock * data_provider.close(code, ddr.days[-1])
     yield_ = money / 100000
     year_yield = yield_ ** (245 / buy_count)
-    original_yield = gdp.close(code, ddr.days[-1]) / gdp.open(code, ddr.days[0])
+    original_yield = data_provider.close(code, ddr.days[-1]) / data_provider.open(code, ddr.days[0])
     year_yield_base = original_yield ** (245 / len(ddr.days))
     ycompare = year_yield / year_yield_base
     year_yield = round(year_yield, 3)
     year_yield_base = round(year_yield_base, 3)
     ycompare = round(ycompare, 3)
-    name = gdp.name_of(code)
+    name = data_provider.name_of(code)
     print(
         f'Code: {code}, Name:{name}, YYield:{year_yield_base}, YYield:{year_yield}, YieldRaise: {ycompare}')
     return ycompare
 
 
 def drop_after_count3(code):
-    ddr = gdp.ddr_of(code)
+    ddr = data_provider.ddr_of(code)
     money = 100000
     stock = 0
     drop_count = 0
@@ -94,32 +94,32 @@ def drop_after_count3(code):
     for index, day in enumerate(ddr.days):
         if index == 0: continue
         if stock != 0:
-            money = stock * gdp.open(code, day)
+            money = stock * data_provider.open(code, day)
             stock = 0
         elif drop_count == 2:
             buy_count += 1
-            stock = money / gdp.open(code, day)
+            stock = money / data_provider.open(code, day)
             money = 0
         else:
             pass
 
-        if gdp.open(code, ddr.days[index - 1]) > gdp.open(code, day) \
-                and gdp.close(code, ddr.days[index - 1]) > gdp.close(code, day):
+        if data_provider.open(code, ddr.days[index - 1]) > data_provider.open(code, day) \
+                and data_provider.close(code, ddr.days[index - 1]) > data_provider.close(code, day):
             drop_count += 1
         else:
             drop_count = 0
 
     if stock != 0:
-        money = stock * gdp.close(code, ddr.days[-1])
+        money = stock * data_provider.close(code, ddr.days[-1])
     yield_ = money / 100000
     year_yield = yield_ ** (245 / buy_count)
-    original_yield = gdp.close(code, ddr.days[-1]) / gdp.open(code, ddr.days[0])
+    original_yield = data_provider.close(code, ddr.days[-1]) / data_provider.open(code, ddr.days[0])
     year_yield_base = original_yield ** (245 / len(ddr.days))
     ycompare = year_yield / year_yield_base
     year_yield = round(year_yield, 3)
     year_yield_base = round(year_yield_base, 3)
     ycompare = round(ycompare, 3)
-    name = gdp.name_of(code)
+    name = data_provider.name_of(code)
     print(
         f'Code: {code}, Name:{name}, YYield:{year_yield_base}, YYield:{year_yield}, YieldRaise: {ycompare}')
     return ycompare
@@ -128,7 +128,7 @@ def drop_after_count3(code):
 def drop_after_count4(code, days):
     # Test sz159919 and sh510330
     moneys = []
-    ddr = gdp.ddr_of(code)
+    ddr = data_provider.ddr_of(code)
     money = 100000
     stock = 0
     drop_count = 0
@@ -139,35 +139,35 @@ def drop_after_count4(code, days):
         moneys.append(money)
         if stock != 0:
             if gtrade_day.span_of(last_buy_day, day) >= 1:
-                money = stock * gdp.open(code, day)
+                money = stock * data_provider.open(code, day)
                 stock = 0
         else:
             if drop_count == 2:
                 last_buy_day = day
                 buy_count += 1
-                stock = money / gdp.open(code, day)
+                stock = money / data_provider.open(code, day)
                 money = 0
             else:
                 pass
 
-        if gdp.open(code, day) > gdp.close(code, day):
+        if data_provider.open(code, day) > data_provider.close(code, day):
             drop_count += 1
         else:
             drop_count = 0
 
     if stock != 0:
-        money = stock * gdp.close(code, ddr.days[-1])
+        money = stock * data_provider.close(code, ddr.days[-1])
         moneys[-1] = money
     print(buy_count)
     yield_ = money / 100000
     year_yield = yield_ ** (245 / buy_count)
-    original_yield = gdp.close(code, ddr.days[-1]) / gdp.open(code, ddr.days[0])
+    original_yield = data_provider.close(code, ddr.days[-1]) / data_provider.open(code, ddr.days[0])
     year_yield_base = original_yield ** (245 / len(ddr.days))
     ycompare = year_yield / year_yield_base
     year_yield = round(year_yield, 3)
     year_yield_base = round(year_yield_base, 3)
     ycompare = round(ycompare, 3)
-    name = gdp.name_of(code)
+    name = data_provider.name_of(code)
     print(
         f'Code: {code}, Name:{name}, YYield:{year_yield_base}, YYield:{year_yield}, YieldRaise: {ycompare}')
     # return ycompare
@@ -199,8 +199,8 @@ def compare():
     # etf_with_amount = ['sz159919', 'sh510330']
     # codes = ['sh510050']
     # codes = gdp.components_of('sh000016')
-    days = gdp.ddr_of('sh510050').days[0:30]
-    print(gdp.ddr_of('sh510050').df)
+    days = data_provider.ddr_of('sh510050').days[0:30]
+    print(data_provider.ddr_of('sh510050').df)
     codes = ['sh510050']
     for code in codes:
         c1.append(drop_after_count1(code, days))

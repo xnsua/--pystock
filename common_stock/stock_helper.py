@@ -12,45 +12,30 @@ trade1_end_time = datetime.time(11, 30, 0)
 trade2_begin_time = datetime.time(13, 0, 0)
 trade2_end_time = datetime.time(15, 0, 0)
 
+
 class CodeTools:
     sh_stock = '6'
     sh_func = '5'
     sz_stock = '0'
     sz_func = '1'
     sz_gem = '3'
-    sh_all = ['6','5']
-    sz_all = ['0','1', '3']
+    sh_all = ['6', '5']
+    sz_all = ['0', '1', '3']
 
-    def to_sinacode(code):
-        if code.endswith('.XSHE'):
-            code = 'sz' + code[0:6]
-        elif code.endswith('.XSHG'):
-            code = 'sh' + code[0:6]
-        elif code.startswith('sh') or code.startswith('sz'):
-            pass
-        else:
-            raise Exception(f'Not valid code, {code}')
-        return code
-
-
-    def to_sinacodes(codes):
-        ncodes = [to_sinacode(code) for code in codes]
-        return ncodes
-
-
-    def to_pcode(self, code):
+    @staticmethod
+    def to_pcode(code):
         import re
         val = re.search('\d+', code)[0]
         return val
 
-
-    def to_rqcode(self, code):
-        if code.startswith('6') or code.startswith('5'):
-            return code + '.SHG'
-        elif code.startswith('0') or code.startswith('1') or code.startswith('3'):
-            return code + '.SHE'
+    @staticmethod
+    def to_rqcode(pcode):
+        if pcode.startswith('6') or pcode.startswith('5'):
+            return pcode + '.SHG'
+        elif pcode.startswith('0') or pcode.startswith('1') or pcode.startswith('3'):
+            return pcode + '.SHE'
         else:
-            assert False, f'Not supported code {code}'
+            assert False, f'Not supported code {pcode}'
 
 
 def dict_with_float_repr(dict_):

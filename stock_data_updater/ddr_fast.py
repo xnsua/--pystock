@@ -7,8 +7,8 @@ pathlib.Path(ddr_fast_dir).mkdir(exist_ok=True)
 
 
 def write_ddr(code):
-    from stock_data_updater.data_provider import gdp
-    ddr = gdp.ddr_of(code)
+    from stock_data_updater.data_provider import data_provider
+    ddr = data_provider.ddr_of(code)
     val = pickle.dumps(ddr)
     path = pathlib.Path(ddr_fast_dir) / code
 

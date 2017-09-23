@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from common_stock.stock_helper import to_pcode
+from common_stock.stock_helper import CodeTools
 
 
 def read_xls_data(path) -> List[List]:
@@ -25,7 +25,7 @@ class IndexInfoProvider:
         self.code_to_component = {}
 
     def components_of(self, code):
-        ncode = to_pcode(code)
+        ncode = CodeTools.to_pcode(code)
         if code not in self.code_to_component:
             self.code_to_component[code] = self._data_of(ncode)
         return self.code_to_component[code]
@@ -47,16 +47,16 @@ class IndexInfoProvider:
         # noinspection PyUnboundLocalVariable
         for i, value in enumerate(market):
             if value == 'Shanghai':
-                comp_codes[i] = 'sh' + comp_codes[i]
+                comp_codes[i] = comp_codes[i] + '.XSHG'
             elif value == 'Shenzhen':
-                comp_codes[i] = 'sz' + comp_codes[i]
+                comp_codes[i] = comp_codes[i] + '.XSHE'
         return comp_codes
 
 
 gindex_pv = IndexInfoProvider(os.path.expanduser('~/StockData/index_data/'))
 
 def main():
-    val = gindex_pv.components_of('000001')
+    val = gindex_pv.components_of('000016')
     print(val)
 
 

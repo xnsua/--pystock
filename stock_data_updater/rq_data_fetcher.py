@@ -39,14 +39,7 @@ def rq_all_instruments(type_):
 def main():
     # ------- Print run time --------------
     # ------- Print run time --------------
-    import datetime
-    s_time = datetime.datetime.now()
-    val1 = rq_all_instruments('LOF')
-    val2 = rq_all_instruments('ETF')
-    val3 = rq_all_instruments('CS')
-    val1dict = val1 + val2 + val3
-    print(list(val['order_book_id']))
-    print(datetime.datetime.now() - s_time)
+    pass
 
 
 if __name__ == '__main__':

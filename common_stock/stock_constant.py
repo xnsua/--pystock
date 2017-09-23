@@ -1,4 +1,20 @@
 ## Need Update
+
+
+def code_to_name():
+    import datetime
+    from stock_data_updater.rq_data_fetcher import rq_all_instruments
+    s_time = datetime.datetime.now()
+    val1 = rq_all_instruments('LOF')
+    val2 = rq_all_instruments('ETF')
+    val3 = rq_all_instruments('CS')
+    d1 = dict(zip(val1.order_book_id,val1.symbol))
+    d2 = dict(zip(val2.order_book_id,val2.symbol))
+    d3 = dict(zip(val3.order_book_id,val3.symbol))
+    return {**d1, **d2, **d3}
+
+val = code_to_name()
+print(len(val))
 pcode_to_name = {'000001': '平安银行', '000002': '万科A', '000004': '国农科技', '000005': '世纪星源',
                  '000006': '深振业A', '000007': '全新好', '000008': '神州高铁', '000009': '中国宝安',
                  '000010': '美丽生态', '000011': '深物业A', '000012': '南玻A', '000014': '沙河股份',

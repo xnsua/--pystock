@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from common_stock.stock_helper import to_num_code
+from common_stock.stock_helper import to_pcode
 
 
 def read_xls_data(path) -> List[List]:
@@ -25,7 +25,7 @@ class IndexInfoProvider:
         self.code_to_component = {}
 
     def components_of(self, code):
-        ncode = to_num_code(code)
+        ncode = to_pcode(code)
         if code not in self.code_to_component:
             self.code_to_component[code] = self._data_of(ncode)
         return self.code_to_component[code]

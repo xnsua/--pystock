@@ -12,7 +12,7 @@ from common_stock.stock_helper import dict_with_float_repr, calc_year_yield_arr
 from common_stock.trade_day import gtrade_day
 from models.abstract_model import AbstractModel
 from models.model_utility import calc_date_range
-from stock_analyser.plot import LineAndStyle, plot_image_with_annotation, TextAnnotation
+from stock_analyser.plot import LineAndStyle, plot_with_annotation, TextAnnotation
 from stock_analyser.stock_indicators.stock_indicator import MddInfo, calc_max_drawdown_info
 from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos_and_value
 from stock_data_updater.data_provider import gdp
@@ -182,9 +182,9 @@ def plot_analyse_result(ana_result: AnalyseResult, show_figure=True, figure_file
                        formatter=percentage_formatter),
         TextAnnotation('TradeDays', ana_result.trade_day_cnt)
     ]
-    plot_image_with_annotation(lines, [line1annotations, line2annotations, line3annotations],
-                               [rline1annotations, rline2annotations],
-                               show=show_figure, save_file_name=figure_filename)
+    plot_with_annotation(lines, [line1annotations, line2annotations, line3annotations],
+                         [rline1annotations, rline2annotations],
+                         show=show_figure, image_file_name=figure_filename)
 
 
 def run_emu_for_single_code(days, model, show_figure):

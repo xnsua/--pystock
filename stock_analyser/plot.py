@@ -9,6 +9,7 @@ from matplotlib.gridspec import GridSpec
 
 from common.helper import dt_date_to_dt
 from common_stock.trade_day import gtrade_day
+from stock_analyser.k_line_analyser.hammer_or_hang import calc_hammer_or_hang
 from stock_analyser.k_line_analyser.local_max_analyser import calc_peak_info
 from stock_data_updater.data_provider import gdp
 
@@ -293,41 +294,41 @@ class RightAlignTextAnnotations:
         self.annotiation = annotations
 
 
-def plot_image_with_annotation(lines_and_style: List[LineAndStyle],
-                               left_annotation,
-                               right_annotation,
-                               save_file_name=None, show=False, show_float_annotation=True):
-    plotter = StockTrendPlotter(lines_and_style, left_annotation, right_annotation, save_file_name,
+def plot_with_annotation(lines_and_style: List[LineAndStyle],
+                         left_annotation,
+                         right_annotation,
+                         image_file_name=None, show=False, show_float_annotation=True):
+    plotter = StockTrendPlotter(lines_and_style, left_annotation, right_annotation, image_file_name,
                                 show_float_annotation)
-    if save_file_name:
-        plotter.save_figure(save_file_name)
+    if image_file_name:
+        plotter.save_figure(image_file_name)
     if show:
         plotter.show_figure()
     plotter.close_figure()
 
 
 # def plot_test():
-# ddr = gdp.ddr_of('sh510900')
-# ddr = ddr.clip(20170605, gtrade_day.previous(20170710))
-#
-# days = [gtrade_day.int_to_date(item) for item in ddr.days]
-# days_num = list(map(date2num, days))
-# kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
-#               down_color='g')
-# values = ddr.open
-# mdd_x = [datetime.date(2017, 6, 4), datetime.datetime(2017, 6, 8)]
-# mdd_y = [1, 0.8]
-# lines = [
-#     LineAndStyle(days, values, 'b', marker='o', label='Value', show_value_in_annotaion=True),
-#     kline,
-# ]
-# line1annotations = [
-#     TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
-#     TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
-# ]
-# plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
-#                            show=True, save_file_name='d:/tfile.png',
-#                            show_float_annotation=False)
+    # ddr = gdp.ddr_of('sh510900')
+    # ddr = ddr.clip(20170605, gtrade_day.previous(20170710))
+    #
+    # days = [gtrade_day.int_to_date(item) for item in ddr.days]
+    # days_num = list(map(date2num, days))
+    # kline = KLine(list(zip(days_num, ddr.open, ddr.close, ddr.high, ddr.low)), up_color='r',
+    #               down_color='g')
+    # values = ddr.open
+    # mdd_x = [datetime.date(2017, 6, 4), datetime.datetime(2017, 6, 8)]
+    # mdd_y = [1, 0.8]
+    # lines = [
+    #     LineAndStyle(days, values, 'b', marker='o', label='Value', show_value_in_annotaion=True),
+    #     kline,
+    # ]
+    # line1annotations = [
+    #     TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
+    #     TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
+    # ]
+    # plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
+    #                            show=True, save_file_name='d:/tfile.png',
+    #                            show_float_annotation=False)
 
 def plot_kline_with_marker(ddr, markers, save_filename = None, show = True):
     days = [gtrade_day.int_to_date(item) for item in ddr.days]
@@ -349,33 +350,10 @@ def plot_kline_with_marker(ddr, markers, save_filename = None, show = True):
                      show_value_in_annotaion=True),
         kline,
     ]
-    plot_image_with_annotation(lines, [], [],
-                               show=show, save_file_name=save_filename,
-                               show_float_annotation=False)
+    plot_with_annotation(lines, [], [],
+                         show=show, image_file_name=save_filename,
+                         show_float_annotation=False)
 
-
-# def plot_test2():
-#     date1 = (2014, 12, 1)  # 起始日期，格式：(年，月，日)元组
-#     date2 = (2016, 12, 1)  # 结束日期，格式：(年，月，日)元组
-#     ddr = gdp.ddr_of('sh510900')
-#     df = ddr.df
-#     ddr2 = ddr.clip(20170604, gtrade_day.previous(20170710))
-#
-#     days = ddr2.days
-#     values = ddr2.open
-#     mdd_x = [datetime.date(2017, 6, 1), datetime.datetime(2017, 7, 10)]
-#     mdd_y = [1, 2]
-#     # noinspection PyTypeChecker
-#     lines = [
-#         LineAndStyle(days, values, 'b', alpha=1, label='Value', show_value_in_annotaion=True),
-#         LineAndStyle(mdd_x, mdd_y, 'k', alpha=0.3)
-#     ]
-#     line1annotations = [
-#         TextAnnotation('Key1', 0.1234, 6, 'b', formatter=None),
-#         TextAnnotation('Key2', 0.1234, 6, 'b', formatter=None),
-#     ]
-#     plot_image_with_annotation(lines, [line1annotations, line1annotations], [line1annotations],
-#                                show=False, save_file_name='d:/tfile.png')
 
 
 def main():

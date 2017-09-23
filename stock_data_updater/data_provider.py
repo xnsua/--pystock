@@ -6,6 +6,7 @@ from common_stock.py_dataframe import DayDataRepr
 # from stock_data_updater.rq_data_proxy import grq_data
 #
 # dp = DataProxy(BaseDataSource(os.path.expanduser('~/.rqalpha/bundle')))
+from common_stock.stock_helper import to_pcode
 from stock_data_updater.rq_data_fetcher import rq_history_bars
 
 
@@ -51,8 +52,9 @@ class DataProvider:
     def symbol_to_code(self, symbol):
         return r
 
-    def name_of(self, symbol, default = None):
-        return grq_data.name_of(symbol, default)
+    def name_of(self, pcode, default = None):
+        pcode = to_pcode(symbol)
+        return (symbol, default)
 
     def is_etf(self, stdcode):
         return grq_data.is_etf(stdcode)

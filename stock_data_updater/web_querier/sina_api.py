@@ -7,8 +7,8 @@ import pandas as pd
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
 from common_stock import stock_cache_one_month
-from common_stock.stock_helper import to_stdcode, \
-    to_num_code
+from common_stock.stock_helper import to_sinacode, \
+    to_pcode
 
 pd.set_option('precision', 5)
 
@@ -23,7 +23,7 @@ def get_realtime_stock_infos(stock_list) -> pdDF:
         stock_codes = []
         attrs = []
         for v in find_results:
-            stock_codes.append(to_num_code(v[1]))
+            stock_codes.append(to_pcode(v[1]))
             content = v[2].split(',')
             content = content[0:6]
             content.append(content.pop(0))
@@ -33,7 +33,7 @@ def get_realtime_stock_infos(stock_list) -> pdDF:
         df['name'] = df['name'].astype(str)
         return df
 
-    list_str = ','.join(map(to_stdcode, stock_list))
+    list_str = ','.join(map(to_sinacode, stock_list))
     url = 'http://hq.sinajs.cn/list=' + list_str
     resp = firefox_quick_get_url(url)
     if resp.status_code == 200:

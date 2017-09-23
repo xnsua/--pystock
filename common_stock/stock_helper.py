@@ -12,37 +12,45 @@ trade1_end_time = datetime.time(11, 30, 0)
 trade2_begin_time = datetime.time(13, 0, 0)
 trade2_end_time = datetime.time(15, 0, 0)
 
+class CodeTools:
+    sh_stock = '6'
+    sh_func = '5'
+    sz_stock = '0'
+    sz_func = '1'
+    sz_gem = '3'
+    sh_all = ['6','5']
+    sz_all = ['0','1', '3']
 
-def to_stdcode(code):
-    if code.endswith('.XSHE'):
-        code = 'sz' + code[0:6]
-    elif code.endswith('.XSHG'):
-        code = 'sh' + code[0:6]
-    elif code.startswith('sh') or code.startswith('sz'):
-        pass
-    else:
-        raise Exception(f'Not valid code, {code}')
-    return code
-
-
-def to_stdcodes(codes):
-    ncodes = [to_stdcode(code) for code in codes]
-    return ncodes
-
-
-def to_num_code(code):
-    import re
-    val = re.search('\d+', code)[0]
-    return val
+    def to_sinacode(code):
+        if code.endswith('.XSHE'):
+            code = 'sz' + code[0:6]
+        elif code.endswith('.XSHG'):
+            code = 'sh' + code[0:6]
+        elif code.startswith('sh') or code.startswith('sz'):
+            pass
+        else:
+            raise Exception(f'Not valid code, {code}')
+        return code
 
 
-def to_rqcode(code):
-    if code.startswith('60'):
-        return code + '.SHG'
-    elif code.startswith('00'):
-        return code + '.SHE'
-    elif code.startswith('30'):
-        return code + '.SHE'
+    def to_sinacodes(codes):
+        ncodes = [to_sinacode(code) for code in codes]
+        return ncodes
+
+
+    def to_pcode(self, code):
+        import re
+        val = re.search('\d+', code)[0]
+        return val
+
+
+    def to_rqcode(self, code):
+        if code.startswith('6') or code.startswith('5'):
+            return code + '.SHG'
+        elif code.startswith('0') or code.startswith('1') or code.startswith('3'):
+            return code + '.SHE'
+        else:
+            assert False, f'Not supported code {code}'
 
 
 def dict_with_float_repr(dict_):
@@ -83,7 +91,16 @@ def calc_year_yield_arr(yields):
     return val2
 
 
-def int_to_date(val):
+def intday_to_date(val):
     a, b = divmod(val, 10000)
     b, c = divmod(b, 100)
     return datetime.date(a, b, c)
+
+
+def dtdate_to_intday(date_):
+    return (date_.year * 10000 + date_.month * 100) + date_.day
+
+
+def date_str_to_intday(date_str):
+    y, m, d = map(int, date_str.split('-'))
+    return y * 10000 + m * 100 + d

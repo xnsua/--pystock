@@ -2,8 +2,9 @@ from collections import OrderedDict
 from typing import Dict
 
 import tushare
+
 from common_stock import stock_cache_three_month
-from common_stock.stock_helper import to_stdcodes
+from common_stock.stock_helper import to_sinacodes
 from stock_data_updater.web_querier import sina_api
 
 
@@ -11,27 +12,27 @@ from stock_data_updater.web_querier import sina_api
 @stock_cache_three_month
 def get_stock_index_to_name():
     df = tushare.get_index()
-    return OrderedDict(zip(to_stdcodes(df.code), df.name))
+    return OrderedDict(zip(to_sinacodes(df.code), df.name))
 
 
 @stock_cache_three_month
 def query_sz50s() -> Dict[str, str]:
     df = tushare.get_sz50s()
-    code_dict = dict(zip(to_stdcodes(df.code), df.name))
+    code_dict = dict(zip(to_sinacodes(df.code), df.name))
     return code_dict
 
 
 @stock_cache_three_month
 def query_hs300s() -> Dict[str, str]:
     df2 = tushare.get_hs300s()
-    code_dict = dict(zip(to_stdcodes(df2.code), df2.name))
+    code_dict = dict(zip(to_sinacodes(df2.code), df2.name))
     return code_dict
 
 
 @stock_cache_three_month
 def query_zz500s() -> Dict[str, str]:
     df3 = tushare.get_zz500s()
-    code_dict = dict(zip(to_stdcodes(df3.code), df3.name))
+    code_dict = dict(zip(to_sinacodes(df3.code), df3.name))
     return code_dict
 
 

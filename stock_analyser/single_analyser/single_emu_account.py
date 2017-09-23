@@ -1,7 +1,7 @@
 from operator import attrgetter
 from typing import List
 
-from common_stock.stock_helper import int_to_date, f_repr
+from common_stock.stock_helper import intday_to_date, f_repr
 
 
 class _AccountOperation:
@@ -48,7 +48,7 @@ class SingleEmuAccount:
 
         self.buy_count = 0
 
-        self.dates = [int_to_date(val) for val in ddr.days]
+        self.dates = [intday_to_date(val) for val in ddr.days]
 
         self.stat = _Statistic()
 

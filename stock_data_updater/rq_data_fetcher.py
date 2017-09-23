@@ -3,6 +3,7 @@ from io import BytesIO
 
 import jsonpickle
 import numpy
+
 from common.scipy_helper import pdDF
 from common.web_helper import firefox_quick_get_url
 
@@ -27,14 +28,25 @@ def _np_compound_arr_to_df(arr):
     return val
 
 def rq_history_bars(rq_code):
-    val = _visit_server('history_bar', headers={'code':rq_code})
+    val = _visit_server('history_bars', headers={'code':rq_code})
     val = _np_compound_arr_to_df(val)
+    return val
+
+def rq_all_instruments(type_):
+    val = _visit_server('all_instruments', headers={'type':type_})
     return val
 
 def main():
     # ------- Print run time --------------
-    val = rq_history_bars('600016.XSHG')
-
+    # ------- Print run time --------------
+    import datetime
+    s_time = datetime.datetime.now()
+    val1 = rq_all_instruments('LOF')
+    val2 = rq_all_instruments('ETF')
+    val3 = rq_all_instruments('CS')
+    val1dict = val1 + val2 + val3
+    print(list(val['order_book_id']))
+    print(datetime.datetime.now() - s_time)
 
 
 if __name__ == '__main__':

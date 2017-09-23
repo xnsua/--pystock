@@ -11,6 +11,9 @@ from common.key_value_db import KeyValueDb
 
 
 class _PersistentCacheBase:
+    """
+    Usage: Use create_persistent_cache function
+    """
     _db_path = None
     _db = None
 

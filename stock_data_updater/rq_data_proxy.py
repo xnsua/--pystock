@@ -9,7 +9,7 @@ from rqalpha.data.data_proxy import DataProxy
 from common.helper import dt_now
 from common.scipy_helper import pdDF
 from common_stock.py_dataframe import DayDataRepr
-from common_stock.stock_helper import to_stdcode
+from common_stock.stock_helper import to_sinacode
 
 
 class RqDataProxy:
@@ -35,15 +35,15 @@ class RqDataProxy:
          concept_names='基金重仓|深圳本地|外资背景|社保重仓|本月解禁|保险重仓|券商重仓', status='Active', 
          order_book_id='000001.XSHE', sector_code='Financials', industry_name='货币金融服务', type='CS')
         """
-        self._stockcode_to_instrument = {to_stdcode(item.order_book_id):
+        self._stockcode_to_instrument = {to_sinacode(item.order_book_id):
                                              item for item in self._stock_to_instruments}
-        self._etf_stdcode_to_instrument = {to_stdcode(item.order_book_id): item
+        self._etf_stdcode_to_instrument = {to_sinacode(item.order_book_id): item
                                            for item in self._etf_stdcode_to_instrument}
 
         self._index_to_instrumment = {}
         for val in self._index_to_instrument:
             if val.order_book_id.endswith('.INDX'): continue
-            self._index_to_instrumment[to_stdcode(val.order_book_id)] = val
+            self._index_to_instrumment[to_sinacode(val.order_book_id)] = val
         self._all_code_to_instrument = {**self._stockcode_to_instrument,
                                         **self._etf_stdcode_to_instrument,
                                         **self._index_to_instrumment}

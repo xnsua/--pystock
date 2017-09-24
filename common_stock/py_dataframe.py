@@ -54,6 +54,9 @@ class DayDataRepr:
         self.high_nparr = df.high.values
         self.low_nparr = df.low.values
 
+    def __len__(self):
+        return len(self.df)
+
     def index_of(self, day):
         return self.day_to_index[day]
 
@@ -110,7 +113,7 @@ class DayDataRepr:
         index = self.day_to_index[day]
         return DayK(self.opens[index], self.closes[index], self.highs[index], self.lows[index])
 
-    def ochls(self, index):
+    def ochl(self, index):
         return self.opens[index], self.closes[index], self.highs[index], self.lows[index]
 
 
@@ -139,8 +142,8 @@ class RealtimeDataRepr:
 class EmuRealTimeDataRepr(RealtimeDataRepr):
     def __init__(self):
         super().__init__(None)
-        from stock_data_updater.data_provider import data_provider
-        self.pv = data_provider
+        from stock_data_updater.data_provider import ddr_pv
+        self.pv = ddr_pv
         self.day = None
 
     def open_of(self, stock_code):

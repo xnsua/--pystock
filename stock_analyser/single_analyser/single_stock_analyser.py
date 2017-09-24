@@ -14,7 +14,7 @@ def single_stock_analyser(ddr: DayDataRepr, model: SingleAbcModel):
         skip_len = model.skip_len
         for index in range(skip_len):
             acc.on_date_begin(index)
-            acc.on_date_finished(index, ddr.ochls(index))
+            acc.on_date_finished(index, ddr.ochl(index))
         for index in range(skip_len, len(ddr.days)):
             # if ddr.days[index] == 20130502:
             #     print(ddr.closes[index])
@@ -28,7 +28,7 @@ def single_stock_analyser(ddr: DayDataRepr, model: SingleAbcModel):
                 acc.buy(bs)
             elif bs < 0:
                 acc.sell(-bs)
-            acc.on_date_finished(index, ddr.ochls(index))
+            acc.on_date_finished(index, ddr.ochl(index))
 
         acc.stat.original_earn = ddr.closes[-1] / ddr.closes[skip_len]
         acc.stat.original_year_earn = acc.stat.original_earn ** (245 / (len(ddr.days) - skip_len))

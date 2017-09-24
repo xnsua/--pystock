@@ -6,7 +6,7 @@ from common.algorithm import group_consecutive_count
 from common.scipy_helper import pdDF
 from common_stock.py_dataframe import DayDataRepr
 # noinspection PyTypeChecker
-from stock_data_updater.data_provider import data_provider
+from stock_data_updater.data_provider import ddr_pv
 
 
 class DropRiseDayIndicator:
@@ -40,7 +40,7 @@ class DropRiseDayProvider:
     def _calc_drop_rise(self, code):
         # with self.lock:
             if code not in self.code_to_drop_rise:
-                self.code_to_drop_rise[code] = DropRiseDayIndicator(data_provider.ddr_of(code))
+                self.code_to_drop_rise[code] = DropRiseDayIndicator(ddr_pv.ddr_of(code))
             return self.code_to_drop_rise[code]
 
     def rise(self, code, day):

@@ -37,8 +37,6 @@ def rq_all_instruments(type_):
     return val
 
 def main():
-    # ------- Print run time --------------
-    # ------- Print run time --------------
     pass
 
 

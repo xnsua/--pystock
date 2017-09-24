@@ -3,7 +3,7 @@ import talib
 
 from common.helper import EnterExit
 from common_stock.py_dataframe import DayDataRepr
-from stock_data_updater.data_provider import data_provider
+from stock_data_updater.data_provider import ddr_pv
 
 
 @EnterExit(lambda: numpy.seterr(all='ignore'), lambda v: numpy.seterr(**v))
@@ -44,7 +44,7 @@ def plot_hammer_or_hang(ddr: DayDataRepr):
 
 
 def main():
-    ddr = data_provider.ddr_of('sh510900')
+    ddr = ddr_pv.ddr_of('sh510900')
     # ddr = ddr.tail(200)
     # ------- Print run time --------------
     import datetime

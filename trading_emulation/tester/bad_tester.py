@@ -4,7 +4,7 @@ from concurrent import futures
 from stock_data_updater.classify import etf_with_amount
 
 from common.scipy_helper import pdDF
-from stock_data_updater.data_provider import data_provider
+from stock_data_updater.data_provider import ddr_pv
 from stock_data_updater.index_info import gindex_pv
 from trading_emulation.emu_model_bad import EmuModelBad
 from trading_emulation.emu_model_runner import EmuModelRunner, analyse_emu_result
@@ -44,7 +44,7 @@ def run_bad_for_all_etf_non_fee():
 
 def run_bad_for_all_index_non_fee():
     set_account_none_fee()
-    index_list = list(map(data_provider.symbol_to_code, gindex_pv.main_index_symbol))
+    index_list = list(map(ddr_pv.symbol_to_code, gindex_pv.main_index_symbol))
     # index_list = index_list[0:1]
 
     with concurrent.futures.ProcessPoolExecutor() as executor:

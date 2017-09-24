@@ -6,12 +6,12 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, num2date
 from matplotlib.gridspec import GridSpec
+from stock_analyser.k_line_analyser.local_max_analyser import calc_peak_info
 
 from common.helper import dt_date_to_dt
 from common_stock.trade_day import gtrade_day
 from stock_analyser.k_line_analyser.hammer_or_hang import calc_hammer_or_hang
-from stock_analyser.k_line_analyser.local_max_analyser import calc_peak_info
-from stock_data_updater.data_provider import data_provider
+from stock_data_updater.data_provider import ddr_pv
 
 
 # noinspection PyUnusedLocal
@@ -357,7 +357,7 @@ def plot_kline_with_marker(ddr, markers, save_filename = None, show = True):
 
 
 def main():
-    ddr = data_provider.ddr_of('sh510900')
+    ddr = ddr_pv.ddr_of('sh510900')
     ddr = ddr.tail(200)
     days = calc_hammer_or_hang(ddr)
     plot_kline_with_marker(ddr, days)

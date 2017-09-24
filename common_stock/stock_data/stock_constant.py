@@ -36,7 +36,7 @@ def index_components(index):
     val = gindex_pv.components_of(index)
     return val
 
-
+# rq data format ******.XSHG
 ksz50_com = index_components('000016')
 khs300_com = index_components('000300')
 kzz500_com = index_components('000905')

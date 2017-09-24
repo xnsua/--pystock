@@ -31,8 +31,10 @@ class DataProvider:
         ddr = self._try_read_data(code)
         return ddr.low_of(day)
 
-    def ddr_of(self, code) -> DayDataRepr:
+    def ddr_of(self, code, len = None) -> DayDataRepr:
         ddr = self._try_read_data(code)
+        if len:
+            ddr = ddr.tail(len)
         return ddr
 
     def has_day_data(self, code, date_or_intday):
@@ -40,11 +42,11 @@ class DataProvider:
             date_or_intday = date_or_intday.year * 10000 + date_or_intday.month * 100 + date_or_intday.day
         return self.ddr_of(code).has_day(date_or_intday)
 
-data_provider = DataProvider()
+ddr_pv = DataProvider()
 
 
 def main():
-    val = data_provider.ddr_of('000001.XSHE')
+    val = ddr_pv.ddr_of('000001.XSHE')
     print(val.df)
     pass
 

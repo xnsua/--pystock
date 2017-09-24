@@ -15,7 +15,7 @@ from models.model_utility import calc_date_range
 from stock_analyser.plot import LineAndStyle, plot_with_annotation, TextAnnotation
 from stock_analyser.stock_indicators.stock_indicator import MddInfo, calc_max_drawdown_info
 from stock_analyser.stock_indicators.stock_indicator import calc_max_drawdown_pos_and_value
-from stock_data_updater.data_provider import data_provider
+from stock_data_updater.data_provider import ddr_pv
 from trading_emulation.emu_model_bad import EmuModelBad
 from trading_emulation.emu_trade_context import EmuContext
 from trading_emulation.emuaccount import EmuAccount, EmuDayAccounts, set_account_none_fee
@@ -31,7 +31,7 @@ class EmuModelRunner:
 
     def run_model(self, init_money=10000, days=None):
         if not days:
-            days = calc_date_range(self.model.codes, data_provider)
+            days = calc_date_range(self.model.codes, ddr_pv)
         self.model.init_model(self.context)
 
         init_account = EmuAccount(init_money, days[0])
@@ -210,8 +210,8 @@ def run_emu_for_single_code(days, model, show_figure):
 
 
 def main():
-    data_provider.ddr_of('sh510050').df.to_csv('jqtt.csv')
-    days = data_provider.ddr_of('sh510050').days[0:900]
+    ddr_pv.ddr_of('sh510050').df.to_csv('jqtt.csv')
+    days = ddr_pv.ddr_of('sh510050').days[0:900]
     model_bad = EmuModelBad(['sh510050'], 2)
     # noinspection PyUnusedLocal
     ana_result = run_emu_for_single_code(days, model_bad, show_figure=True)

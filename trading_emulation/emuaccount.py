@@ -6,7 +6,7 @@ from nose.tools import assert_equal
 from common_stock.stock_helper import p_repr
 from common_stock.trade_day import gtrade_day
 from ip.st import EntrustWay
-from stock_data_updater.data_provider import data_provider
+from stock_data_updater.data_provider import ddr_pv
 from trading.abstract_account import AbstractAccount
 
 
@@ -112,7 +112,7 @@ class EmuAccount(AbstractAccount):
         amount = share.amount
 
         money_got = round(price * amount * (1 - self.sell_fee), 3)
-        if not data_provider.is_etf(code):
+        if not ddr_pv.is_etf(code):
             money_got = round(money_got * (1 - self.tax), 3)
 
         self.balance += money_got
@@ -143,7 +143,7 @@ class EmuAccount(AbstractAccount):
         try:
             self.total_asset = self.balance
             for stock, share in self.stock_to_share.items():
-                self.total_asset += data_provider.open(stock, self.day) * share.amount
+                self.total_asset += ddr_pv.open(stock, self.day) * share.amount
             return self.total_asset
         except KeyError:
             self.total_asset = default

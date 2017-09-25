@@ -1,0 +1,1 @@
+C:\Users\cqhme\Anaconda3\python.exe D:\GitRepo\PyStock\stock_data_updater/rq_server.py

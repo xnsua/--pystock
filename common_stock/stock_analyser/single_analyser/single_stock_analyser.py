@@ -1,7 +1,8 @@
-from common_stock.py_dataframe import DayDataRepr
-from stock_analyser.single_analyser.ma_model import MacdModel
 from stock_analyser.single_analyser.single_abc_model import SingleAbcModel
 from stock_analyser.single_analyser.single_emu_account import SingleEmuAccount
+
+from common_stock.py_dataframe import DayDataRepr
+from common_stock.stock_analyser.single_analyser.ma_model import MacdModel
 from stock_data_updater.ddr_fast import read_ddr_fast
 
 

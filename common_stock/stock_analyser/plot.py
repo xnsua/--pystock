@@ -6,11 +6,11 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.dates import date2num, num2date
 from matplotlib.gridspec import GridSpec
-from stock_analyser.k_line_analyser.local_max_analyser import calc_peak_info
 
 from common.helper import dt_date_to_dt
+from common_stock.stock_analyser.k_line_analyser import calc_hammer_or_hang
+from common_stock.stock_analyser.k_line_analyser import calc_peak_info
 from common_stock.trade_day import gtrade_day
-from stock_analyser.k_line_analyser.hammer_or_hang import calc_hammer_or_hang
 from stock_data_updater.data_provider import ddr_pv
 
 

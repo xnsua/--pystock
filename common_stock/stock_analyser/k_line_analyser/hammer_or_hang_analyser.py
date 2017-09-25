@@ -1,5 +1,6 @@
-from stock_analyser.k_line_analyser.hammer_or_hang import calc_hammer_or_hang
 from stock_analyser.plot import plot_kline_with_marker
+
+from common_stock.stock_analyser.k_line_analyser import calc_hammer_or_hang
 from stock_data_updater.data_provider import ddr_pv
 
 

@@ -1,7 +1,7 @@
 import talib
 
 from common_stock.py_dataframe import DayDataRepr
-from stock_analyser.single_analyser.single_abc_model import SingleAbcModel
+from common_stock.stock_analyser.single_analyser.single_abc_model import SingleAbcModel
 
 
 class MaModel(SingleAbcModel):

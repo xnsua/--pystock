@@ -10,8 +10,7 @@ def set_pandas_max_rows(rows):
 
 pdDF = pandas.DataFrame
 pdSr = pandas.Series
-nparr = numpy.array
-npasarr = numpy.asarray
 
+nparr = numpy.array
 
 

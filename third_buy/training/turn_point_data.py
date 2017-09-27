@@ -5,19 +5,19 @@ from common_stock.py_dataframe import DayDataRepr
 from stock_data_updater.data_provider import ddr_pv
 
 
-def calc_is_up_turn_point_arr(nparr, window_len):
-    assert not isinstance(nparr, pdSr)
-    nparr = pdSr(nparr)
-    val_r = nparr.rolling(window=window_len, center=True).min()
-    predicate = (val_r == nparr)
+def calc_is_up_turn_point_arr(sr, window_len):
+    assert not isinstance(sr, pdSr)
+    sr = pdSr(sr)
+    val_r = sr.rolling(window=window_len, center=True).min()
+    predicate = (val_r == sr)
     return predicate
 
 
-def calc_is_down_turn_point_arr(nparr, window_len):
-    assert not isinstance(nparr, pdSr)
-    nparr = pdSr(nparr)
-    val_r = nparr.rolling(window=window_len, center=True).max()
-    predicate = (val_r == nparr)
+def calc_is_down_turn_point_arr(sr, window_len):
+    assert not isinstance(sr, pdSr)
+    sr = pdSr(sr)
+    val_r = sr.rolling(window=window_len, center=True).max()
+    predicate = (val_r == sr)
     return predicate
 
 def k_feature_extrator(ddr:DayDataRepr, window_len):

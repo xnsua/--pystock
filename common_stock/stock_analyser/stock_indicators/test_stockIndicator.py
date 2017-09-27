@@ -19,3 +19,9 @@ class TestStockIndicator(TestCase):
         arr = numpy.concatenate((arr[::-1], arr))
         max_arr = StockIndicator.min_poses(arr, 5)
         assert numpy.all(max_arr == [False, False, False, True, True, False, False, False])
+
+    def test_len_and_slope(self):
+        arr = numpy.arange(4)
+        arr = numpy.concatenate((arr[::-1], arr, arr[::-1]))
+        arr[0] = -1
+        StockIndicator.trend_len_and_slope(arr, 5)

@@ -1,44 +1,22 @@
 import numpy
 
-from common.scipy_helper import pdSr
 from common_stock.py_dataframe import DayDataRepr
-from stock_data_updater.data_provider import ddr_pv
+from common_stock.stock_analyser.stock_indicators.stock_indicator import StockIndicator
 
 
-def calc_is_up_turn_point_arr(sr, window_len):
-    assert not isinstance(sr, pdSr)
-    sr = pdSr(sr)
-    val_r = sr.rolling(window=window_len, center=True).min()
-    predicate = (val_r == sr)
-    return predicate
+def extract_turn_point_train_data(ddr:DayDataRepr, window):
+    trend_lens, slope = StockIndicator.trend_len_and_slope(ddr.close_nparr)
+    train_datas = []
+    train_labels = []
+    omc = ddr.open_nparr - ddr.close_nparr
+    hml = ddr.high_nparr - ddr.low_nparr
+    maxoc = numpy.maximum(ddr.open_nparr, ddr.close_nparr)
+    minoc = numpy.minimum(ddr.open_nparr, ddr.close_nparr)
+    hshadow = ddr.high_nparr -
 
-
-def calc_is_down_turn_point_arr(sr, window_len):
-    assert not isinstance(sr, pdSr)
-    sr = pdSr(sr)
-    val_r = sr.rolling(window=window_len, center=True).max()
-    predicate = (val_r == sr)
-    return predicate
-
-def k_feature_extrator(ddr:DayDataRepr, window_len):
-    is_down = calc_is_down_turn_point_arr(ddr.close_nparr, window_len)
-    is_up = calc_is_up_turn_point_arr(ddr.close_nparr, window_len)
-
-
-
-def get_up_turn_train_data(ddr: DayDataRepr, window_len):
-    margin_len = int(window_len / 2)
-    train_data_1 = []
-    is_up_turn = calc_is_up_turn_point_arr(ddr.close_nparr, window_len)
-    # todo
-
-
-def tfunc():
-    ttarr = numpy.array([1, 2, 3, 4, 5, 3, 2, 4, 6])
-    get_up_turn_train_data(ddr_pv.ddr_of('510900.XSHG', 100), window_len=5)
 
 def main():
-    tfunc()
+    pass
 
 
 if __name__ == '__main__':

@@ -5,10 +5,10 @@ from common.helper import dt_today, dt_now
 from common.key_value_db import KeyValueDb
 from common.scipy_helper import pdDF
 from ip.st import EntrustType, ClientOperCancel, EntrustWay, ClientOperSell, ClientOperBuy
-from models.abstract_model import AbstractModel
 from project_helper.logbook_logger import mylog
 from stock_data_updater.day_data_updater import SingleStockUpdater
 from trading.abstract_context import AbstractContext
+from trading.models.abstract_model import AbstractModel
 
 
 class BadData:

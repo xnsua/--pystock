@@ -2,10 +2,10 @@ from common.scipy_helper import pdSr
 from common_stock.py_dataframe import RealtimeDataRepr
 from common_stock.stock_analyser.k_line_analyser.drop_rise_day import gdroprise_pv
 from common_stock.trade_day import gtrade_day
-from models.abstract_model import AbstractModel
 from stock_data_updater.data_provider import ddr_pv
 from trading.abstract_context import AbstractContext
-from trading_emulation.emu_trade_context import EmuContext
+from trading.models.abstract_model import AbstractModel
+from trading.trading_emulation import EmuContext
 
 
 class EmuModelBad(AbstractModel):

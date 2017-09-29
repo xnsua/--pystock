@@ -2,7 +2,7 @@ from sklearn import svm
 
 from common_stock.stock_data.stock_constant import ksz50_com
 from stock_data_updater.data_provider import ddr_pv
-from third_buy.training.turn_point_data import get_up_turn_train_data
+from trading.third_buy.training.turn_point_data import get_up_turn_train_data
 
 
 # X = [(0, 0), (1, 1)]

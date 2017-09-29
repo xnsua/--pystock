@@ -7,7 +7,6 @@ import pandas
 
 from ip.constants import ClientConstant
 from ip.st import ClientOperQuery, ClientOperBase
-from models.model_buy_after_drop import ModelBuyAfterDrop
 from project_helper.logbook_logger import mylog
 from trading.base_structure.trade_constants import TradeId, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
@@ -15,6 +14,7 @@ from trading.client_access import is_client_server_running, \
     fire_operation
 from trading.data_server_main import DataServer
 from trading.model_runner_thread import ModelRunnerThread
+from trading.models.model_buy_after_drop import ModelBuyAfterDrop
 from trading.trade_context import TradeContext
 
 pandas.options.display.max_rows = 10

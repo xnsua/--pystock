@@ -3,7 +3,6 @@ from pathlib import Path
 class MyConfig:
     def __init__(self):
         self.project_root = Path(__file__).parent.parent
-        self.stock_data_path = Path
 
 class ProjectPath:
     def __init__(self):

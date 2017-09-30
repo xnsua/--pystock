@@ -1,7 +1,7 @@
 import queue
 import threading
 
-from common.data_structures.object_cabinet import ObjectCabinet
+from common.data_structures.object_cabinet import ObjectPool
 from project_helper.logbook_logger import mylog
 from trading.abstract_context import AbstractContext
 from trading.account_manager import AccountManager
@@ -15,7 +15,7 @@ class TradeContext(AbstractContext):
         self.account = AccountManager()
 
         self.queue_dict = queue_dict
-        self.queue_cabinet = ObjectCabinet(queue.Queue, None)
+        self.queue_cabinet = ObjectPool(queue.Queue, None)
         self.thread_local = threading.local()
         self.thread_local.name = None
 
@@ -30,7 +30,7 @@ class TradeContext(AbstractContext):
     def send_msg(self, dest, operation):
         assert self.thread_local.name
         dest_queue = self.queue_dict[dest]
-        with self.queue_cabinet.use_one() as result_queue:
+        with self.queue_cabinet.use_and_return() as result_queue:
             msg = TradeMessage(self.thread_local.name, operation, result_queue=result_queue)
             dest_queue.put(msg)
             result = result_queue.get()

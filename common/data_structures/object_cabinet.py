@@ -1,7 +1,7 @@
 import queue
 
 
-class ObjectCabinet:
+class ObjectPool:
     def __init__(self, generator, clear_func):
         self.queue = queue.Queue()
         self.generator = generator
@@ -19,7 +19,8 @@ class ObjectCabinet:
             self.clear_func(obj)
         self.queue.put(obj)
 
-    def use_one(self):
+    # Use with python with statement
+    def use_and_return(self):
         class Context:
             def __init__(self, cabinet):
                 self.cabinet = cabinet
@@ -36,9 +37,9 @@ class ObjectCabinet:
 
 
 def test_object_cabinet():
-    cab = ObjectCabinet(list, list.clear)
+    cab = ObjectPool(list, list.clear)
     assert len(cab.queue.queue) == 0
-    with cab.use_one() as obj:
+    with cab.use_and_return() as obj:
         obj.append('a')
         pass
     assert len(cab.queue.queue) == 1

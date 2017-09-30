@@ -12,5 +12,5 @@ pdDF = pandas.DataFrame
 pdSr = pandas.Series
 
 nparr = numpy.array
-
+np = numpy
 

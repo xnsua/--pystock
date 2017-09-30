@@ -2,7 +2,8 @@ import datetime
 import datetime as dt
 import os
 import pickle
-from copyreg import pickle
+
+from nose.tools import assert_equal
 
 from common_stock import stock_cache_one_month
 
@@ -160,32 +161,32 @@ print(datetime.datetime.now() - s_time)
 
 
 
-# def test():
-#     # 24,25 is Saturday and Sunday
-#     val = gtrade_day.next(20170624)
-#     assert_equal(val, 20170626)
-#     val = gtrade_day.next(20170626)
-#     assert_equal(val, 20170627)
-#
-#     val = gtrade_day.previous(20170624)
-#     assert_equal(val, 20170623)
-#     val = gtrade_day.previous(20170627)
-#     assert_equal(val, 20170626)
-#
-#     val = gtrade_day.shift(20170626, 2)
-#     assert_equal(val, 20170628)
-#     val = gtrade_day.shift(20170626, -2)
-#     assert_equal(val, 20170622)
-#
-#     range_list = [i for i in gtrade_day.range_list(20170623, 20170626)]
-#     assert_equal(range_list, [20170623])
-#     range_list = [i for i in gtrade_day.range_list(20170623, 20170627)]
-#     assert_equal(range_list, [20170623, 20170626])
-#
-#     range_list = [i for i in gtrade_day.close_range_list(20170623, 20170626)]
-#     # 20170623 is Friday, 20170626 is Monday
-#     assert_equal(range_list, [20170623, 20170626])
-#
-#     assert_equal(gtrade_day.span_of(20170623, 20170626), 1)
-#     assert_equal(gtrade_day.span_of(20170623, 20170627), 2)
+def test():
+    # 24,25 is Saturday and Sunday
+    val = gtrade_day.next(20170624)
+    assert_equal(val, 20170626)
+    val = gtrade_day.next(20170626)
+    assert_equal(val, 20170627)
+
+    val = gtrade_day.previous(20170624)
+    assert_equal(val, 20170623)
+    val = gtrade_day.previous(20170627)
+    assert_equal(val, 20170626)
+
+    val = gtrade_day.shift(20170626, 2)
+    assert_equal(val, 20170628)
+    val = gtrade_day.shift(20170626, -2)
+    assert_equal(val, 20170622)
+
+    range_list = [i for i in gtrade_day.range_list(20170623, 20170626)]
+    assert_equal(range_list, [20170623])
+    range_list = [i for i in gtrade_day.range_list(20170623, 20170627)]
+    assert_equal(range_list, [20170623, 20170626])
+
+    range_list = [i for i in gtrade_day.close_range_list(20170623, 20170626)]
+    # 20170623 is Friday, 20170626 is Monday
+    assert_equal(range_list, [20170623, 20170626])
+
+    assert_equal(gtrade_day.span_of(20170623, 20170626), 1)
+    assert_equal(gtrade_day.span_of(20170623, 20170627), 2)
 #

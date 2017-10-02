@@ -2,6 +2,8 @@ import os
 import pathlib
 import pickle
 
+from common_stock.py_dataframe import DayDataRepr
+
 ddr_fast_dir = os.path.expanduser('~/StockData/ddr_fast/')
 pathlib.Path(ddr_fast_dir).mkdir(exist_ok=True)
 
@@ -22,7 +24,7 @@ def _read_ddr_fast(code):
     return ddr
 
 
-def read_ddr_fast(code):
+def read_ddr_fast(code)->DayDataRepr:
     try:
         return _read_ddr_fast(code)
     except:

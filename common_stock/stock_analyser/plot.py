@@ -105,6 +105,7 @@ class StockTrendPlotter(object):
 
     def __init__(self, lines, left_annotations, right_annotations, save_file_name,
                  show_float_annotation=True):
+        plt.rcParams["font.family"] = "consolas"
         self.show_float_annotation = show_float_annotation
         self.lines = lines  # type: List[LineAndStyle]
         self.left_annotations = left_annotations

@@ -2,7 +2,6 @@ import datetime
 import sched
 import time
 
-
 class SchedulerWithDt:
     def __init__(self):
         self.sched = sched.scheduler(time.time, time.sleep)

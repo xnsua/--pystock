@@ -1,7 +1,7 @@
 import numpy
 import pandas
 
-pandas.options.display.max_rows = 10
+pandas.options.display.max_rows = 20
 
 
 def set_pandas_max_rows(rows):

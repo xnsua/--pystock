@@ -3,6 +3,7 @@ import pathlib
 
 import numpy  as np
 
+# Year update
 kintdays = np.load(pathlib.Path(__file__).parent / 'intday.pickle')
 kintday_to_index = dict(zip(kintdays, range(len(kintdays))))
 
@@ -28,17 +29,17 @@ def nearest_int_day(intday, preday=False):
         search_day = date_.year * 10000 + date_.month * 100 + date_.day
     return search_day
 
-def arr_of_intday_range(start_intday, end_intday):
+def intday_arr_of(start_intday, end_intday):
     start_intday = nearest_int_day(start_intday)
     end_intday = nearest_int_day(end_intday)
     i1 = kintday_to_index[start_intday]
     i2 = kintday_to_index[end_intday]
-    return kintdays[i1:i2]
+    return kintdays[i1:i2+1]
 
 def main():
     val = nearest_int_day(20170930, preday=True)
     print(val)
-    val = (arr_of_intday_range(20170825,20171003))
+    val = (intday_arr_of(20170825, 20171003))
     print(val)
 
 

@@ -89,3 +89,36 @@ def dtdate_to_intday(date_):
 def date_str_to_intday(date_str):
     y, m, d = map(int, date_str.split('-'))
     return y * 10000 + m * 100 + d
+
+
+def handle_df_missing_values(df):
+    df = df.mask(df < 0.000001, numpy.nan)
+    df.fillna(method='ffill', axis=0, inplace=True)
+    volume = df.volume
+    df.drop('volume', axis=1, inplace=True)
+    df.high = df.max(axis=1)
+    df.low = df.min(axis=1)
+    df['volume'] = volume.values
+    return df
+
+
+def tt_reformat():
+    from pandas import DataFrame
+    arr = numpy.arange(700000)
+    arr1 = numpy.roll(arr, -1)
+    arr2 = numpy.roll(arr, -2)
+    arr3 = numpy.roll(arr, -3)
+    arr4 = numpy.roll(arr, -4)
+    arr5 = numpy.roll(arr, -5)
+    df = DataFrame(data={'open': arr1, 'close': arr2, 'high': arr3, 'low': arr4, 'volume': arr5})
+    val = handle_df_missing_values(df)
+    print(val.head(10))
+
+
+def main():
+    tt_reformat()
+    pass
+
+
+if __name__ == '__main__':
+    main()

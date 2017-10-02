@@ -151,7 +151,7 @@ class StockAxisPlot:
 
 def main():
     ddr = read_ddr_fast('510050.XSHG')
-    ddr = ddr.tail(10)
+    # ddr = ddr.tail(1000)
     # plot_range = ddr.df.index[10], ddr.df.index[20]
     # print(plot_range)
     fig, ax = plt.subplots()

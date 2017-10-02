@@ -48,8 +48,9 @@ ddr_pv = DataProvider()
 
 
 def main():
-    val = ddr_pv.ddr_of('000001.XSHE')
-    print(val.df)
+    val = ddr_pv.ddr_of('510050.XSHG')
+    print(val.df.open[20131230])
+    # print(val.df)
     pass
 
 

@@ -2,7 +2,7 @@ import queue
 import threading
 
 from common.data_structures.object_cabinet import ObjectPool
-from project_helper.logbook_logger import mylog
+from project_config.logbook_logger import mylog
 from trading.abstract_context import AbstractContext
 from trading.account_manager import AccountManager
 from trading.base_structure.trade_constants import TradeId, MsgSetRealTimeStocks, MsgQuitLoop

@@ -1,7 +1,7 @@
 import numpy
 
-from common_stock.py_dataframe import DayDataRepr
-from common_stock.stock_analyser.stock_indicators.stock_indicator import StockIndicator
+from common_stock.day_data_representation import DayDataRepr
+from common_stock.stock_indicators.stock_indicator import StockIndicator
 
 
 def extract_turn_point_train_data(ddr:DayDataRepr, window):
@@ -12,7 +12,7 @@ def extract_turn_point_train_data(ddr:DayDataRepr, window):
     hml = ddr.high_nparr - ddr.low_nparr
     maxoc = numpy.maximum(ddr.open_nparr, ddr.close_nparr)
     minoc = numpy.minimum(ddr.open_nparr, ddr.close_nparr)
-    hshadow = ddr.high_nparr -
+    # hshadow = ddr.high_nparr -
 
 
 def main():

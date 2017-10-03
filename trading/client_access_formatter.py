@@ -1,7 +1,8 @@
 import math
 
+from stock_data_manager.classify import etf_stdcode_to_name
+
 from ip.st import ClientOperBuy, ClientOperSell
-from stock_data_updater.classify import etf_stdcode_to_name
 
 
 def format_price(stock, price):

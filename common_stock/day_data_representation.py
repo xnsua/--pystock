@@ -142,7 +142,7 @@ class RealtimeDataRepr:
 class EmuRealTimeDataRepr(RealtimeDataRepr):
     def __init__(self):
         super().__init__(None)
-        from stock_data_updater.data_provider import ddr_pv
+        from stock_data_manager.data_provider import ddr_pv
         self.pv = ddr_pv
         self.day = None
 
@@ -162,7 +162,7 @@ class EmuRealTimeDataRepr(RealtimeDataRepr):
         return self.pv.low(stock_code, self.day)
 
     def yclose_of(self, stock_code):
-        from common_stock.trade_day import gtrade_day
+        from common_stock.old_things.trade_day import gtrade_day
         return self.pv.close(stock_code, gtrade_day.previous(self.day))
 
 

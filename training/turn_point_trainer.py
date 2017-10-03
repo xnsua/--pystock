@@ -1,8 +1,8 @@
 from sklearn import svm
+from stock_data_manager.stock_sectorpy import ksz50_com
 
-from common_stock.stock_data.stock_constant import ksz50_com
-from stock_data_updater.data_provider import ddr_pv
-from trading.third_buy.training.turn_point_data import get_up_turn_train_data
+from common_stock.stock_indicators.turn_point_data import get_up_turn_train_data
+from stock_data_manager.data_provider import ddr_pv
 
 
 # X = [(0, 0), (1, 1)]

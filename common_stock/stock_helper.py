@@ -82,7 +82,7 @@ def intday_to_date(val):
     return datetime.date(a, b, c)
 
 
-def dtdate_to_intday(date_):
+def date_to_intday(date_):
     return (date_.year * 10000 + date_.month * 100) + date_.day
 
 

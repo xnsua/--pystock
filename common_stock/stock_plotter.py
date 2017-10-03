@@ -9,8 +9,8 @@ from matplotlib.pyplot import Axes
 from matplotlib.ticker import FuncFormatter
 
 from common.numpy_helper import np_shift
-from common_stock.stock_data.int_trade_day import intday_arr_of
-from stock_data_updater.ddr_fast import read_ddr_fast
+from stock_data_manager.ddr_file_cache import read_ddr_fast
+from stock_data_manager.stock_data.int_trade_day import intday_arr_of
 
 
 class StockAxisPlot:
@@ -38,8 +38,9 @@ class StockAxisPlot:
 
         self.annotation = None
 
-    def add_plot_lines(self, name, values, **linestyle):
-        assert len(values) == self.date_len
+    def add_plot_lines(self, name, series, **linestyle):
+        assert isinstance(series, pd.Series)
+        values = series[self.plot_range].values
         self.lines.append((name, values, linestyle))
 
     def x_tick_labels(self):
@@ -129,16 +130,16 @@ class StockAxisPlot:
         xpos = int(xpos)
         if not 0 <= xpos < self.date_len:
             return
-        o = self.df.open.values[xpos]
-        c = self.df.close.values[xpos]
-        h = self.df.high.values[xpos]
-        l = self.df.low.values[xpos]
+        o = round(self.df.open.values[xpos],3)
+        c = round(self.df.close.values[xpos],3)
+        h = round(self.df.high.values[xpos],3)
+        l = round(self.df.low.values[xpos],3)
         text = f' open: {o}\n' \
                f'close: {c}\n' \
                f' high: {h}\n' \
                f'  low: {l}\n'
         for name, data, _ in self.lines:
-            text += f'{name: >5}' + ': ' + str(data[xpos])
+            text += f'{name: >5}' + ': ' + str(round(data[xpos],3))
         return text
 
     def set_x_y_lim(self):
@@ -156,7 +157,7 @@ def main():
     # print(plot_range)
     fig, ax = plt.subplots()
     val = StockAxisPlot((fig, ax), ddr.df)
-    val.add_plot_lines('test', ddr.close_nparr + 0.2, color='b')
+    val.add_plot_lines('test', ddr.df.high + 0.2, color='b')
     val.plot()
     plt.show()
 

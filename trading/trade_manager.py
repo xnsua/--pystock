@@ -7,7 +7,7 @@ import pandas
 
 from ip.constants import ClientConstant
 from ip.st import ClientOperQuery, ClientOperBase
-from project_helper.logbook_logger import mylog
+from project_config.logbook_logger import mylog
 from trading.base_structure.trade_constants import TradeId, MsgQuitLoop
 from trading.base_structure.trade_message import TradeMessage
 from trading.client_access import is_client_server_running, \

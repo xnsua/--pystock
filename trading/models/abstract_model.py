@@ -1,6 +1,6 @@
 import abc
 
-from common_stock.py_dataframe import RealtimeDataRepr
+from common_stock.day_data_representation import RealtimeDataRepr
 from trading.abstract_context import AbstractContext
 
 

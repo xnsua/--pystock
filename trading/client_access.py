@@ -2,13 +2,14 @@ from typing import List
 
 import jsonpickle
 import requests
+
 from common.alert import message_box_error
 from common.web_helper import firefox_quick_get_url
 from ip.constants import ClientConstant
 from ip.st import ClientOperBuy, EntrustType, BuyResult, SellResult, ClientOperSell, \
     ClientOperQuery, AccountInfo, QueryResult, ShareItem, EntrustItem, ClientOperCancel, \
     EntrustWay, ErrorResult
-from project_helper.logbook_logger import mylog
+from project_config.logbook_logger import mylog
 from trading.client_access_formatter import format_operation
 
 jsonpickle.load_backend('simplejson')

@@ -11,7 +11,7 @@ except:
 from logbook.base import LogRecord
 from logbook.handlers import StreamHandler
 
-from project_helper.config_module import myconfig
+from project_config.config_module import PROJECT_ROOT
 
 logbook.set_datetime_format("local")
 
@@ -62,10 +62,10 @@ def file_formatter(record, handler):
 stdout_handler = StreamHandler(sys.stdout, bubble=True, level=logbook.INFO)
 stdout_handler.formatter = stdout_formatter
 
-_file_path = myconfig.project_root / 'log/py_stock.log'
+_file_path = PROJECT_ROOT / 'log/py_stock.log'
 _file_handler = logbook.FileHandler(_file_path, bubble=False, level=logbook.INFO)
 
-_file_path_with_debug = myconfig.project_root / 'log/py_stock_debug.log'
+_file_path_with_debug = PROJECT_ROOT / 'log/py_stock_debug.log'
 _file_handler_with_debug = logbook.FileHandler(_file_path_with_debug, bubble=False,
                                                level=logbook.DEBUG)
 # file_handler = logbook.RotatingFileHandler(_file_path, bubble=True, max_size=5 * 1024 * 1024,

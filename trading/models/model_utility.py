@@ -1,10 +1,10 @@
 import numpy as np
 
-from common_stock.trade_day import gtrade_day
-from stock_data_updater.data_provider import DataProvider
+from common_stock.old_things.trade_day import gtrade_day
+from stock_data_manager.data_provider import DDRprovider
 
 
-def calc_date_range(codes, dp: DataProvider):
+def calc_date_range(codes, dp: DDRprovider):
     first_day = min(dp.ddr_of(code).first_day() for code in codes)
     last_day = min(dp.ddr_of(code).last_day() for code in codes)
     return gtrade_day.close_range_list(first_day, last_day)

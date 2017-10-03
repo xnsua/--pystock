@@ -2,11 +2,12 @@ import datetime
 import queue
 
 import pandas
+
 from common.scipy_helper import pdDF
 from common_stock.stock_helper import trade_bid_end_time, trade1_end_time, \
     trade2_begin_time, trade2_end_time
-from project_helper.logbook_logger import mylog
-from stock_data_updater.web_querier import sina_api
+from project_config.logbook_logger import mylog
+from stock_data_manager.web_querier import sina_api
 from trading.base_structure.trade_constants import TradeId, MsgPushRealTimePrice, \
     MsgSetRealTimeStocks, \
     MsgBidOver, MsgQuitLoop

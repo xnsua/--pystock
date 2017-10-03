@@ -1,5 +1,5 @@
 from common.alert import message_box_error
-from project_helper.logbook_logger import mylog
+from project_config.logbook_logger import mylog
 from trading.base_structure.trade_constants import MsgPushRealTimePrice, MsgQuitLoop, MsgBidOver
 from trading.base_structure.trade_message import TradeMessage
 from trading.models.abstract_model import AbstractModel

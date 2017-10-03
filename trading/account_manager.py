@@ -7,7 +7,7 @@ from ip.st import AccountInfo, ClientOperBase, QueryResult, BuyResult, SellResul
     EntrustStatus, ClientOperCancel, ClientOperQuery, EntrustItem, EntrustType
 from ip.st import ClientOperBuy
 from ip.st import ClientOperSell
-from project_helper.logbook_logger import mylog
+from project_config.logbook_logger import mylog
 
 
 class AccountManager:

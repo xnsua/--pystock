@@ -26,3 +26,8 @@ class TestStockIndicator(TestCase):
         val2 = CommonIndicator.trend_len_and_slope(arr1, window_len=5)
         assert numpy.array_equal(val2[0], [0, 1, 2, 3, 1, 2, 3, 1, 2, 1, 2, 3])
         assert numpy.allclose(val2[1], [0., 1., 0., -0.33333333, 1., 1., 1., -1., -1., 1., 1., 1.])
+
+    def test_mdd_poses(self):
+        arr1 = nparr([1,2,1,1.5,0,1,2])
+        poses = CommonIndicator.mdd_poses(arr1)
+        assert poses == (1,4)

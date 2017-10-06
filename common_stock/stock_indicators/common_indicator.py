@@ -1,7 +1,7 @@
 import numba
 import numpy
 
-from common.scipy_helper import pdSr, nparr
+from common.scipy_helper import pdSr
 
 
 class CommonIndicator:
@@ -77,11 +77,6 @@ class CommonIndicator:
 
 
 def main():
-    arr1 = nparr([1, 2, 1, 0, 1, 2, 3, 2], dtype=numpy.float64)
-    val1 = CommonIndicator.trend_len_and_slope(arr1, window_len=5)
-    print(val1)
-    val2 = CommonIndicator.trend_len_and_slope(arr1, window_len=5)
-    print(val2)
 
     pass
 

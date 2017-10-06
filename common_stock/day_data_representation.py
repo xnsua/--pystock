@@ -162,7 +162,7 @@ class EmuRealTimeDataRepr(RealtimeDataRepr):
         return self.pv.low(stock_code, self.day)
 
     def yclose_of(self, stock_code):
-        from common_stock.old_things.trade_day import gtrade_day
+        from common_stock.__old.trade_day import gtrade_day
         return self.pv.close(stock_code, gtrade_day.previous(self.day))
 
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from common_stock.old_things.trade_day import gtrade_day
+from common_stock.__old.trade_day import gtrade_day
 from stock_data_manager.data_provider import DDRprovider
 
 

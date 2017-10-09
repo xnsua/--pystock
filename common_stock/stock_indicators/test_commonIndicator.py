@@ -31,3 +31,9 @@ class TestStockIndicator(TestCase):
         arr1 = nparr([1,2,1,1.5,0,1,2])
         poses = CommonIndicator.mdd_poses(arr1)
         assert poses == (1,4)
+
+    def test_continuous_count(self):
+        arr1 = nparr([False,True,True,False,True,False])
+        assert numpy.array_equal(CommonIndicator.consecutive_count_of_True(arr1), [0, 1, 2, 0, 1, 0])
+        arr1 = nparr([True,True,True,False,True,True])
+        assert numpy.array_equal(CommonIndicator.consecutive_count_of_True(arr1), [1, 2, 3, 0, 1, 2])

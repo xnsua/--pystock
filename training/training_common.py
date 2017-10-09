@@ -1,13 +1,16 @@
 import numpy as np
 from sklearn import svm
 
+from common_stock.stock_helper import p_repr
 
-class TrainStatistics:
+
+class PredictResult:
     def __init__(self, real, predict):
         self.real = real
         self.predict = predict
-        self.true_per = 0
-        self.false_per = 0
+        self.true_per = 0.
+        self.false_per = 0.
+        self.error_per = sum(real == predict) / len(predict)
 
         self.calc()
 
@@ -46,15 +49,22 @@ class TrainStatistics:
 
         self.tp, self.tn, self.fp, self.fn = tp, tn, fp, fn
 
+    def __repr__(self):
+        return f'ClassifyAccuracy:{{ ' \
+               f'True: {p_repr(self.true_per)}, ' \
+               f'False: {p_repr(self.false_per)}, ' \
+               f'Total: {p_repr(self.error_per)} }}'
+
 
 def divide_train_and_test(train_data, percentage, is_random):
     feature, label = train_data
 
     data_len = len(feature)
-    train_len = data_len * percentage
+    train_len = int(data_len * percentage)
 
     if is_random:
         indexes = np.arange(data_len)
+        np.random.shuffle(indexes)
         train_index = indexes[:train_len]
         test_index = indexes[train_len:]
 
@@ -71,23 +81,27 @@ def combine_train_datas(train_datas):
     return datas, labels
 
 
-def train_model(data):
-    clf = svm.LinearSVC()
+def train_model(data, is_linear):
+    if is_linear:
+        clf = svm.LinearSVC()
+    else:
+        clf = svm.SVC()
     model = clf.fit(data[0], data[1])
     return model
 
 
-def train_and_test(data, is_random):
-    train, test = divide_train_and_test(data, is_random=is_random)
-    model = train_model(data)
-    test_success = model.predict(test[0])
-    trstat = TrainStatistics(test[1], test_success)
-    return trstat
+def train_and_analyse_result(data, is_random_data, is_linear_svc, train_percentage):
+    fl_train, fl_test = divide_train_and_test(data, is_random=is_random_data,
+                                        percentage=train_percentage)
+    model = train_model(fl_train, is_linear=is_linear_svc)
 
+    # Calc train result
+    train_part = fl_train[0][:200]
+    train_label_part = fl_train[1][:200]
 
-def main():
-    pass
+    train_predict = model.predict(train_part)
+    train_predict_stat = PredictResult(train_label_part, train_predict)
 
-
-if __name__ == '__main__':
-    main()
+    test_predict = model.predict(fl_test[0])
+    test_predict_stat = PredictResult(fl_test[1], test_predict)
+    return train_predict_stat, test_predict_stat

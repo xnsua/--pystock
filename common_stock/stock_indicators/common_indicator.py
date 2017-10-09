@@ -75,9 +75,21 @@ class CommonIndicator:
         val = CommonIndicator._jit_trend_len_and_slope(arr_like, is_maxs, is_mins)
         return val
 
+    @staticmethod
+    @numba.jit('i8[:](b1[:])', nopython=True)
+    def consecutive_count_of_True(arr_in):
+        count_arr = numpy.empty_like(arr_in, dtype=numpy.int64)
+        last_count = 0
+        for i in range(0, len(arr_in)):
+            if arr_in[i]:
+                last_count += 1
+            else:
+                last_count = 0
+            count_arr[i] = last_count
+        return count_arr
+
 
 def main():
-
     pass
 
 

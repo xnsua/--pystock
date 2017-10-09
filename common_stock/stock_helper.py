@@ -56,7 +56,7 @@ def dict_with_float_repr(dict_):
 
 def p_repr(val):
     # Percentage represenstation of value
-    assert isinstance(val, float), f'{type(val)}'
+    assert isinstance(val, float) or isinstance(val, int), f'{type(val)}'
     text = str(val * 100)[0:4]
     return text + '%'
 

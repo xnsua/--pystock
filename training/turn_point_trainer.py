@@ -1,12 +1,12 @@
 import numpy as np
 
-from common_stock.stock_indicators.turn_point_data import extract_feature
+from data_mining.train_features import extract_kline_pren_feature
 from stock_data_manager.ddr_file_cache import read_ddr_fast
 from stock_data_manager.stock_sector import index_components
 from training.training_common import divide_train_and_test, train_model
 
 
-def train_turn_point_sz50(save_path):
+def train_turn_point_sz50():
     # sz50 成分股
     sz50 = index_components('000016')
     # sz50 = sz50[:5]
@@ -15,8 +15,7 @@ def train_turn_point_sz50(save_path):
     for code in sz50:
         print(code)
         ddr = read_ddr_fast(code)
-        df = ddr.df.round(4)
-        train_data = extract_feature(df, window=5)
+        train_data = extract_kline_pren_feature(ddr.df, window=5)
         train_data, test_data = divide_train_and_test(train_data, 0.80)
         model = train_model(train_data)
 
@@ -31,7 +30,7 @@ def train_turn_point_sz50(save_path):
 
 
 def main():
-    val = train_turn_point_sz50('d:/tt.model')
+    val = train_turn_point_sz50()
     print(val)
 
 

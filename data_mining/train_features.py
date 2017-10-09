@@ -7,7 +7,27 @@ from common_stock.stock_indicators.common_indicator import CommonIndicator
 from stock_data_manager.ddr_file_cache import read_ddr_fast
 
 
-def extract_feature(df: pd.DataFrame, window):
+class KlineFeatures:
+    @staticmethod
+    def up_count_of_previous_days(arr):
+        is_up = arr - np_shift(arr, 1, 0) > 0
+        count = CommonIndicator.consecutive_count_of_True(is_up)
+        return np_shift(count, 1, 0)
+
+    @staticmethod
+    def down_count_of_previous_days(arr):
+        is_up = arr - np_shift(arr, 1, 0) < 0
+        count = CommonIndicator.consecutive_count_of_True(is_up)
+        return np_shift(count, 1, 0)
+
+    @staticmethod
+    def even_count_of_previous_days(arr):
+        is_even = (arr == np_shift(arr,1,0))
+        count = CommonIndicator.consecutive_count_of_True(is_even)
+        return np_shift(count, 1, 0)
+
+def extract_kline_pren_feature(df: pd.DataFrame, window):
+    df = df.round(4)
     oarr, carr, harr, larr = [df[item].values for item in ['open', 'close', 'high', 'low']]
     trend_lens, slope = CommonIndicator.trend_len_and_slope(carr, window)
 
@@ -82,8 +102,7 @@ def main():
     ddr = read_ddr_fast('510050.XSHG')
 
     df = ddr.df.tail(6)
-    df = df.round(4)
-    val = extract_feature(df, window=5)
+    val = extract_kline_pren_feature(df, window=5)
     print(val)
 
 

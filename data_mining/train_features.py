@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 from common.numpy_helper import np_shift
-from common_stock.stock_indicators.common_indicator import CommonIndicator
+from common_stock.stock_indicators.common_indicator import ArrayIndicator
 from stock_data_manager.ddr_file_cache import read_ddr_fast
 
 
@@ -11,25 +11,33 @@ class KlineFeatures:
     @staticmethod
     def up_count_of_previous_days(arr):
         is_up = arr - np_shift(arr, 1, 0) > 0
-        count = CommonIndicator.consecutive_count_of_True(is_up)
+        count = ArrayIndicator.consecutive_count_of_True(is_up)
         return np_shift(count, 1, 0)
 
     @staticmethod
     def down_count_of_previous_days(arr):
         is_up = arr - np_shift(arr, 1, 0) < 0
-        count = CommonIndicator.consecutive_count_of_True(is_up)
+        count = ArrayIndicator.consecutive_count_of_True(is_up)
         return np_shift(count, 1, 0)
 
     @staticmethod
     def even_count_of_previous_days(arr):
         is_even = (arr == np_shift(arr,1,0))
-        count = CommonIndicator.consecutive_count_of_True(is_even)
+        count = ArrayIndicator.consecutive_count_of_True(is_even)
         return np_shift(count, 1, 0)
+
+    @staticmethod
+    def is_up_inday(df):
+        open_, close_ = df.open.values, df.close.values
+        return open_ < close_
+
+    @staticmethod
+    def
 
 def extract_kline_pren_feature(df: pd.DataFrame, window):
     df = df.round(4)
     oarr, carr, harr, larr = [df[item].values for item in ['open', 'close', 'high', 'low']]
-    trend_lens, slope = CommonIndicator.trend_len_and_slope(carr, window)
+    trend_lens, slope = ArrayIndicator.trend_len_and_slope(carr, window)
 
     epsilon = np.finfo(float).eps
 

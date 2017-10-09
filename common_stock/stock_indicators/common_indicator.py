@@ -1,10 +1,11 @@
 import numba
 import numpy
 
+from common.numpy_helper import np_shift
 from common.scipy_helper import pdSr
 
 
-class CommonIndicator:
+class ArrayIndicator:
     @staticmethod
     def mdd_poses(arr_like):
         arr = numpy.array(arr_like)
@@ -70,9 +71,9 @@ class CommonIndicator:
 
     @staticmethod
     def trend_len_and_slope(arr_like, window_len):
-        is_mins = CommonIndicator.min_poses(arr_like, window_len)
-        is_maxs = CommonIndicator.max_poses(arr_like, window_len)
-        val = CommonIndicator._jit_trend_len_and_slope(arr_like, is_maxs, is_mins)
+        is_mins = ArrayIndicator.min_poses(arr_like, window_len)
+        is_maxs = ArrayIndicator.max_poses(arr_like, window_len)
+        val = ArrayIndicator._jit_trend_len_and_slope(arr_like, is_maxs, is_mins)
         return val
 
     @staticmethod
@@ -88,10 +89,21 @@ class CommonIndicator:
             count_arr[i] = last_count
         return count_arr
 
+    @staticmethod
+    def rise_count(arr):
+        is_rises = arr - np_shift(arr, 1, 0) > 0
+        counts = ArrayIndicator.consecutive_count_of_True(is_rises)
+        return counts
 
-def main():
-    pass
+    @staticmethod
+    def drop_count(arr):
+        is_drops = arr - np_shift(arr, 1, 0) < 0
+        counts = ArrayIndicator.consecutive_count_of_True(is_drops)
+        return counts
 
+    @staticmethod
+    def even_count(arr):
+        is_evens = (arr == np_shift(arr, 1, 0))
+        counts = ArrayIndicator.consecutive_count_of_True(is_evens)
+        return counts
 
-if __name__ == '__main__':
-    main()

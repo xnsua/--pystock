@@ -1,4 +1,4 @@
-ztest/
+zztest/
 log/
 *.log
 __pycache__/

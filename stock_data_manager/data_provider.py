@@ -1,7 +1,7 @@
 from typing import Dict
 
 from common_stock.day_data_representation import DayDataRepr
-from common_stock.stock_helper import handle_df_missing_values
+from data_mining.data_preprocess import handle_df_missing_values
 from stock_data_manager.rq_data_fetcher import rq_history_bars
 
 

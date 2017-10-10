@@ -1,9 +1,11 @@
+import sys
+
 import numpy
 import numpy as np
 import pandas as pd
 
 from common.numpy_helper import np_shift
-from common_stock.stock_indicators.common_indicator import ArrayIndicator
+from common_stock.common_indicator import ArrayIndicator
 from stock_data_manager.ddr_file_cache import read_ddr_fast
 
 
@@ -22,7 +24,7 @@ class KlineFeatures:
 
     @staticmethod
     def even_count_of_previous_days(arr):
-        is_even = (arr == np_shift(arr,1,0))
+        is_even = (arr == np_shift(arr, 1, 0))
         count = ArrayIndicator.consecutive_count_of_True(is_even)
         return np_shift(count, 1, 0)
 
@@ -32,7 +34,49 @@ class KlineFeatures:
         return open_ < close_
 
     @staticmethod
-    def
+    def day_compare_features(df):
+        o, c, h, l = df.open.values, df.close.values, df.high.values, df.low.values
+        po = np_shift(o, 1, 0)
+        pc = np_shift(c, 1, 0)
+        ph = np_shift(h, 1, 0)
+        pl = np_shift(l, 1, 0)
+
+        hh = np.maximum(h, ph)
+        ll = np.minimum(l, pl)
+        rr = hh - ll + sys.float_info.epsilon
+
+        f1 = (c - ll) / rr
+        f2 = (o - ll) / rr
+        f3 = (pc - ll) / rr
+        f4 = (po - ll) / rr
+
+        f5 = (h - ll) / rr
+        f6 = (l - ll) / rr
+        f7 = (ph - ll) / rr
+        f8 = (pl - ll) / rr
+
+        return f1, f2, f3, f4, f5, f6, f7, f8
+
+    @staticmethod
+    def ochl_features(df):
+        o, c, h, l = df.open.values, df.close.values, df.high.values, df.low.values
+        return o, c, h, l
+
+    @staticmethod
+    def trend_features(df):
+        pass
+
+    @staticmethod
+    def reverse_features(df):
+        pass
+
+    @staticmethod
+    def trend_continuation_features(df):
+        pass
+
+    @staticmethod
+    def support_features(df):
+
 
 def extract_kline_pren_feature(df: pd.DataFrame, window):
     df = df.round(4)

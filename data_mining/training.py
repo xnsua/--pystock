@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn import svm
 
 from common_stock.stock_helper import p_repr
 
@@ -10,6 +9,7 @@ class PredictResult:
         self.predict = predict
         self.true_per = 0.
         self.false_per = 0.
+        # noinspection PyTypeChecker
         self.error_per = sum(real == predict) / len(predict)
 
         self.calc()
@@ -56,8 +56,8 @@ class PredictResult:
                f'Total: {p_repr(self.error_per)} }}'
 
 
-def divide_train_and_test(train_data, percentage, is_random):
-    feature, label = train_data
+def divide_train_and_test(data, percentage, is_random):
+    feature, label = data
 
     data_len = len(feature)
     train_len = int(data_len * percentage)
@@ -70,38 +70,16 @@ def divide_train_and_test(train_data, percentage, is_random):
 
         return (feature[train_index], label[train_index]), (feature[test_index], label[test_index])
     else:
-        #
         return (feature[:train_len], label[:train_len]), (feature[train_len:], label[train_len:])
 
 
-def combine_train_datas(train_datas):
-    zip_value = list(zip(*train_datas))
-    datas = [val for item in zip_value[0] for val in item]
-    labels = [val for item in zip_value[1] for val in item]
-    return datas, labels
+def train_and_analyse(train_data, test_data, train_model):
+    model = train_model.fit(train_data)
 
+    train_predict = model.predict(train_data[0])
+    train_predict_result = PredictResult(train_predict, train_data[1])
 
-def train_model(data, is_linear):
-    if is_linear:
-        clf = svm.LinearSVC()
-    else:
-        clf = svm.SVC()
-    model = clf.fit(data[0], data[1])
-    return model
+    test_predict = model.predict(test_data[0])
+    test_predict_result = PredictResult(test_predict, test_data[1])
 
-
-def train_and_analyse_result(data, is_random_data, is_linear_svc, train_percentage):
-    fl_train, fl_test = divide_train_and_test(data, is_random=is_random_data,
-                                        percentage=train_percentage)
-    model = train_model(fl_train, is_linear=is_linear_svc)
-
-    # Calc train result
-    train_part = fl_train[0][:200]
-    train_label_part = fl_train[1][:200]
-
-    train_predict = model.predict(train_part)
-    train_predict_stat = PredictResult(train_label_part, train_predict)
-
-    test_predict = model.predict(fl_test[0])
-    test_predict_stat = PredictResult(fl_test[1], test_predict)
-    return train_predict_stat, test_predict_stat
+    return train_predict_result, test_predict_result

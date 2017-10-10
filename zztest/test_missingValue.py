@@ -15,7 +15,7 @@ class TestMissingValue(TestCase):
         arr4 = numpy.roll(arr, -4)
         arr5 = numpy.roll(arr, -5)
         df = DataFrame(data={'open': arr1, 'close': arr2, 'high': arr3, 'low': arr4, 'volume': arr5})
-        val = MissingValue.handle_df_missing_values(df)
+        val = MissingValue.fill_with_previous(df)
         print(val.head(10))
 
 

@@ -35,7 +35,7 @@ class KlineFeatures:
 
     @staticmethod
     def day_compare_features(df):
-        o, c, h, l = df.open.values, df.close.values, df.high.values, df.low.values
+        o, c, h, l = KlineFeatures.ochl_features(df)
         po = np_shift(o, 1, 0)
         pc = np_shift(c, 1, 0)
         ph = np_shift(h, 1, 0)
@@ -45,10 +45,10 @@ class KlineFeatures:
         ll = np.minimum(l, pl)
         rr = hh - ll + sys.float_info.epsilon
 
-        f1 = (c - ll) / rr
-        f2 = (o - ll) / rr
-        f3 = (pc - ll) / rr
-        f4 = (po - ll) / rr
+        f1 = (o - ll) / rr
+        f2 = (c - ll) / rr
+        f3 = (po - ll) / rr
+        f4 = (pc - ll) / rr
 
         f5 = (h - ll) / rr
         f6 = (l - ll) / rr
@@ -56,6 +56,19 @@ class KlineFeatures:
         f8 = (pl - ll) / rr
 
         return f1, f2, f3, f4, f5, f6, f7, f8
+
+    @staticmethod
+    def jump_value(df):
+        # Return 0, negative value, positive value
+        high = df.high.values
+        low = df.low.values
+        prehigh = np_shift(high, 1, 0)
+        prelow = np_shift(low, 1, 0)
+        jump_up = (low - prehigh)
+        jump_up[jump_up <= 0] = 0
+        jump_down = (high - prelow)
+        jump_down[jump_down >= 0] = 0
+        return jump_up + jump_down
 
     @staticmethod
     def ochl_features(df):
@@ -76,6 +89,7 @@ class KlineFeatures:
 
     @staticmethod
     def support_features(df):
+        pass
 
 
 def extract_kline_pren_feature(df: pd.DataFrame, window):

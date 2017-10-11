@@ -32,10 +32,10 @@ class DDRprovider:
         ddr = self._try_read_data(code)
         return ddr.low_of(day)
 
-    def ddr_of(self, code, len=None) -> DayDataRepr:
+    def ddr_of(self, code, len_=None) -> DayDataRepr:
         ddr = self._try_read_data(code)
-        if len:
-            ddr = ddr.tail(len)
+        if len_:
+            ddr = ddr.tail(len_)
         return ddr
 
     def has_day_data(self, code, date_or_intday):
@@ -48,15 +48,11 @@ ddr_pv = DDRprovider()
 
 
 def main():
-    # ------- Print run time --------------
     import datetime
     s_time = datetime.datetime.now()
     val = ddr_pv.ddr_of('510050.XSHG')
     print(datetime.datetime.now() - s_time)
-
-
     print(val.df.open[20131230])
-    # print(val.df)
     pass
 
 

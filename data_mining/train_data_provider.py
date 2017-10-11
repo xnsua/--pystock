@@ -4,7 +4,7 @@ from data_mining import data_preprocess
 from stock_data_manager.ddr_file_cache import read_ddr_fast
 
 
-def combine_train_datas(train_datas):
+def _combine_train_datas(train_datas):
     zip_value = list(zip(*train_datas))
     datas = [val for item in zip_value[0] for val in item]
     labels = [val for item in zip_value[1] for val in item]
@@ -35,7 +35,7 @@ class TrainDataProvider:
         label = label_extractors(df)
         label = label[1:]
 
-        feature2 = np.asarray([all_features]).T
+        feature2 = np.asarray(all_features).T
 
         return feature2, label
 

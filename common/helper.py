@@ -1,7 +1,6 @@
 import cmath
 import datetime as datetime
 import os
-import statistics
 
 
 class hfile:
@@ -142,15 +141,8 @@ def geo_mean_overflow(iterable):
     a = [cmath.log(val) for val in iterable]
     return cmath.exp(sum(a) / len(a)).real
 
-
-def geo_std_deviation(iterable):
-    for val in iterable:
-        assert val > 0
-    a = [cmath.log(val).real for val in iterable]
-
-    deviation = statistics.stdev(a)
-    deviation = cmath.exp(deviation).real
-    return deviation
+def print_line_item(*args):
+    print(*args, sep='\n')
 
 class EnterExit:
     def __init__(self, func_enter, func_exit):
@@ -174,7 +166,6 @@ class EnterExit:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.func_exit()
-
 def main():
     pass
 

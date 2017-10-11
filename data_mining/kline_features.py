@@ -34,6 +34,13 @@ class KlineFeatures:
         return open_ < close_
 
     @staticmethod
+    def is_close_up(df):
+        close_ = df.close.values
+        close_pre = np_shift(close_,1,0)
+        return close_ - close_pre > 0
+
+
+    @staticmethod
     def day_compare_features(df):
         o, c, h, l = KlineFeatures.ochl_features(df)
         po = np_shift(o, 1, 0)

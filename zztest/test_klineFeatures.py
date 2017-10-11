@@ -54,3 +54,8 @@ class TestKlineFeatures(TestCase):
                                   [0., 0., 0., 0.]])
 
         assert np.all(result - test_result < 0.0001)
+
+    def test_is_close_up(self):
+        df = pdDF(data={'open': [1., 2., 3., 4.], 'close': [1.1, 2.1, 0.1, 4.1]})
+        val = KlineFeatures.is_close_up(df)
+        assert np.allclose(val, [True, True, False, True])

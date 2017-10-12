@@ -34,9 +34,28 @@ def rq_history_bars(rq_code):
 
 def rq_all_instruments(type_):
     val = _visit_server('all_instruments', headers={'type':type_})
+    print(len(val))
     return val
 
+def rq_all_A_instruments(type_):
+    """ Remove stock in B-share market """
+    val = rq_all_instruments(type_)
+    index = val.order_book_id.apply(lambda v:not v.startswith('9'))
+    val = val[index]
+    return val
+
+def rq_all_stock_code():
+    val = rq_all_A_instruments('CS')
+    return val.order_book_id
+
 def main():
+    import datetime
+    s_time = datetime.datetime.now()
+    val = (rq_all_A_instruments('CS'))
+
+    print(val.order_book_id)
+    print(datetime.datetime.now() - s_time)
+
     pass
 
 

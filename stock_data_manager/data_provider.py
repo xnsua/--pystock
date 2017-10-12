@@ -1,7 +1,6 @@
 from typing import Dict
 
 from common_stock.day_data_representation import DayDataRepr
-from data_mining.data_preprocess import handle_df_missing_values
 from stock_data_manager.rq_data_fetcher import rq_history_bars
 
 
@@ -12,8 +11,7 @@ class DDRprovider:
 
     def _try_read_data(self, code):
         if not code in self.code_to_ddr:
-            self.code_to_ddr[code] =  DayDataRepr(code,
-                                                  handle_df_missing_values(rq_history_bars(code)))
+            self.code_to_ddr[code] =  DayDataRepr(code, (rq_history_bars(code)))
         return self.code_to_ddr[code]
 
     def open(self, code, day):
@@ -51,6 +49,7 @@ def main():
     import datetime
     s_time = datetime.datetime.now()
     val = ddr_pv.ddr_of('510050.XSHG')
+
     print(datetime.datetime.now() - s_time)
     print(val.df.open[20131230])
     pass

@@ -95,9 +95,9 @@ def all_instruments_wrapper():
     val = all_instruments(type_)
     vfunc = numpy.vectorize(is_st_stock)
     bool_index = vfunc(val['order_book_id'])
-    print(len(val))
+    print('Length: ', len(val))
     val = val[bool_index == False]
-    print('after ', len(val))
+    print('After remove st stock: ', len(val))
 
     return pickle.dumps(val)
 

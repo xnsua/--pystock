@@ -5,12 +5,12 @@ from common_stock.stock_helper import p_repr
 
 class PredictResult:
     def __init__(self, real, predict):
-        self.real = real
-        self.predict = predict
+        self.real = np.asarray(real)
+        self.predict = np.asarray(predict)
         self.true_accuracy = 0.
         self.false_accuracy = 0.
         # noinspection PyTypeChecker
-        self.total_accuracy = sum(real == predict) / len(predict)
+        self.total_accuracy = sum(self.real == self.predict) / len(predict)
 
         self.predict_true_per = sum(predict) / len(predict)
 
@@ -63,7 +63,14 @@ class PredictResult:
                f'TruePer:{p_repr(self.predict_true_per)} }}'
 
 
-def divide_train_and_test(data, percentage, *, is_random):
+def combine_predict_results(results):
+    reals = np.concatenate([item.real for item in results])
+    predicts = np.concatenate([item.predict for item in results])
+    val = PredictResult(reals, predicts)
+    return val
+
+
+def divide_train_and_test(data, percentage, *, is_random=True):
     feature, label = data
 
     data_len = len(feature)
@@ -80,13 +87,13 @@ def divide_train_and_test(data, percentage, *, is_random):
         return (feature[:train_len], label[:train_len]), (feature[train_len:], label[train_len:])
 
 
-def cross_divide_train_and_test(data, number):
+def cross_divide_data(data, number):
     features, labels = data
     sample_cnt = len(features)
     indexes = np.arange(sample_cnt)
     np.random.shuffle(indexes)
     data_list = []
-    seps = np.linspace(0, sample_cnt, num=(number + 1),dtype=np.int64)
+    seps = np.linspace(0, sample_cnt, num=(number + 1), dtype=np.int64)
     for val in zip(seps, seps[1:]):
         index = indexes[val[0]:val[1]]
         features_copy = features.copy()
@@ -110,18 +117,27 @@ def train_and_analyse(train_data, test_data, train_model):
     return train_predict_result, test_predict_result
 
 
+def train_and_analyse_true_variation(train_data, test_data, train_model, ):
+    """ Analyse the true percentage according to the distance to the hyperplane """
+    model = train_model.fit(*train_data)
+    predict_distance = model.decision_function(test_data[0])
+    pos = np.argsort(predict_distance)[::-1]
+    true_cls = test_data[1][pos]
+
+    true_pers = np.cumsum(true_cls) / np.arange(1, len(true_cls) + 1)
+    return true_pers
+
+
 # noinspection PyPep8Naming
 def cross_train_and_analyse(train_data, number, model):
-    cross_data  = cross_divide_train_and_test(train_data, number)
+    cross_data = cross_divide_data(train_data, number)
     predicts = []
     for train_data, test_data in cross_data:
         val = train_and_analyse(train_data, test_data, model)
         predicts.append(val)
-    import numpy
-    print([ item[1].true_accuracy for item in predicts ])
-    print([ item[1].false_accuracy for item in predicts ])
-    print([ item[1].total_accuracy for item in predicts ])
-    trueA = numpy.mean([ item[1].true_accuracy for item in predicts ])
-    falseA = numpy.mean([ item[1].false_accuracy for item in predicts ])
-    totalA = numpy.mean([ item[1].total_accuracy for item in predicts ])
-    return {'trueA':trueA, 'falseA':falseA,'totalA':totalA}
+    return combine_predict_results([item[0] for item in predicts]), \
+           combine_predict_results([item[1] for item in predicts])
+
+
+def cross_train_and_analyse_true_predication(train_data, number, model):
+    pass

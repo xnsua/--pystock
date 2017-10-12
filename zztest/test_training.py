@@ -1,6 +1,7 @@
 import numpy as np
 
-from data_mining.training import cross_divide_train_and_test, divide_train_and_test
+from data_mining.training import cross_divide_data, divide_train_and_test, PredictResult, \
+    combine_predict_results
 
 
 def test_cross_divide_train_and_test():
@@ -15,7 +16,7 @@ def test_cross_divide_train_and_test():
     ])
     label = np.asarray([1, 2, 3, 4, 5, 6, 7.])
 
-    val = cross_divide_train_and_test((feature, label), 3)
+    val = cross_divide_data((feature, label), 3)
 
     for item in val:
         f1 = item[0][:, 0]
@@ -51,3 +52,16 @@ def test_divide_train_and_test():
     label2 = np.concatenate(tuple(item[1] for item in val))
     label2.sort()
     assert np.allclose(label2, label)
+
+
+def test_combine_predict_results():
+    real1 = [True]
+    predict1 = [False]
+    predict_result1 = PredictResult(real1, predict1)
+    real2 = [True]
+    predict2 = [True]
+    predict_result2 = PredictResult(real2, predict2)
+    predict3 = combine_predict_results((predict_result1, predict_result2))
+    print(predict3)
+
+

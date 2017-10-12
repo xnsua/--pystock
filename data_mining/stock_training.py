@@ -56,11 +56,12 @@ class PredictResult:
 
     def __repr__(self):
         return f'ClassifyAccuracy:{{ ' \
-               f'TrueA: {p_repr(self.true_accuracy)}, ' \
-               f'FalseA: {p_repr(self.false_accuracy)}, ' \
+               f'TrueA: # {p_repr(self.true_accuracy)} #, ' \
                f'TotalA: {p_repr(self.total_accuracy)},' \
-               f'RealPer: {p_repr(self.real_per)},' \
-               f'TruePer:{p_repr(self.predict_true_per)} }}'
+               f'}}'
+               # f'FalseA: {p_repr(self.false_accuracy)}, ' \
+               # f'RealPer: {p_repr(self.real_per)},' \
+               # f'TruePer:{p_repr(self.predict_true_per)} ' \
 
 
 def combine_predict_results(results):
@@ -117,7 +118,7 @@ def train_and_analyse(train_data, test_data, train_model):
     return train_predict_result, test_predict_result
 
 
-def train_and_analyse_true_variation(train_data, test_data, train_model, ):
+def train_PD_curve(train_data, test_data, train_model, ):
     """ Analyse the true percentage according to the distance to the hyperplane """
     model = train_model.fit(*train_data)
     predict_distance = model.decision_function(test_data[0])

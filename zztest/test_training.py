@@ -1,6 +1,6 @@
 import numpy as np
 
-from data_mining.training import cross_divide_data, divide_train_and_test, PredictResult, \
+from data_mining.stock_training import cross_divide_data, divide_train_and_test, PredictResult, \
     combine_predict_results
 
 

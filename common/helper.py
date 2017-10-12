@@ -72,57 +72,6 @@ def n_seconds(n):
     return datetime.timedelta(seconds=n)
 
 
-# def to_seconds_str(o) -> str:
-#     return o.strftime('%y-%m-%d %H:%M:%S')
-
-
-# def to_datetime_str(o, second_digits=3) -> str:
-#     ss = o.strftime('%Y-%m-%d %H:%M:%S.%f')
-#     if second_digits == 0:
-#         ss = ss[:-7]
-#         return ss
-#     if second_digits == 6:
-#         return ss
-#     ss = ss[:second_digits - 6]
-#     return ss
-
-
-# def find_date_substr(source: str):
-#     return re.search(r'\d{4}-\d{1,2}-\d{1,2}', source).group()
-
-
-# def loop_for_seconds(func, seconds):
-#     start_dt = dt_now()
-#     while (dt_now() - start_dt).total_seconds() < seconds:
-#         func()
-
-
-# </editor-fold>
-
-# <editor-fold desc="Basic">
-# def type_info(val):
-#     if type(val) == list:
-#         info = 'typeinfo:: list['
-#         for i in range(min(len(val), 3)):
-#             info += str(type(val[i])) + ','
-#         info += ']'
-#         return info
-#     if type(val) == dict:
-#         info = 'typeinfo:: dict{'
-#         for i, key in enumerate(val):
-#             if i < 3:
-#                 info += str(type(key)) + ':' + str(type(val[key])) + ','
-#         info += '}'
-#         return info
-#     if type(val) == set:
-#         info = 'typeinfo:: set{'
-#         for i, item in enumerate(val):
-#             if i < 3:
-#                 info += str(type(item)) + ','
-#         info += '}'
-#         return info
-
-# </editor-fold>
 def float_default_zero(text):
     if text:
         return float(text)
@@ -141,31 +90,65 @@ def geo_mean_overflow(iterable):
     a = [cmath.log(val) for val in iterable]
     return cmath.exp(sum(a) / len(a)).real
 
+
 def print_line_item(*args):
     print(*args, sep='\n')
 
-class EnterExit:
-    def __init__(self, func_enter, func_exit):
-        self.func_enter = func_enter
-        self.func_exit = func_exit
 
-    def __call__(self, *args, **kwargs):
-        assert len(args) == 1
-        self.func = args[0]
+def iterable_extend(func):
+    def func_inner(*args):
+        try:
+            if isinstance(args[0], str):
+                return func(*args)
+            else:
+                iter(args[0])
+        except:
+            return func(*args)
+        else:
+            ll = []
+            first, remain = args[0], args[1:]
+            for i in first:
+                ll.append(func(i, *remain))
+            return ll
 
-        def func_inner(*args1, **kwargs1):
-            enter_ret = self.func_enter()
-            val = self.func(*args1, **kwargs1)
-            self.func_exit(enter_ret)
-            return val
+    return func_inner
 
-        return func_inner
+def is_iterable(val):
+    if isinstance(val, str):
+        return False
+    try:
+        iter(val)
+    except:
+        return False
+    return True
 
-    def __enter__(self):
-        self.func_enter()
+def full_file_name_under_folder(path):
+    from os import listdir
+    from os.path import isfile, join
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+    return [join(path,item) for item in onlyfiles]
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.func_exit()
+# def reduce_along_column(func, first, *remains):
+#     try:
+#         ll = []
+#         for val in first:
+#             ll.append(func(val, *remains))
+#         return ll
+#     except:
+#         return func(first, *remains)
+#
+#
+# def reduce_along_row(func, first, *remains):
+#     try:
+#         vals = zip(*first)
+#         ll = []
+#         for val in vals:
+#             ll.append(func(val, *remains))
+#         return ll
+#     except:
+#         return func(first, *remains)
+
+
 def main():
     pass
 

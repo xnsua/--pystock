@@ -3,7 +3,7 @@ import numpy as np
 
 
 def np_shift(arr, num, fill_value=np.nan):
-    assert len(arr.shape) == 1
+    assert len(arr.shape) == 1, arr.shape
     result = np.empty_like(arr)
     if num > 0:
         result[:num] = fill_value

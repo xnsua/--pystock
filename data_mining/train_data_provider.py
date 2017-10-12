@@ -21,23 +21,26 @@ class TrainDataProvider:
         # extract feature
         for extractor in feature_extractors:
             features = extractor(df)
-            if isinstance(features, tuple):
+            if isinstance(features, tuple) or isinstance(features, list):
                 all_features.extend(features)
             elif isinstance(features, np.ndarray):
                 all_features.append(features)
             else:
                 assert False, f'Unknown features {features}'
 
+        # Skip items that may do not have feature
+        skip_items = 50
         # remove invalid value
         for i, feature in enumerate(all_features):
-            all_features[i] = feature[:-1]
+            all_features[i] = feature[skip_items - 1:-1]
 
         label = label_extractors(df)
-        label = label[1:]
+        label = label[skip_items:]
 
         feature2 = np.asarray(all_features).T
 
-        return feature2, label
-
-
-
+        # scaler = StandardScaler()
+        # scaler.fit(feature2)
+        # feature2 = scaler.transform(feature2)
+        date_index =df.index.values[skip_items:]
+        return date_index, (feature2, label)

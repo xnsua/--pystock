@@ -18,6 +18,7 @@ def test_cross_divide_train_and_test():
 
     val = cross_divide_data((feature, label), 3)
 
+    val = val[1]
     for item in val:
         f1 = item[0][:, 0]
         assert np.allclose(f1, item[1])
@@ -63,5 +64,3 @@ def test_combine_predict_results():
     predict_result2 = PredictResult(real2, predict2)
     predict3 = combine_predict_results((predict_result1, predict_result2))
     print(predict3)
-
-

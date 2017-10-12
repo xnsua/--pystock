@@ -59,9 +59,9 @@ class PredictResult:
                f'TrueA: # {p_repr(self.true_accuracy)} #, ' \
                f'TotalA: {p_repr(self.total_accuracy)},' \
                f'}}'
-               # f'FalseA: {p_repr(self.false_accuracy)}, ' \
-               # f'RealPer: {p_repr(self.real_per)},' \
-               # f'TruePer:{p_repr(self.predict_true_per)} ' \
+        # f'FalseA: {p_repr(self.false_accuracy)}, ' \
+        # f'RealPer: {p_repr(self.real_per)},' \
+        # f'TruePer:{p_repr(self.predict_true_per)} ' \
 
 
 def combine_predict_results(results):
@@ -99,23 +99,11 @@ def cross_divide_data(data, number):
         index = indexes[val[0]:val[1]]
         features_copy = features.copy()
         labels_copy = labels.copy()
-        np.delete(features_copy, index, axis=0)
-        np.delete(labels_copy, index, axis=0)
+        features_copy = np.delete(features_copy, index, axis=0)
+        labels_copy = np.delete(labels_copy, index, axis=0)
 
         data_list.append(((features_copy, labels_copy), (features[index, :], labels[index])))
     return data_list
-
-
-def train_and_analyse(train_data, test_data, train_model):
-    model = train_model.fit(*train_data)
-
-    train_predict = model.predict(train_data[0])
-    train_predict_result = PredictResult(train_data[1], train_predict)
-
-    test_predict = model.predict(test_data[0])
-    test_predict_result = PredictResult(test_data[1], test_predict)
-
-    return train_predict_result, test_predict_result
 
 
 def train_PD_curve(train_data, test_data, train_model, ):
@@ -129,16 +117,26 @@ def train_PD_curve(train_data, test_data, train_model, ):
     return true_pers
 
 
+def train_and_analyse(fl_data, train_model):
+    train_data, test_data = fl_data
+    model = train_model.fit(*train_data)
+
+    train_predict = model.predict(train_data[0])
+    train_predict_result = PredictResult(train_data[1], train_predict)
+
+    test_predict = model.predict(test_data[0])
+    test_predict_result = PredictResult(test_data[1], test_predict)
+
+    return train_predict_result, test_predict_result
+
+
 # noinspection PyPep8Naming
 def cross_train_and_analyse(train_data, number, model):
     cross_data = cross_divide_data(train_data, number)
     predicts = []
-    for train_data, test_data in cross_data:
-        val = train_and_analyse(train_data, test_data, model)
+    for fl_data in cross_data:
+        val = train_and_analyse(fl_data, model)
         predicts.append(val)
     return combine_predict_results([item[0] for item in predicts]), \
            combine_predict_results([item[1] for item in predicts])
 
-
-def cross_train_and_analyse_true_predication(train_data, number, model):
-    pass

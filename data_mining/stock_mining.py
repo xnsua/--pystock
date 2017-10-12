@@ -1,11 +1,12 @@
-import numpy as np
+import concurrent.futures
+
 from sklearn.svm import LinearSVC
 
+from common.helper import iterable_extend
 from data_mining.kline_features import KlineFeatures
-from data_mining.stock_training import cross_train_and_analyse
+from data_mining.stock_training import cross_train_and_analyse, \
+    combine_predict_results
 from data_mining.train_data_provider import TrainDataProvider
-
-
 # def mining_simple_stock_code():
 #
 #
@@ -14,51 +15,56 @@ from data_mining.train_data_provider import TrainDataProvider
 # def svm_mining():
 #     codes = rq_data_fetcher.rq_all_stock_code()
 #     for code in codes
-def stock_mining(stock_codes):
-    stock_codes = np.asarray([stock_codes]).flatten()
-    predict_results = []
-    for code in stock_codes:
-        data = TrainDataProvider.provide_single(
-            code,
-            [
-                # KlineFeatures.ochl_features,
-                KlineFeatures.day_compare_features,
-            ],
-            KlineFeatures.is_close_up)
-        model = LinearSVC()
-        val = cross_train_and_analyse(data,6, model)
-        predict_results.append(val)
-    return predict_results
-val = stock_mining(['510900.XSHG'])
-print(val)
-1/0
+from stock_data_manager.stock_sector import ksample80
+
+
+@iterable_extend
+def _stock_mining(codes, cross_number=6):
+    """ fl_data is feature and lable data """
+    date_index, fl_data = TrainDataProvider.provide_single(
+        codes,
+        [
+            KlineFeatures.ochl_features,
+            KlineFeatures.day_compare_features,
+            # KlineFeatures.volume_percentage,
+            # KlineFeatures.fg_day_compare_features_n(1),
+        ],
+        KlineFeatures.is_close_up)
+    model = LinearSVC()
+    # model = SVC()
+    # val = train_and_analyse(fl_data, cross_number, model)
+    val = cross_train_and_analyse(fl_data, cross_number, model)
+    return val
+
+
+def stock_mining(code, cross_number):
+    """ For multi-process """
+    return _stock_mining(code, cross_number)
+
+def concurrent_run(func, disperse_vals, *args):
+    args2 = list(zip(*([args] * len(disperse_vals))))
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        val = executor.map(func, disperse_vals, *args2)
+
+    return list(val)
+
+
+def _print_test_result(result):
+    vals = [item[1] for item in result]
+    print(vals)
+
 
 def main():
-    codes = ['159915.XSHE', '510050.XSHG','510090.XSHG', '510900.XSHG', '000039.XSHG']
-    codes = codes[:2]
-    for code in codes:
-        data = TrainDataProvider.provide_single(
-            code,
-            [
-                # KlineFeatures.ochl_features,
-             KlineFeatures.day_compare_features,
-             ],
-            KlineFeatures.is_close_up)
-        model = LinearSVC()
-        # train_data, test_data = divide_train_and_test(data, percentage=0.7, is_random=True)
-        # val = train_and_analyse_true(train_data, test_data , model)
-        # ------- Print run time --------------
-        import datetime
-        s_time = datetime.datetime.now()
-        val = cross_train_and_analyse(data, 6, model)
-        print(datetime.datetime.now() - s_time)
+    codes = ksample80
+    codes = codes[0:1]
+    # ------- Print run time --------------
+    import datetime
+    s_time = datetime.datetime.now()
+    result = concurrent_run(stock_mining, codes, 5)
+    print(datetime.datetime.now() - s_time)
 
-
-        print(val)
-        # ddr = read_ddr_fast(code)
-        # val = ddr.close_nparr - np_shift(ddr.close_nparr,1, fill_value=0) >0
-        # print(sum(val) / len(val))
-
+    single_result = [combine_predict_results(item) for item in zip(*result)]
+    print(single_result)
 
 
 if __name__ == '__main__':

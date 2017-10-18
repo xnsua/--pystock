@@ -15,9 +15,9 @@ trade2_end_time = datetime.time(15, 0, 0)
 
 class CodeTools:
     sh_stock = '6'
-    sh_func = '5'
+    sh_fund = '5'
     sz_stock = '0'
-    sz_func = '1'
+    sz_fund = '1'
     sz_gem = '3'
     sh_all = ['6', '5']
     sz_all = ['0', '1', '3']
@@ -29,13 +29,30 @@ class CodeTools:
         return val
 
     @staticmethod
-    def to_rqcode(pcode):
+    def is_sh_code(code):
+        pcode = CodeTools.to_pcode(code)
         if pcode.startswith('6') or pcode.startswith('5'):
-            return pcode + '.SHG'
+            return True
         elif pcode.startswith('0') or pcode.startswith('1') or pcode.startswith('3'):
-            return pcode + '.SHE'
+            return False
         else:
             assert False, f'Not supported code {pcode}'
+
+    @staticmethod
+    def to_rqcode(code):
+        pcode = CodeTools.to_pcode(code)
+        if CodeTools.is_sh_code(pcode):
+            return pcode + '.SHG'
+        else:
+            return pcode + '.SHE'
+
+    @staticmethod
+    def to_sina_code(code):
+        pcode = CodeTools.to_pcode(code)
+        if CodeTools.is_sh_code(pcode):
+            return 'sh' + pcode
+        else:
+            return 'sz' + pcode
 
 
 def dict_with_float_repr(dict_):
@@ -75,13 +92,6 @@ def calc_year_yield_arr(yields):
     val2[1:] = val2[1:] ** val3
     return val2
 
-
-def intday_to_date(val):
-    a, b = divmod(val, 10000)
-    b, c = divmod(b, 100)
-    return datetime.date(a, b, c)
-
-
 def date_to_intday(date_):
     return (date_.year * 10000 + date_.month * 100) + date_.day
 
@@ -92,7 +102,6 @@ def date_str_to_intday(date_str):
 
 
 def main():
-    tt_reformat()
     pass
 
 

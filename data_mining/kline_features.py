@@ -99,20 +99,16 @@ class KlineFeatures:
         return o, c, h, l
 
     @staticmethod
-    def trend_features(df):
+    def _support_high_low_strength(df, window_len):
+        is_max = ArrayIndicator.is_max_poses(df.high, window_len)
+        is_min = ArrayIndicator.is_min_poses(df.low, window_len)
+
         pass
 
-    @staticmethod
-    def reverse_features(df):
-        pass
 
-    @staticmethod
-    def trend_continuation_features(df):
-        pass
 
-    @staticmethod
-    def support_features(df):
-        pass
+
+
 
 
 def main():

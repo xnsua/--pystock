@@ -19,17 +19,16 @@ from common_stock import stock_cache_one_week
 
 
 @stock_cache_one_week
-def _etf_codes(type_):
+def _code_of_type(type_):
     from stock_data_manager.rq_data_fetcher import rq_all_instruments
     val2 = rq_all_instruments(type_)
     d2 = list(val2.order_book_id)
     return d2
 
 
-ketf_codes = _etf_codes('ETF')
-klof_codes = _etf_codes('LOF')
-kcs_codes = _etf_codes('CS')
-
+ketf_codes = _code_of_type('ETF')
+klof_codes = _code_of_type('LOF')
+kcs_codes = _code_of_type('CS')
 
 @stock_cache_one_week
 def index_components(index):
@@ -44,11 +43,11 @@ khs300_com = index_components('000300')
 kzz500_com = index_components('000905')
 
 ksample80 = ['300202.XSHE', '601766.XSHG', '000627.XSHE', '600383.XSHG', '000021.XSHE',
-            '600418.XSHG', '002500.XSHE', '000025.XSHE', '002155.XSHE', '600993.XSHG',
-            '002027.XSHE', '300055.XSHE', '001696.XSHE', '600525.XSHG', '600015.XSHG',
-            '600729.XSHG', '600143.XSHG', '000488.XSHE', '600570.XSHG', '002123.XSHE',
-            '600436.XSHG', '000008.XSHE', '002572.XSHE', '600917.XSHG', '600587.XSHG',
-            '000587.XSHE', '002183.XSHE', '600872.XSHG', '600736.XSHG', '000997.XSHE',
+             '600418.XSHG', '002500.XSHE', '000025.XSHE', '002155.XSHE', '600993.XSHG',
+             '002027.XSHE', '300055.XSHE', '001696.XSHE', '600525.XSHG', '600015.XSHG',
+             '600729.XSHG', '600143.XSHG', '000488.XSHE', '600570.XSHG', '002123.XSHE',
+             '600436.XSHG', '000008.XSHE', '002572.XSHE', '600917.XSHG', '600587.XSHG',
+             '000587.XSHE', '002183.XSHE', '600872.XSHG', '600736.XSHG', '000997.XSHE',
              '002019.XSHE', '000725.XSHE', '000848.XSHE', '601928.XSHG', '002120.XSHE',
              '600737.XSHG', '000541.XSHE', '300376.XSHE', '002396.XSHE', '601872.XSHG',
              '600751.XSHG', '600643.XSHG', '002366.XSHE', '600028.XSHG', '300166.XSHE',
@@ -59,3 +58,11 @@ ksample80 = ['300202.XSHE', '601766.XSHG', '000627.XSHE', '600383.XSHG', '000021
              '002385.XSHE', '601390.XSHG', '002344.XSHE', '002384.XSHE', '600435.XSHG',
              '603858.XSHG', '600750.XSHG', '002030.XSHE', '000738.XSHE', '603528.XSHG',
              '601608.XSHG', '002460.XSHE', '600151.XSHG', '000425.XSHE', '000761.XSHE']
+
+ktestcode = ["000001", "000002", "000004", "000005", "000006", "000007", "000008", "000009",
+             "000010", "000011", "000012", "000014", "000016", "000017", "000018", "000019",
+             "000020", "000021", "000022", "000023", "000025", "000026", "000027", "000028",
+             "000029", "000030", "000031", "000032", "000034", "000035", "000036", "000037",
+             "000038", "000039", "000040", "000042", "000043", "000045", "000046", "000048",
+             "000049", "000050", "000055", "000056", "000058", "000059", "000060", "000061",
+             "000062", "000063", "000065", "000066", "000068", "000069", "000070", "000078"]

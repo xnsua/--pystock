@@ -8,7 +8,7 @@ kintdays = np.load(pathlib.Path(__file__).parent / 'intday.pickle')
 kintday_to_index = dict(zip(kintdays, range(len(kintdays))))
 
 
-def int_day_to_date(intday):
+def intday_to_date(intday):
     y, m = divmod(intday, 10000)
     m, d = divmod(m, 100)
     date_ = datetime.date(y, m, d)
@@ -19,7 +19,7 @@ def nearest_int_day(intday, preday=False):
     if intday in kintday_to_index:
         return intday
     search_day = intday
-    date_ = int_day_to_date(intday)
+    date_ = intday_to_date(intday)
 
     while search_day not in kintday_to_index:
         if preday:
@@ -36,13 +36,13 @@ def intday_arr_of(start_intday, end_intday):
     i2 = kintday_to_index[end_intday]
     return kintdays[i1:i2+1]
 
-def main():
-    val = nearest_int_day(20170930, preday=True)
-    print(val)
-    val = (intday_arr_of(20170825, 20171003))
-    print(val)
+def intday_span(start_intday, end_intday):
+    i1 = kintday_to_index[start_intday]
+    i2 = kintday_to_index[end_intday]
+    return i2 - i1
 
+def test_all():
+    assert 20170929 == nearest_int_day(20170930, preday=True)
+    assert intday_span(20170929,20170929) == 0
+    assert intday_span(20170928,20170929) == 1
 
-
-if __name__ == '__main__':
-    main()

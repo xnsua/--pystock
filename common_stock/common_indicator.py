@@ -14,18 +14,23 @@ class ArrayIndicator:
         return left, right
 
     @staticmethod
-    def min_poses(arr_like, window_len):
+    def is_min_poses(arr_like, window_len):
         pdsr = pdSr(arr_like)
         val_r = pdsr.rolling(window=window_len, center=True).min()
         predicate = (val_r == pdsr)
         return predicate.values
 
     @staticmethod
-    def max_poses(arr_like, window_len):
+    def is_max_poses(arr_like, window_len):
         pdsr = pdSr(arr_like)
         val_r = pdsr.rolling(window=window_len, center=True).max()
         predicate = (val_r == pdsr)
         return predicate.values
+
+    @classmethod
+    def is_minmax_poses(cls, arr_like, window_len):
+        return numpy.logical_or(cls.is_max_poses(arr_like, window_len),
+                                cls.is_min_poses(arr_like, window_len))
 
     @staticmethod
     @numba.jit('Tuple((i8[:],f8[:]))( f8[:], b1[:], b1[:] )', nopython=True)
@@ -71,8 +76,8 @@ class ArrayIndicator:
 
     @staticmethod
     def trend_len_and_slope(arr_like, window_len):
-        is_mins = ArrayIndicator.min_poses(arr_like, window_len)
-        is_maxs = ArrayIndicator.max_poses(arr_like, window_len)
+        is_mins = ArrayIndicator.is_min_poses(arr_like, window_len)
+        is_maxs = ArrayIndicator.is_max_poses(arr_like, window_len)
         val = ArrayIndicator._jit_trend_len_and_slope(arr_like, is_maxs, is_mins)
         return val
 
@@ -106,4 +111,3 @@ class ArrayIndicator:
         is_evens = (arr == np_shift(arr, 1, 0))
         counts = ArrayIndicator.consecutive_count_of_True(is_evens)
         return counts
-

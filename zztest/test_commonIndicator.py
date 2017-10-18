@@ -11,14 +11,14 @@ class TestStockIndicator(TestCase):
         arr = numpy.arange(4)
         arr[0] = 10
         arr = numpy.concatenate((arr, arr[::-1]))
-        max_arr = ArrayIndicator.max_poses(arr, 5)
+        max_arr = ArrayIndicator.is_max_poses(arr, 5)
         assert numpy.all(max_arr == [False, False, False, True, True, False, False, False])
 
     def test_max_poses(self):
         arr = numpy.arange(4)
         arr[0] = -1
         arr = numpy.concatenate((arr[::-1], arr))
-        max_arr = ArrayIndicator.min_poses(arr, 5)
+        max_arr = ArrayIndicator.is_min_poses(arr, 5)
         assert numpy.all(max_arr == [False, False, False, True, True, False, False, False])
 
     def test_len_and_slope(self):

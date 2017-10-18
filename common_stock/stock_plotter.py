@@ -9,6 +9,8 @@ from matplotlib.pyplot import Axes
 from matplotlib.ticker import FuncFormatter
 
 from common.numpy_helper import np_shift
+from common.scipy_helper import pdSr
+from common_stock.common_indicator import ArrayIndicator
 from stock_data_manager.ddr_file_cache import read_ddr_fast
 from stock_data_manager.stock_data.int_trade_day import intday_arr_of
 
@@ -35,13 +37,18 @@ class StockAxisPlot:
         self.time_pos_info = None
 
         self.lines = []
+        self.scatter_points = []
 
         self.annotation = None
 
-    def add_plot_lines(self, name, series, **linestyle):
+    def add_plot_lines(self, name, series: pdSr, **linestyle):
         assert isinstance(series, pd.Series)
         values = series[self.plot_range].values
         self.lines.append((name, values, linestyle))
+
+    def add_scatter_point(self, name, series: pdSr, **linestyle):
+        assert isinstance(series, pd.Series)
+        self.scatter_points.append((name, series, linestyle))
 
     def x_tick_labels(self):
         arr = np.mod(self.plot_range, 10000)
@@ -88,6 +95,10 @@ class StockAxisPlot:
 
             for label, data, style_dict in self.lines:
                 self.ax.plot(data, label=label, **style_dict)
+            for label, data, style_dict in self.scatter_points:
+                sr = pdSr(data=self.plot_range)
+                pos = sr[sr.isin(data.index)]
+                self.ax.scatter(pos.index.values, data.values, label=label, **style_dict)
 
             self.set_x_y_lim()
 
@@ -130,16 +141,23 @@ class StockAxisPlot:
         xpos = int(xpos)
         if not 0 <= xpos < self.date_len:
             return
-        o = round(self.df.open.values[xpos],3)
-        c = round(self.df.close.values[xpos],3)
-        h = round(self.df.high.values[xpos],3)
-        l = round(self.df.low.values[xpos],3)
+        o = round(self.df.open.values[xpos], 3)
+        c = round(self.df.close.values[xpos], 3)
+        h = round(self.df.high.values[xpos], 3)
+        l = round(self.df.low.values[xpos], 3)
         text = f' open: {o}\n' \
                f'close: {c}\n' \
                f' high: {h}\n' \
                f'  low: {l}\n'
         for name, data, _ in self.lines:
-            text += f'{name: >5}' + ': ' + str(round(data[xpos],3))
+            text += f'{name: >5}' + ': ' + str(round(data[xpos], 3))
+
+        for name, data, _ in self.scatter_points:
+            try:
+                text += f'{name: >5}' + ': ' + str(round(data[xpos], 3))
+            except KeyError:
+                pass
+
         return text
 
     def set_x_y_lim(self):
@@ -149,18 +167,25 @@ class StockAxisPlot:
         self.ax.set_ylim([ymin * 0.9, ymax * 1.05])
         self.ax.set_xlim([0, self.date_len])
 
-
-def main():
-    ddr = read_ddr_fast('510050.XSHG')
-    # ddr = ddr.tail(1000)
-    # plot_range = ddr.df.index[10], ddr.df.index[20]
-    # print(plot_range)
+def plot_df_with_min_max(df):
     fig, ax = plt.subplots()
-    val = StockAxisPlot((fig, ax), ddr.df)
-    val.add_plot_lines('test', ddr.df.high + 0.2, color='b')
+    val = StockAxisPlot((fig, ax), df)
+    is_min = ArrayIndicator.is_min_poses(df.low.values, 5)
+    is_max = ArrayIndicator.is_max_poses(df.high.values, 5)
+    pos_shift = (max(df.high) - min(df.low) )/30
+
+    is_min_sr = df.low[is_min]
+    is_max_sr = df.high[is_max]
+
+    val.add_scatter_point('test', is_min_sr - pos_shift, color='b', marker='^')
+    val.add_scatter_point('test', is_max_sr + pos_shift, color='b', marker='v')
     val.plot()
     plt.show()
 
+def main():
+    ddr = read_ddr_fast('510050.XSHG')
+    ddr = ddr.tail(100)
+    plot_df_with_min_max(ddr.df)
 
 if __name__ == '__main__':
     main()

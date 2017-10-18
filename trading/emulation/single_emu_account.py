@@ -12,41 +12,44 @@ class _AccountOperation:
         self.add_info = add_info
 
 
-class _HoldPeriod:
-    def __init__(self, start_index, end_date, hold_days, yield_, year_yield):
-        self.start_index = start_index
-        self.end_index = end_date
-        self.hold_len = hold_days
-        self.yield_ = yield_
-        self.year_yield = year_yield
+class HoldPeriod:
+    def __init__(self, stock_code, start_date, end_date, buy_price, sell_price):
+        self.stock_code = stock_code
+        self.start_date = start_date
+        self.buy_price = buy_price
+        self.end_date = end_date
+        self.sell_price = sell_price
+
+        self.cache_info = None
+
+    def _calc_info(self):
+        idx1 = intday_to_date()
+
 
 
 class _Statistic:
     def __init__(self):
-        self.max_earn = None  # type: _HoldPeriod
-        self.max_lose = None  # type: _HoldPeriod
-        self.max_year_earn = None  # type: _HoldPeriod
-        self.max_year_lose = None  # type: _HoldPeriod
+        self.max_earn = None  # type: HoldPeriod
+        self.max_lose = None  # type: HoldPeriod
+        self.max_year_earn = None  # type: HoldPeriod
+        self.max_year_lose = None  # type: HoldPeriod
 
         # include Earn, YearEarn and Hold percentage, Hold Earn.
         self.recent_year_infos = None
 
 
 class SingleEmuAccount:
-    def __init__(self, code, ddr, init_money=10000, skip_len=0, loss_stop=None):
+    def __init__(self, code, ddr, init_money=10000):
         self.init_money = init_money
 
         self._cur_money = init_money
         self._cur_stock = 0
         self._cur_hold_day = 0
-        self._cur_index = None
 
         self.assets = []
         self.operations = []  # type: List[_AccountOperation]
-        self.hold_periods = []  # type: List[_HoldPeriod]
+        self.hold_periods = []  # type: List[HoldPeriod]
         self.hold_days = []
-
-        self.buy_count = 0
 
         self.dates = [intday_to_date(val) for val in ddr.days]
 
@@ -55,29 +58,19 @@ class SingleEmuAccount:
         self.prices = []
         self.code = code
         self.model_str = None
-        self.skip_len = skip_len
-        self.loss_stop = loss_stop
+
+        self.indexes = []
 
         self.ddr = ddr
 
     def on_date_begin(self, index):
-        assert not self._cur_index or self._cur_index == index - 1
-        self._cur_index = index
+        assert not self.indexes or self.indexes[-1] + 1 == index
+        self.indexes.append(index)
 
     def on_date_finished(self, index, ochl):
-        # loss stop
-        open_price = ochl[0]
         close_price = ochl[1]
-        low_price = ochl[3]
-        if self.loss_stop and self.operations:
-            oper = self.operations[-1]
-            stop_price = oper.price * (1 - self.loss_stop)
-            if oper.index != index and oper.isbuy and stop_price > low_price:
-                stop_price = min(stop_price, open_price)
-                if stop_price:
-                    self.sell(stop_price)
 
-        assert self._cur_index == index
+        assert self.indexes[-1] == index
         self.assets.append(self._cur_money + self._cur_stock * close_price)
         self.prices.append(close_price)
         if self._cur_stock != 0:
@@ -99,13 +92,13 @@ class SingleEmuAccount:
 
     def calc_statistics(self):
         assert len(self.assets) == len(self.dates)
-        self.hold_periods = []  # type: List[_HoldPeriod]
+        self.hold_periods = []  # type: List[HoldPeriod]
         for val1, val2 in zip(self.operations[0::2], self.operations[1::2]):
             duration = val2.index - val1.index
             yield_ = val2.price / val1.price
             year_yield = yield_ ** (245 / duration)
             self.hold_periods.append(
-                _HoldPeriod(val1.index, val2.index, duration, yield_, year_yield))
+                HoldPeriod(val1.index, val2.index, duration, yield_, year_yield))
 
         total_hold_len = sum([item.hold_len for item in self.hold_periods])
         self.stat.hold_percentage = total_hold_len / len(self.dates)
@@ -127,8 +120,8 @@ class SingleEmuAccount:
     def print_hold_period(self):
         print('Hold period:')
         for item in self.hold_periods:
-            print('yield:', f_repr(item.yield_), self.dates[item.start_index],
-                  self.dates[item.end_index], f_repr(item.yield_), item.hold_len, sep='  ')
+            print('yield:', f_repr(item.yield_), self.dates[item.start_date],
+                  self.dates[item.end_date], f_repr(item.yield_), item.hold_len, sep='  ')
 
     def print_statistic(self):
         if not self.stat.recent_year_infos:

@@ -34,7 +34,6 @@ def rq_history_bars(rq_code):
 
 def rq_all_instruments(type_):
     val = _visit_server('all_instruments', headers={'type':type_})
-    print(len(val))
     return val
 
 def rq_all_A_instruments(type_):

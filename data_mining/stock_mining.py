@@ -1,11 +1,12 @@
 import concurrent.futures
 
+from matplotlib import pyplot
 from sklearn.svm import LinearSVC
 
 from common.helper import iterable_extend
 from data_mining.kline_features import KlineFeatures
 from data_mining.stock_training import cross_train_and_analyse, \
-    combine_predict_results
+    combine_predict_results, train_PD_curve, divide_train_and_test
 from data_mining.train_data_provider import TrainDataProvider
 # def mining_simple_stock_code():
 #
@@ -15,7 +16,7 @@ from data_mining.train_data_provider import TrainDataProvider
 # def svm_mining():
 #     codes = rq_data_fetcher.rq_all_stock_code()
 #     for code in codes
-from stock_data_manager.stock_sector import ksample80
+from stock_data_manager.stock_sector import ksample80, ktestcode
 
 
 @iterable_extend
@@ -24,9 +25,9 @@ def _stock_mining(codes, cross_number=6):
     date_index, fl_data = TrainDataProvider.provide_single(
         codes,
         [
-            KlineFeatures.ochl_features,
+            # KlineFeatures.ochl_features,
             KlineFeatures.day_compare_features,
-            # KlineFeatures.volume_percentage,
+            KlineFeatures.volume_percentage,
             # KlineFeatures.fg_day_compare_features_n(1),
         ],
         KlineFeatures.is_close_up)
@@ -48,6 +49,21 @@ def concurrent_run(func, disperse_vals, *args):
 
     return list(val)
 
+@iterable_extend
+def pd_curve_analyse(code):
+    date_index, fl_data = TrainDataProvider.provide_single(
+        code,
+        [
+            # KlineFeatures.ochl_features,
+            KlineFeatures.day_compare_features,
+            KlineFeatures.volume_percentage,
+            # KlineFeatures.fg_day_compare_features_n(1),
+        ],
+        KlineFeatures.is_close_up)
+    model = LinearSVC()
+    train_data, test_data = divide_train_and_test(fl_data, 0.9, is_random=True)
+    val = train_PD_curve(train_data, test_data, model)
+    return val
 
 def _print_test_result(result):
     vals = [item[1] for item in result]
@@ -56,11 +72,16 @@ def _print_test_result(result):
 
 def main():
     codes = ksample80
-    codes = codes[0:1]
-    # ------- Print run time --------------
+    codes = ktestcode
+    codes = codes[0:6]
     import datetime
     s_time = datetime.datetime.now()
-    result = concurrent_run(stock_mining, codes, 5)
+    # result = concurrent_run(stock_mining, codes, 5)
+    vals = pd_curve_analyse(codes)
+    for val in vals:
+        pyplot.plot(val)
+        pyplot.show()
+    return
     print(datetime.datetime.now() - s_time)
 
     single_result = [combine_predict_results(item) for item in zip(*result)]

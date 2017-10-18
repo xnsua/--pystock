@@ -1,7 +1,7 @@
 import numpy as np
 
 from data_mining import data_preprocess
-from stock_data_manager.ddr_file_cache import read_ddr_fast
+from stock_data_manager.ddr_file_cache import read_30min_df
 
 
 def _combine_train_datas(train_datas):
@@ -14,8 +14,8 @@ def _combine_train_datas(train_datas):
 class TrainDataProvider:
     @staticmethod
     def provide_single(code, feature_extractors, label_extractors):
-        ddr = read_ddr_fast(code)
-        df = ddr.df
+        df = read_30min_df(code)
+        # df = ddr.df
         df = data_preprocess.MissingValue.fill_with_previous(df)
         all_features = []
         # extract feature

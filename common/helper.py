@@ -3,7 +3,7 @@ import datetime as datetime
 import os
 
 
-class hfile:
+class file_helper:
     @staticmethod
     def modify_time(path):
         file_dt = os.path.getmtime(path)
@@ -113,6 +113,7 @@ def iterable_extend(func):
 
     return func_inner
 
+
 def is_iterable(val):
     if isinstance(val, str):
         return False
@@ -122,36 +123,37 @@ def is_iterable(val):
         return False
     return True
 
+
 def full_file_name_under_folder(path):
     from os import listdir
     from os.path import isfile, join
     onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
-    return [join(path,item) for item in onlyfiles]
-
-# def reduce_along_column(func, first, *remains):
-#     try:
-#         ll = []
-#         for val in first:
-#             ll.append(func(val, *remains))
-#         return ll
-#     except:
-#         return func(first, *remains)
-#
-#
-# def reduce_along_row(func, first, *remains):
-#     try:
-#         vals = zip(*first)
-#         ll = []
-#         for val in vals:
-#             ll.append(func(val, *remains))
-#         return ll
-#     except:
-#         return func(first, *remains)
+    return [join(path, item) for item in onlyfiles]
 
 
-def main():
-    pass
+def p_repr(val, numbers=1):
+    # Percentage represenstation of value
+    assert isinstance(val, float) or isinstance(val, int), f'{type(val)}'
+    if val >= 0:
+        return f_repr(val * 100, numbers) + '%'
+    else:
+        return '-' + f_repr(-val * 100, numbers) + '%'
 
 
-if __name__ == '__main__':
-    main()
+def f_repr(val, numbers=4):
+    # Float representation of value
+    if val < 0:
+        return '-' + f_repr(-val, numbers)
+    text = str(val)
+    pos = text.find('.')
+    if pos == -1:
+        return text
+    else:
+        if abs(val) < 1:
+            return text[:numbers + 2]
+        if pos <= numbers - 1:
+            return text[:numbers + 1]
+        else:
+            return text[:pos]
+
+

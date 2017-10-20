@@ -1,6 +1,6 @@
 import numpy as np
 
-from common_stock.stock_helper import p_repr
+from common.helper import p_repr
 
 
 class PredictResult:

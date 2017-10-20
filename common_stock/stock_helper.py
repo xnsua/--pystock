@@ -2,6 +2,8 @@ import datetime
 
 import numpy
 
+from common.helper import f_repr
+
 stock_start_day = datetime.date(1990, 12, 19)
 stock_start_datetime = datetime.datetime(1990, 12, 19)
 
@@ -71,19 +73,6 @@ def dict_with_float_repr(dict_):
     return result
 
 
-def p_repr(val):
-    # Percentage represenstation of value
-    assert isinstance(val, float) or isinstance(val, int), f'{type(val)}'
-    text = str(val * 100)[0:4]
-    return text + '%'
-
-
-def f_repr(val):
-    # Float representation of value
-    text = str(val)[0:6]
-    return text
-
-
 def calc_year_yield_arr(yields):
     yields = numpy.asarray(yields)
     val2 = yields / yields[0]
@@ -92,6 +81,7 @@ def calc_year_yield_arr(yields):
     val2[1:] = val2[1:] ** val3
     return val2
 
+
 def date_to_intday(date_):
     return (date_.year * 10000 + date_.month * 100) + date_.day
 
@@ -99,6 +89,12 @@ def date_to_intday(date_):
 def date_str_to_intday(date_str):
     y, m, d = map(int, date_str.split('-'))
     return y * 10000 + m * 100 + d
+
+
+def plot_values(values):
+    from matplotlib import pyplot
+    pyplot.plot(values)
+    pyplot.show()
 
 
 def main():

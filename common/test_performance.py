@@ -12,6 +12,7 @@ def parse_date():
 
 
 def test_function_call():
+    print('test function call:\n')
     l = [1] * 10000
     import timeit
 

@@ -1,5 +1,7 @@
 import atexit
 import datetime
+import hashlib
+import inspect
 import os
 import pathlib
 import time
@@ -58,8 +60,10 @@ class _PersistentCacheBase:
         def function_wrapper(*args, **kwargs):
             import ntpath
             filename = ntpath.basename(func.__code__.co_filename)
+            md5id = inspect.getsource(func)
+            md5id = hashlib.md5(md5id.encode('utf-8')).hexdigest()
             key_text = '.'.join(
-                map(str, [filename, func.__name__, *args, *kwargs.items()]))
+                map(str, [filename, func.__name__, *args, *kwargs.items(), md5id]))
             val = self._db.get(key_text, None)
             if val and self._in_cache_time_span(val[0]):
                 return val[1]

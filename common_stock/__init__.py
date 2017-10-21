@@ -15,3 +15,4 @@ stock_cache_one_month = stock_cache(n_days(30))
 stock_cache_three_month = stock_cache(n_days(100))
 
 stock_trade_over_cache = stock_cache(day_boundary=datetime.time(17, 0, 0), cache_days=1)
+

@@ -96,19 +96,19 @@ def print_line_item(*args):
 
 
 def iterable_extend(func):
-    def func_inner(*args):
+    def func_inner(*args, **kwargs):
         try:
             if isinstance(args[0], str):
-                return func(*args)
+                return func(*args, **kwargs)
             else:
                 iter(args[0])
         except:
-            return func(*args)
+            return func(*args, **kwargs)
         else:
             ll = []
             first, remain = args[0], args[1:]
             for i in first:
-                ll.append(func(i, *remain))
+                ll.append(func(i, *remain, **kwargs))
             return ll
 
     return func_inner

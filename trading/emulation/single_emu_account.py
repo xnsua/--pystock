@@ -63,15 +63,21 @@ class SingleEmuAccount:
             import pandas
             pandas.options.display.float_format = '{:,.3f}'.format
             df = pandas.DataFrame([item.__dict__ for item in self.hold_periods])
-            df = df[
-                ['stock_code', 'start_date', 'end_date', 'buy_price', 'sell_price', 'period_len',
-                 'yield_', 'yyield']]
-            self.df = df
-        self.hold_len = self.df.period_len.sum()
-        self.hold_yield = self.df.yield_.prod()
-        self.hold_yyield = self.hold_yield ** (245 / self.hold_len)
+            if len(df):
+                df = df[
+                    ['stock_code', 'start_date', 'end_date', 'buy_price', 'sell_price', 'period_len',
+                     'yield_', 'yyield']]
+                self.hold_len = df.period_len.sum()
+                self.hold_yield = df.yield_.prod()
+                self.hold_yyield = self.hold_yield ** (245 / self.hold_len)
 
-        self.occupy_per = self.hold_len / self.day_len
+                self.occupy_per = self.hold_len / self.day_len
+            else:
+                self.hold_len = self.day_len
+                self.hold_yield = 1
+                self.hold_yyield = 1
+                self.occupy_per = 1
+            self.df = df
 
         return self
 
@@ -82,14 +88,14 @@ class SingleEmuAccount:
                f'       yyield: {yyield}  hold_yyield: {hold_yyield}'
 
     def overlap_other(self, other: 'SingleEmuAccount'):
-        new_periods = _overlap_hold_periods(self.hold_periods, other.hold_periods)
+        new_periods = _calc_overlapped_hold_periods(self.hold_periods, other.hold_periods)
         acc = SingleEmuAccount(self.code, self.date_range, self.yield_)
         acc.hold_periods = new_periods
         acc.calc_addition_infos()
         return acc
 
 
-def _overlap_hold_periods(ps1, ps2):
+def _calc_overlapped_hold_periods(ps1, ps2):
     index1 = 0
     index2 = 0
     periods1 = ps1  # type: List[HoldPeriod]
@@ -116,18 +122,20 @@ def _overlap_hold_periods(ps1, ps2):
     return new_periods
 
 
+def assert_hold_period_equal(hp1: HoldPeriod, hp2: HoldPeriod):
+    assert hp1.start_date == hp2.start_date
+    assert hp2.end_date == hp2.end_date
+    assert hp1.buy_price == hp2.buy_price
+    assert hp1.sell_price == hp2.sell_price
+
+
+def assert_hold_periods_equal(hps1, hps2):
+    assert len(hps1) == len(hps2)
+    for hp1, hp2 in zip(hps1, hps2):
+        assert_hold_period_equal(hp1, hp2)
+
+
 def test_overlap_other():
-    def assert_hold_period_equal(hp1: HoldPeriod, hp2: HoldPeriod):
-        assert hp1.start_date == hp2.start_date
-        assert hp2.end_date == hp2.end_date
-        assert hp1.buy_price == hp2.buy_price
-        assert hp1.sell_price == hp2.sell_price
-
-    def assert_hold_periods_equal(hps1, hps2):
-        assert len(hps1) == len(hps2)
-        for hp1, hp2 in zip(hps1, hps2):
-            assert_hold_period_equal(hp1, hp2)
-
     # [20170929 20171009 20171010 20171011 20171012 20171013 20171016 20171017
     #  20171018 20171019 20171020 20171023 20171024 20171025 20171026 20171027]
     dates = [20170929, 20171009, 20171010, 20171011, 20171012, 20171013, 20171016, 20171017
@@ -138,77 +146,77 @@ def test_overlap_other():
     # Test empty
     hp1 = [HoldPeriod(code, dates[1], dates[2], 1, 2)]
     hp2 = [HoldPeriod(code, dates[2], dates[3], 1, 2)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
     # Test empty
     hp1 = [HoldPeriod(code, dates[2], dates[3], 2, 2)]
     hp2 = [HoldPeriod(code, dates[1], dates[2], 1, 2)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
 
     # test contain
     hp1 = [HoldPeriod(code, dates[1], dates[2], 1, 2)]
     hp2 = [HoldPeriod(code, dates[1], dates[2], 1, 2)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [HoldPeriod(code, dates[1], dates[2], 1, 2)])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
     # test contain
     hp1 = [HoldPeriod(code, dates[1], dates[2], 1, 2)]
     hp2 = [HoldPeriod(code, dates[1], dates[3], 1, 2)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [HoldPeriod(code, dates[1], dates[2], 1, 2)])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
     # test contain
     hp1 = [HoldPeriod(code, dates[1], dates[2], 1, 2)]
     hp2 = [HoldPeriod(code, dates[0], dates[3], 1, 2)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [HoldPeriod(code, dates[1], dates[2], 1, 2)])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
 
     # test intersect
     hp1 = [HoldPeriod(code, dates[0], dates[2], 1, 2)]
     hp2 = [HoldPeriod(code, dates[1], dates[3], 3, 4)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [HoldPeriod(code, dates[1], dates[2], 3, 2)])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
 
     # test intersect
     hp1 = [HoldPeriod(code, dates[0], dates[2], 1, 2)]
     hp2 = [HoldPeriod(code, dates[1], dates[3], 3, 4)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(
         val, [HoldPeriod(code, dates[1], dates[2], 3, 2)])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
 
     # test intersect
     hp1 = [HoldPeriod(code, dates[1], dates[2], 1, 2), HoldPeriod(code, dates[3], dates[4], 3, 4)]
     hp2 = [HoldPeriod(code, dates[0], dates[5], 0.1, 5)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(val, hp1)
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)
 
     # test intersect
     hp1 = [HoldPeriod(code, dates[0], dates[2], 0.1, 2),
            HoldPeriod(code, dates[3], dates[4], 3, 4)]
     hp2 = [HoldPeriod(code, dates[1], dates[5], 1, 5)]
-    val = _overlap_hold_periods(hp1, hp2)
+    val = _calc_overlapped_hold_periods(hp1, hp2)
     assert_hold_periods_equal(val, [HoldPeriod(code, dates[1], dates[2], 1, 2),
                                     HoldPeriod(code, dates[3], dates[4], 3, 4)])
-    val2 = _overlap_hold_periods(hp2, hp1)
+    val2 = _calc_overlapped_hold_periods(hp2, hp1)
     assert_hold_periods_equal(val2, val)

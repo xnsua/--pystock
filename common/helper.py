@@ -157,3 +157,19 @@ def f_repr(val, numbers=4):
             return text[:pos]
 
 
+def concurrent_thread_run(func, disperse_vals, *args):
+    import concurrent.futures
+    args2 = list(zip(*([args] * len(disperse_vals))))
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        val = executor.map(func, disperse_vals, *args2)
+
+    return list(val)
+
+
+def concurrent_process_run(func, disperse_vals, *args):
+    import concurrent.futures
+    args2 = list(zip(*([args] * len(disperse_vals))))
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        val = executor.map(func, disperse_vals, *args2)
+
+    return list(val)

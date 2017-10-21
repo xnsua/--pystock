@@ -1,5 +1,3 @@
-import concurrent.futures
-
 from matplotlib import pyplot
 from sklearn.svm import LinearSVC
 
@@ -42,12 +40,6 @@ def stock_mining(code, cross_number):
     """ For multi-process """
     return _stock_mining(code, cross_number)
 
-def concurrent_run(func, disperse_vals, *args):
-    args2 = list(zip(*([args] * len(disperse_vals))))
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        val = executor.map(func, disperse_vals, *args2)
-
-    return list(val)
 
 @iterable_extend
 def pd_curve_analyse(code):

@@ -97,6 +97,17 @@ def plot_values(values):
     pyplot.show()
 
 
+def plot_histogram(values):
+    from matplotlib import pyplot
+    import numpy as np
+    x = values
+    hist, bins = np.histogram(x, bins=50)
+    width = 0.7 * (bins[1] - bins[0])
+    center = (bins[:-1] + bins[1:]) / 2
+    pyplot.bar(center, hist, align='center', width=width)
+    pyplot.show()
+
+
 def main():
     pass
 

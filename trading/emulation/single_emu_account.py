@@ -76,7 +76,7 @@ class SingleEmuAccount:
         return self
 
     def __repr__(self):
-        occupy_per = p_repr(self.occupy_per)
-        yyield, hold_yyield = p_repr(self.yyield), p_repr(self.hold_yyield)
+        occupy_per = p_repr(self.occupy_per, 4)
+        yyield, hold_yyield = p_repr(self.yyield, 4), p_repr(self.hold_yyield, 4)
         return f'Acc:{{day_len: {self.day_len}  hold_len: {self.hold_len}  occupy_per: {occupy_per}\n' \
                f'       yyield: {yyield}  hold_yyield: {hold_yyield}'

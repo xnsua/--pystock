@@ -87,7 +87,7 @@ class Analyser:
 def main():
     # Analyser.multi_level_macd_ana1()
     val = SpecificRunner.macd_emu_hs300_p1()
-    print_line_item(*[(item.start_date, item.end_date) for item in val.hold_periods])
+    print_line_item(*[(item.buy_ts, item.sell_ts) for item in val.hold_periods])
     pass
 
 

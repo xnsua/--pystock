@@ -5,11 +5,11 @@ from stock_data_manager.stock_data.int_trade_day import intday_span
 
 
 class HoldPeriod:
-    def __init__(self, stock_code, start_date, end_date, buy_price, sell_price):
-        self.stock_code = stock_code
-        self.start_date = start_date
+    def __init__(self, code, start_ts, end_ts, buy_price, sell_price):
+        self.code = code
+        self.buy_ts = start_ts
         self.buy_price = buy_price
-        self.end_date = end_date
+        self.sell_ts = end_ts
         self.sell_price = sell_price
 
         self.period_len = None
@@ -20,7 +20,7 @@ class HoldPeriod:
 
     def _calc_info(self):
         # May not use.
-        self.period_len = intday_span(self.start_date, self.end_date)
+        self.period_len = intday_span(self.buy_ts, self.sell_ts)
         self.yield_ = (self.sell_price / self.buy_price)
         self.yyield = self.yield_ ** (245 / self.period_len)
 
@@ -30,7 +30,7 @@ class SingleEmuAccount:
         self.code = code
         self.hold_periods = []  # type: List[HoldPeriod]
 
-        self._buy_day = None
+        self._buy_time = None
         self._buy_price = None
 
         self.date_range = date_range
@@ -47,16 +47,16 @@ class SingleEmuAccount:
         self.df = None
 
     def buy(self, day, price):
-        if not self._buy_day:
-            self._buy_day = day
+        if not self._buy_time:
+            self._buy_time = day
             self._buy_price = price
 
     def sell(self, day, price):
-        if self._buy_day:
+        if self._buy_time:
             self.hold_periods.append(
-                HoldPeriod(self.code, self._buy_day, day, self._buy_price, price)
+                HoldPeriod(self.code, self._buy_time, day, self._buy_price, price)
             )
-            self._buy_day = None
+            self._buy_time = None
 
     def calc_addition_infos(self):
         if self.df is None:
@@ -65,7 +65,8 @@ class SingleEmuAccount:
             df = pandas.DataFrame([item.__dict__ for item in self.hold_periods])
             if len(df):
                 df = df[
-                    ['stock_code', 'start_date', 'end_date', 'buy_price', 'sell_price', 'period_len',
+                    ['code', 'buy_ts', 'sell_ts', 'buy_price', 'sell_price',
+                     'period_len',
                      'yield_', 'yyield']]
                 self.hold_len = df.period_len.sum()
                 self.hold_yield = df.yield_.prod()
@@ -80,6 +81,32 @@ class SingleEmuAccount:
             self.df = df
 
         return self
+
+    def plot(self):
+        import matplotlib.pyplot as plt
+        from common_stock.stock_plotter import StockAxisPlot
+        from stock_data_manager.ddr_file_cache import read_ddr_fast
+        df = read_ddr_fast(self.code).df
+        df = df[df.index <= self.date_range[1]]
+        df = df[df.index >= self.date_range[0]]
+
+        fig, ax = plt.subplots()
+        stock_plotter = StockAxisPlot((fig, ax), df, code=self.code)
+
+        from common.scipy_helper import pdSr
+        buy_series = pdSr(data=[item.buy_price for item in self.hold_periods],
+                          index=[item.buy_ts for item in self.hold_periods])
+        sell_series = pdSr(data=[item.sell_price for item in self.hold_periods],
+                           index=[item.sell_ts for item in self.hold_periods])
+        # print(buy_series)
+        # print(sell_series)
+        stock_plotter.add_scatter_point('buy', buy_series, color='k', marker='^')
+        stock_plotter.add_scatter_point('sell', sell_series, color='k', marker='v')
+        hold_days = [(item.buy_ts, item.sell_ts) for item in self.hold_periods]
+        stock_plotter.add_hold_info(hold_days)
+
+        stock_plotter.plot()
+        plt.show()
 
     def __repr__(self):
         occupy_per = p_repr(self.occupy_per, 4)
@@ -107,15 +134,15 @@ def _calc_overlapped_hold_periods(ps1, ps2):
         p1 = periods1[index1]
         p2 = periods2[index2]
 
-        max_start = max(p1.start_date, p2.start_date)
-        min_end = min(p1.end_date, p2.end_date)
-        buy_price = p1.buy_price if max_start == p1.start_date else p2.buy_price
-        sell_price = p1.sell_price if min_end == p1.end_date else p2.sell_price
+        max_start = max(p1.buy_ts, p2.buy_ts)
+        min_end = min(p1.sell_ts, p2.sell_ts)
+        buy_price = p1.buy_price if max_start == p1.buy_ts else p2.buy_price
+        sell_price = p1.sell_price if min_end == p1.sell_ts else p2.sell_price
         if min_end > max_start:
-            tmp = HoldPeriod(p1.stock_code, max_start, min_end, buy_price, sell_price)
+            tmp = HoldPeriod(p1.code, max_start, min_end, buy_price, sell_price)
             new_periods.append(tmp)
 
-        if p1.end_date < p2.end_date:
+        if p1.sell_ts < p2.sell_ts:
             index1 = index1 + 1
         else:
             index2 = index2 + 1
@@ -123,8 +150,8 @@ def _calc_overlapped_hold_periods(ps1, ps2):
 
 
 def assert_hold_period_equal(hp1: HoldPeriod, hp2: HoldPeriod):
-    assert hp1.start_date == hp2.start_date
-    assert hp2.end_date == hp2.end_date
+    assert hp1.buy_ts == hp2.buy_ts
+    assert hp2.sell_ts == hp2.sell_ts
     assert hp1.buy_price == hp2.buy_price
     assert hp1.sell_price == hp2.sell_price
 

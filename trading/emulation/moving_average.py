@@ -26,17 +26,17 @@ class SingleStockEmu:
         for index, day in index_day:
             if index <= skip_days: continue
 
-            if sma[index - 1] > c[index - 1]:
+            if sma[index - 1] < c[index - 1]:
                 acc.buy(day, o[index])
-            elif sma[index - 1] < c[index - 1]:
+            elif sma[index - 1] > c[index - 1]:
                 acc.sell(day, o[index])
         acc.calc_addition_infos()
         return acc
 
 class SpecificRunner:
     @staticmethod
-    def emu_hs300_p2():
-        codes = stock_sector.kcs_codes
+    def emu_hs300_p2()->List[SingleEmuAccount]:
+        codes = stock_sector.khs300_com
         accs = iterable_extend(SingleStockEmu.bs_open_open)(codes, 31, day_len=500)
         accs = list(filter(bool, accs))
         return accs
@@ -46,6 +46,8 @@ class Analyser:
     @classmethod
     def analyser1(cls):
         accs = SpecificRunner.emu_hs300_p2()
+        for acc in accs:
+            acc.plot()
         print_line_item(cls.gain_from_acc(accs))
 
     @staticmethod

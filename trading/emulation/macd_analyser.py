@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import talib
 
-from common.helper import iterable_extend, print_line_item
+from common.helper import iterable_extend
 from common_stock import stock_cache_one_week
 from stock_data_manager import stock_sector
 from stock_data_manager.ddr_file_cache import read_ddr_fast
@@ -37,7 +37,7 @@ class SingleStockEmu:
 
 class SpecificRunner:
     @staticmethod
-    def macd_emu_hs300_p1()->SingleEmuAccount:
+    def macd_emu_510050()->SingleEmuAccount:
         code = '510050.XSHG'
         accs = SingleStockEmu.bs_open_open(code, (12, 26, 9), day_len=500)
         return accs
@@ -75,19 +75,15 @@ class Analyser:
 
     @staticmethod
     def gain_from_acc(accs):
-        hold_yyields = [item.hold_yyield for item in accs]
-        yyields = [item.yyield for item in accs]
         import numpy
-        val = numpy.divide(hold_yyields, yyields)
-        # plot_histogram(val)
-        val = numpy.prod(val) ** (1 / len(val))
+        val = numpy.prod([val.gain for val in accs]) ** (1 / len(accs))
         return val
 
 
 def main():
-    # Analyser.multi_level_macd_ana1()
-    val = SpecificRunner.macd_emu_hs300_p1()
-    print_line_item(*[(item.buy_ts, item.sell_ts) for item in val.hold_periods])
+    Analyser.multi_level_macd_ana1()
+    # val = SpecificRunner.macd_emu_510050()
+    # print_line_item(*[(item.buy_ts, item.sell_ts) for item in val.hold_periods])
     pass
 
 

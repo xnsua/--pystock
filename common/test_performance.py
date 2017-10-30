@@ -60,11 +60,13 @@ def test_pandas():
         'a = round(1 / 3, 3)',
         'a = func',
         'a = df.open',
+        'a = df.open.sum()',
         'a = open_list[1]',
         'a = open_array[1]',
         'a = numpy.array(open_array, copy=False)',
         'a = open_.iat[0]',
         'a = df.iat[0,0]',
+        'a = df.iloc[0,0]',
         'a = nparr[0]',
     ]
 

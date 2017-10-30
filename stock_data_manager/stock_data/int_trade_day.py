@@ -44,8 +44,14 @@ def intday_span(start_intday, end_intday):
     i2 = kintday_to_index[end_intday]
     return i2 - i1
 
+def increment_intday(intday, increment):
+    i1 = kintday_to_index[intday]
+    return kintdays[i1+increment]
+
 
 def test_all():
     assert 20170929 == nearest_int_day(20170930, preday=True)
     assert intday_span(20170929, 20170929) == 0
     assert intday_span(20170928, 20170929) == 1
+    print(intday_span(20160907,20160913))
+    print(intday_span(20160829,20160913))

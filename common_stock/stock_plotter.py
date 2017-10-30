@@ -53,6 +53,7 @@ class StockAxisPlot:
 
     def add_scatter_point(self, name, series: pdSr, **linestyle):
         assert isinstance(series, pd.Series)
+        assert len(series)
         self.scatter_points.append((name, series, linestyle))
 
     def add_hold_info(self, hold_days):
@@ -78,7 +79,7 @@ class StockAxisPlot:
             lows = df2.low.values
             rect_bottoms = np.minimum(opens, closes)
             rect_heights = np.abs(opens - closes)
-            rect_is_ups = closes > np.roll(closes, 1)
+            rect_is_ups = closes > opens
             rect_lefts = self.intday_to_index.values - self.kline_width / 2
 
             patch_list = []
@@ -91,16 +92,17 @@ class StockAxisPlot:
                                       fill=True))
             self.ax.add_collection(PatchCollection(patch_list, match_original=True))
 
-            patch_list = []
-            for buy_st, sell_st in self.hold_days:
-                buy_st = self.intday_to_index[buy_st]
-                sell_st = self.intday_to_index[sell_st]
-                patch_list.append(
-                    patches.Rectangle((buy_st, 0), sell_st - buy_st, 1000, facecolor='y',
-                                      fill=True, alpha=0.2)
-                )
+            if self.hold_days:
+                patch_list = []
+                for buy_st, sell_st in self.hold_days:
+                    buy_st = self.intday_to_index[buy_st]
+                    sell_st = self.intday_to_index[sell_st]
+                    patch_list.append(
+                        patches.Rectangle((buy_st, 0), sell_st - buy_st, 1000, facecolor='y',
+                                          fill=True, alpha=0.2)
+                    )
 
-            self.ax.add_collection(PatchCollection(patch_list, match_original=True))
+                self.ax.add_collection(PatchCollection(patch_list, match_original=True))
 
             bool_mask = np.isclose(opens, closes)
             stay_days = self.intday_to_index[bool_mask]
@@ -126,7 +128,9 @@ class StockAxisPlot:
                 try:
                     if 0 <= x < self.date_len:
                         return str(self.index_to_intday[int(x)])
-                except:
+                except KeyError as e:
+                    print('KeyError in major formatter for : ', e)
+                except Exception:
                     traceback.print_exc()
 
             yticks, mticks = self.x_tick_labels()
@@ -141,7 +145,7 @@ class StockAxisPlot:
 
             self.fig.canvas.mpl_connect('motion_notify_event', self.mouse_move)
 
-            self.fig.set_size_inches(15, 4)
+            self.fig.set_size_inches(15, 6)
             self.fig.tight_layout()
 
     def mouse_move(self, event):
@@ -155,6 +159,8 @@ class StockAxisPlot:
             # return annotation
             self.annotation.set_text(self.annotation_text(event.xdata))
             event.canvas.draw()
+        except KeyError as e:
+            print('KeyError in mouse move for : ', e)
         except Exception:
             traceback.print_exc()
 
@@ -169,8 +175,8 @@ class StockAxisPlot:
         c = round(self.df.close[day], 3)
         h = round(self.df.high[day], 3)
         l = round(self.df.low[day], 3)
-        text = f' code: {self.code}\n' \
-               f' open: {o}\n' \
+        # text = f' code: {self.code}\n' \
+        text = f' open: {o}\n' \
                f'close: {c}\n' \
                f' high: {h}\n' \
                f'  low: {l}\n'
@@ -190,7 +196,7 @@ class StockAxisPlot:
         ymin = np.min(self.df.low.values)
         ymax = np.max(self.df.high.values)
         self.ax.set_ylim([ymin * 0.9, ymax * 1.05])
-        self.ax.set_xlim([0, self.date_len])
+        self.ax.set_xlim([0, self.intday_to_index.values[-1]])
 
 
 def plot_df_with_min_max(df):

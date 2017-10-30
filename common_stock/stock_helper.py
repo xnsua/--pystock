@@ -3,6 +3,7 @@ import datetime
 import numpy
 
 from common.helper import f_repr
+from project_config.config_module import STOCK_ANALYSE_RESULT
 
 stock_start_day = datetime.date(1990, 12, 19)
 stock_start_datetime = datetime.datetime(1990, 12, 19)
@@ -106,6 +107,37 @@ def plot_histogram(values):
     center = (bins[:-1] + bins[1:]) / 2
     pyplot.bar(center, hist, align='center', width=width)
     pyplot.show()
+
+
+def stock_result_saver(fpath):
+    import pickle
+    fpath = STOCK_ANALYSE_RESULT / fpath
+    fpath.parent.mkdir(exist_ok=True, parents=True)
+
+    def wrapper(func):
+
+        def worker(*args, **kwargs):
+            import ntpath
+            import inspect
+            import hashlib
+            filename = ntpath.basename(func.__code__.co_filename)
+            md5id = inspect.getsource(func)
+            md5id = hashlib.md5(md5id.encode('utf-8')).hexdigest()
+            key_text = '.'.join(
+                map(str, [filename, func.__name__, *args, *kwargs.items(), md5id]))
+            if fpath.exists():
+                with open(fpath, 'rb') as file:
+                    val = pickle.load(file)
+                    if val[0] == key_text:
+                        return val[1]
+            val = func(*args)
+            with open(fpath, 'wb') as file:
+                pickle.dump((key_text, val), file)
+            return val
+
+        return worker
+
+    return wrapper
 
 
 def main():

@@ -8,9 +8,7 @@ from common_stock.stock_helper import CodeTools
 
 def capture_choice_code():
     import pyscreenshot
-    im=pyscreenshot.grab(bbox=(1430,90,1538,120)) # X1,Y1,X2,Y2
-    # im.show()
-
+    im=pyscreenshot.grab(bbox=(1440,90,1534,120)) # X1,Y1,X2,Y2
     try:
         import Image
     except ImportError:
@@ -24,8 +22,8 @@ def capture_choice_code():
     return val
 
 def open_xue_qiu(code):
+    print('CODE:: '+code)
     assert len(code) == 6
-    print(code)
     code = CodeTools.to_sina_code(code)
     # https://xueqiu.com/S/SZ000710
     url = f'https://xueqiu.com/S/{code}'

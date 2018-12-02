@@ -128,3 +128,9 @@ def crawl_margin_info(codes, start_date=None, end_date=None):
         sleep_time = (1 + random.random()) * 1.5
         time.sleep(sleep_time)
     return
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
